@@ -1,19 +1,16 @@
-function Get-IdentityNowTask {
+function Update-IdentityNowEmailTemplate {
     <#
 .SYNOPSIS
-Get an IdentityNow Task(s).
+Update an IdentityNow Email Template.
 
 .DESCRIPTION
-Get an IdentityNow Task(s).
+Update an IdentityNow Email Template.
 
-.PARAMETER taskID
-(optional) The ID of an IdentityNow task.
-
-.EXAMPLE
-Get-IdentityNowTask 
+.PARAMETER template
+(required - JSON) The configuration for the changes to make to an IdentityNow Email Template.
 
 .EXAMPLE
-Get-IdentityNowTask -taskID 2c918084691120d0016926a6a94251d6
+Update-IdentityNowEmailTemplate -template {"id": "2c91601362431b32016275b4241b08f0", "name": "Template v2" }
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -22,8 +19,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     [cmdletbinding()]
     param(
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$taskID
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]$template
     )
 
     # IdentityNow Admin User
@@ -49,17 +46,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     if ($v3Token.access_token) {
         try {
-            if ($taskID) {
-                $Task = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/task/get/$($taskID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                                                                                     
-                return $Task
-            }
-            else {
-                $tasksList = Invoke-RestMethod -method Get -uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/task/listAll" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-                return $tasksList.items
-            }
+                $IDNETemplate = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/emailTemplate/update" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "content-type" = "application/json" } -body $template                                                                                    
+                return $IDNETemplate
         }
         catch {
-            Write-Error "Task doesn't exist. Check Task ID. $($_)" 
+            Write-Error "Email Template doesn't exist or invalid configuration? $($_)" 
         }
     }
     else {

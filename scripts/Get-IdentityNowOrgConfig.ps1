@@ -25,9 +25,7 @@ function Get-IdentityNowOrgConfig {
     # Requires Get-Hash from PowerShell Community Extensions (PSCX) Module 
     # https://www.powershellgallery.com/packages/Pscx/3.2.2
     $passwordHash = Get-Hash -Algorithm SHA256 -StringEncoding utf8 -InputObject ($($adminPWDClear) + (Get-Hash -Algorithm SHA256 -StringEncoding utf8 -InputObject ($adminUSR)).HashString.ToLower())
-    $adminPWD = $passwordHash.ToString().ToLower() 
-
-    # Qantas-SB   
+    $adminPWD = $passwordHash.ToString().ToLower()   
     $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
     # Basic Auth
     $Bytesv3 = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v3.UserName):$($clientSecretv3)")

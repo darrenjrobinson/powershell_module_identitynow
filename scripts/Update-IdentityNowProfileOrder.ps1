@@ -1,19 +1,19 @@
-function Get-IdentityNowTask {
+function Update-IdentityNowProfileOrder {
     <#
 .SYNOPSIS
-Get an IdentityNow Task(s).
+Update IdentityNow Profile Order.
 
 .DESCRIPTION
-Get an IdentityNow Task(s).
+Update IdentityNow Profile Order.
 
-.PARAMETER taskID
-(optional) The ID of an IdentityNow task.
+.PARAMETER ID
+(required) ID of the Identity Profile to update
+
+.PARAMETER priority
+(required) Priority value for the Identity Profile
 
 .EXAMPLE
-Get-IdentityNowTask 
-
-.EXAMPLE
-Get-IdentityNowTask -taskID 2c918084691120d0016926a6a94251d6
+Update-IdentityNowProfileOrder -id 1285 -priority 20
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -21,9 +21,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
 #>
 
     [cmdletbinding()]
-    param(
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$taskID
+    param( 
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]$ID,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]$priority
     )
 
     # IdentityNow Admin User
@@ -49,17 +51,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     if ($v3Token.access_token) {
         try {
-            if ($taskID) {
-                $Task = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/task/get/$($taskID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                                                                                     
-                return $Task
-            }
-            else {
-                $tasksList = Invoke-RestMethod -method Get -uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/task/listAll" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-                return $tasksList.items
-            }
+            $updateProfile = Invoke-RestMethod -Method Post -uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/update/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" } -Body (@{"priority" = $priority } | convertto-json)            
+            return $updateProfile
         }
         catch {
-            Write-Error "Task doesn't exist. Check Task ID. $($_)" 
+            Write-Error "Profile doesn't exist? $($_)" 
         }
     }
     else {

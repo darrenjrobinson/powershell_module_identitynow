@@ -1,19 +1,22 @@
-function Get-IdentityNowTask {
+function Get-IdentityNowProfileOrder {
     <#
 .SYNOPSIS
-Get an IdentityNow Task(s).
+Get IdentityNow Profiles Order.
 
 .DESCRIPTION
-Get an IdentityNow Task(s).
-
-.PARAMETER taskID
-(optional) The ID of an IdentityNow task.
+Get IdentityNow Profiles Order.
 
 .EXAMPLE
-Get-IdentityNowTask 
+Get-IdentityNowProfileOrder 
 
-.EXAMPLE
-Get-IdentityNowTask -taskID 2c918084691120d0016926a6a94251d6
+ProfileName           Priority   ID
+-----------           --------   --
+IdentityNow Admins          10 1066
+Cloud Identities            30 1285
+Guest Identities            40 1286
+Special Identities          60 1372
+Non Employee Identities     70 1380
+Employee Identities         80 1387
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -21,10 +24,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
 #>
 
     [cmdletbinding()]
-    param(
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$taskID
-    )
+    param()
 
     # IdentityNow Admin User
     $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
@@ -49,17 +49,23 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     if ($v3Token.access_token) {
         try {
-            if ($taskID) {
-                $Task = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/task/get/$($taskID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                                                                                     
-                return $Task
+            $IDNProfile = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/list" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+            $identityProfileOrderSelect = $IDNProfile | Select-Object -Property name, id, priority | Sort-Object -Property priority 
+
+            $iProfiles = @()      
+            [int]$order = 0  
+            foreach ($profile in $identityProfileOrderSelect) {
+                $iProfileName = New-Object -TypeName PSObject
+                $iProfileName | Add-Member -Type NoteProperty -Name ProfileName -Value $profile.name  
+                $iProfileName | Add-Member -Type NoteProperty -Name Priority -Value $profile.priority
+                $iProfileName | Add-Member -Type NoteProperty -Name ID -Value $profile.id
+                $iProfiles += $iProfileName 
+                $order++
             }
-            else {
-                $tasksList = Invoke-RestMethod -method Get -uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/task/listAll" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-                return $tasksList.items
-            }
+            return $iProfiles
         }
         catch {
-            Write-Error "Task doesn't exist. Check Task ID. $($_)" 
+            Write-Error "Profile doesn't exist? $($_)" 
         }
     }
     else {

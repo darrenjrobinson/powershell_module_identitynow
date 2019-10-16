@@ -4,7 +4,7 @@ function Update-IdentityNowGovernanceGroup {
     Add or Remove member(s) from an IdentityNow Governance Group.
 
 .DESCRIPTION
-   Add or Remove member(s) from an IdentityNow Governance Group.
+    Add or Remove member(s) from an IdentityNow Governance Group.
 
 .PARAMETER groupID
     (required) The Governance Group ID to update.
@@ -50,7 +50,7 @@ function Update-IdentityNowGovernanceGroup {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$update
     )
-  
+
     # v2 Auth
     $clientSecretv2 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v2.Password))
     $Bytes = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v2.UserName):$($clientSecretv2)") 

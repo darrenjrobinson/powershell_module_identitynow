@@ -6,14 +6,14 @@ Get IdentityNow oAuth API Client(s).
 .DESCRIPTION
 Get an IdentityNow oAuth API Client(s).
 
-.PARAMETER clientID
-(optional) The Client ID of an IdentityNow oAuth API Client.
+.PARAMETER ID
+(optional) The SailPoint Configuration ID of an IdentityNow oAuth API Client.
 
 .EXAMPLE
-Get-IdentityNowAPIClient 
+Get-IdentityNowOAuthAPIClient 
 
 .EXAMPLE
-Get-IdentityNowAPIClient -clientID 8432e57d-dead-beef-9ebb-abcdef12345
+Get-IdentityNowOAuthAPIClient -ID 8432e57d-dead-beef-9ebb-abcdef12345
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -23,7 +23,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$clientID
+        [string]$ID
     )
 
     # IdentityNow Admin User
@@ -49,9 +49,9 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     if ($v3Token.access_token) {
         try {
-            if ($clientID) {
+            if ($ID) {
                 $utime = [int][double]::Parse((Get-Date -UFormat %s))
-                $IDNAPIClient = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/oauth-clients/$($clientID)?_dc=$($utime)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" }
+                $IDNAPIClient = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/oauth-clients/$($ID)?_dc=$($utime)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" }
                 return $IDNAPIClient
             }
             else {

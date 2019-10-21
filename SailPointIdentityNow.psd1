@@ -14,7 +14,7 @@
         'Get-IdentityNowCertCampaignReport',
         'Get-IdentityNowEmailTemplate',
         'Get-IdentityNowGovernanceGroup',
-        'IdentityNowOAuthAPIClient',
+        'Get-IdentityNowOAuthAPIClient',
         'Get-IdentityNowOrg',
         'Get-IdentityNowOrgConfig',
         'Get-IdentityNowProfile',

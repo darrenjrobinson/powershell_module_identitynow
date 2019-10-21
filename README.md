@@ -793,11 +793,18 @@ Update-IdentityNowProfileOrder -id 1285 -priority 20
 ```
 
 ### Create / Get / Remove API Management Clients (Legacy v2) ###
-Get v2 API Clients
+Get all v2 API Clients (listed as Legacy in the IdentityNow portal under API Management )
 
 Example
 ```
 Get-IdentityNowAPIClient
+```
+
+Get a single v2 API Client
+
+Example
+```
+Get-IdentityNowAPIClient -ID 123
 ```
 
 Create a v2 API Client
@@ -826,7 +833,7 @@ Get an oAuth API (v3) Client
 
 Example
 ```
-Get-IdentityNowOAuthAPIClient -clientID '8432e57d-5f8f-dead-beef-a7bf123456a1'
+Get-IdentityNowOAuthAPIClient -ID '8432e57d-5f8f-dead-beef-a7bf123456a1'
 ```
 
 Create an oAuth API Client (v3)

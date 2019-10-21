@@ -13,7 +13,7 @@ Get IdentityNow API Client(s).
 Get-IdentityNowAPIClient 
 
 .EXAMPLE
-Get-IdentityNowAPIClient -clientID '8432e57d-dead-beef-9ebb-abcdef12345'
+Get-IdentityNowAPIClient -ID 123
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -51,7 +51,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         try {
             if ($ID) {
                 $utime = [int][double]::Parse((Get-Date -UFormat %s))
-                $IDNAPIClient = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/oauth-clients/$($clientID)?_dc=$($utime)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" }
+                $IDNAPIClient = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/client/get/$($ID)?_dc=$($utime)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" }
                 return $IDNAPIClient
             }
             else {

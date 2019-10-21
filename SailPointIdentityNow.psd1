@@ -1,6 +1,6 @@
 @{
     RootModule        = 'SailPointIdentityNow.psm1'
-    ModuleVersion     = '1.0.2'
+    ModuleVersion     = '1.0.3'
     GUID              = 'f82fe16a-7702-46f3-ab86-5de11b7305de'
     Author            = 'Darren J Robinson'
     Copyright         = '(c) 2019 . All rights reserved.'
@@ -8,11 +8,13 @@
     PowerShellVersion = '5.0'
     FunctionsToExport = @('Complete-IdentityNowTask',
         'Get-IdentityNowAccessProfile',
+        'Get-IdentityNowAPIClient',
         'Get-IdentityNowApplication',
         'Get-IdentityNowCertCampaign',
         'Get-IdentityNowCertCampaignReport',
         'Get-IdentityNowEmailTemplate',
         'Get-IdentityNowGovernanceGroup',
+        'IdentityNowOAuthAPIClient',
         'Get-IdentityNowOrg',
         'Get-IdentityNowOrgConfig',
         'Get-IdentityNowProfile',
@@ -27,13 +29,17 @@
         'Invoke-IdentityNowAggregateSource',
         'Invoke-IdentityNowRequest',
         'New-IdentityNowAccessProfile',
+        'New-IdentityNowAPIClient',
         'New-IdentityNowCertCampaign',
         'New-IdentityNowGovernanceGroup',
+        'New-IdentityNowOAuthAPIClient',
         'New-IdentityNowRole',
         'New-IdentityNowUserSourceAccount',
         'New-IdentityNowTransform',
         'Remove-IdentityNowAccessProfile',
+        'Remove-IdentityNowAPIClient',
         'Remove-IdentityNowGovernanceGroup',
+        'Remove-IdentityNowOAuthAPIClient',
         'Remove-IdentityNowRole',
         'Remove-IdentityNowTransform',
         'Remove-IdentityNowUserSourceAccount',

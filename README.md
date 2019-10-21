@@ -6,7 +6,7 @@ A PowerShell Module enabling simple methods for accessing the SailPoint Identity
 
 This PowerShell Module has been written to fulfil my colleagues IdentityNow automation needs. It is based heavily off the extensive work I've done reverse engineering the SailPoint IdentityNow Portal in order to allow me to orchestrate IdentityNow using PowerShell. That work is covered [on my blog here](https://blog.darrenjrobinson.com/sailpoint-identitynow/) 
 
-As such this module very much a shot into the wind at a point in time (Sept 2019). SailPoint IdentityNow is a SaaS product. The functions and functionality of it is constantly evolving as are the API's that underpin those functions. As such I've attempted to keep each cmdlet lean. The ability to submit a request and get something back. 
+As such this module very much a shot into the wind at a point in time (Sept/Oct 2019). SailPoint IdentityNow is a SaaS product. The functions and functionality of it is constantly evolving as are the API's that underpin those functions. As such I've attempted to keep each cmdlet lean. The ability to submit a request and get something back. 
 
 I get a lot of requests for assistance with IdentityNow API integration so here is a module that makes the barrier to entry considerably lower. You may find it helpful and may even wish to comment or contribute. I have hosted the source on GitHub  (https://github.com/darrenjrobinson/powershell_module_identitynow).
 
@@ -32,6 +32,8 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Get / Update Email Templates
 * Get IdentityNow Profiles
 * Get / Update IdentityNow Profiles Order
+* Create / Get / Remove API Management Clients (Legacy v2)
+* Create / Get / Remove oAuth API Clients (v3)
 * .... and if they don't fit Invoke-IdentityNowRequest to make any other API call (examples for Get Source Schema, Get IdentityNow Profiles, Get IdentityNow Identity Attributes)
 
 ## Installation ##
@@ -52,6 +54,10 @@ install-module -name SailPointIdentityNow
 
 ## Examples ##
 ### Setting up Credentials and Organisation Configuration ###
+
+[Reference Post](https://blog.darrenjrobinson.com/generate-sailpoint-identitynow-v2-v3-api-credentials/)
+<b>Note: You can configure oAuth Client Authentication configuration and then use the New-IdentityNowAPIClient cmdlet to generate the v2 API Client.</b>
+
 ```
     $orgName = "customername-sb"
     Set-IdentityNowOrg -orgName $orgName
@@ -82,11 +88,13 @@ install-module -name SailPointIdentityNow
 
     Complete-IdentityNowTask            Complete an IdentityNow Task.
     Get-IdentityNowAccessProfile        Get an IdentityNow Access Profile(s).
+    Get-IdentityNowAPIClient            Get IdentityNow API Client(s).
     Get-IdentityNowApplication          Get IdentityNow Application(s).
     Get-IdentityNowCertCampaign         Get IdentityNow Certification Campaign(s).
     Get-IdentityNowCertCampaignReport   Get IdentityNow Certification Campaign Report(s).
     Get-IdentityNowEmailTemplate        Get IdentityNow Email Template(s).
     Get-IdentityNowGovernanceGroup      Get an IdentityNow Governance Group.
+    Get-IdentityNowOAuthAPIClient       Get IdentityNow oAuth API Client(s).
     Get-IdentityNowOrg                  Displays the default Uri value for all or a particular Organisation based on configured OrgName.
     Get-IdentityNowOrgConfig            Get IdentityNow Org Global Reminders and Escalation Policies Configuration.
     Get-IdentityNowProfile              Get IdentityNow Profile(s).
@@ -101,13 +109,17 @@ install-module -name SailPointIdentityNow
     Invoke-IdentityNowAggregateSource   Initiate Aggregation of an IdentityNow Source.
     Invoke-IdentityNowRequest           Submit an IdentityNow API Request.
     New-IdentityNowAccessProfile        Create an IdentityNow Access Profile.
+    New-IdentityNowAPIClient            Create an IdentityNow v2 API Client.
     New-IdentityNowCertCampaign         Create an IdentityNow Certification Campaign.
     New-IdentityNowGovernanceGroup      Create a new IdentityNow Governance Group.
+    New-IdentityNowOAuthAPIClient       Create an IdentityNow v3 oAuth API Client.
     New-IdentityNowRole                 Create an IdentityNow Role.
     New-IdentityNowTransform            Create an IdentityNow Transform.
     New-IdentityNowUserSourceAccount    Create an IdentityNow User Account on a Flat File Source.
     Remove-IdentityNowAccessProfile     Delete an IdentityNow Access Profile.
+    Remove-IdentityNowAPIClient         Delete an IdentityNow API Client.
     Remove-IdentityNowGovernanceGroup   Delete an IdentityNow Governance Group.
+    Remove-IdentityNowOAuthAPIClient    Delete an IdentityNow oAuth API Client.
     Remove-IdentityNowRole              Delete an IdentityNow Role.
     Remove-IdentityNowTransform         Delete an IdentityNow Transform.
     Remove-IdentityNowUserSourceAccount Delete an IdentityNow User Account on a Flat File Source.
@@ -778,6 +790,57 @@ Update IdentityNow Profile Order
 Example
 ```
 Update-IdentityNowProfileOrder -id 1285 -priority 20
+```
+
+### Create / Get / Remove API Management Clients (Legacy v2) ###
+Get v2 API Clients
+
+Example
+```
+Get-IdentityNowAPIClient
+```
+
+Create a v2 API Client
+
+Example 
+```
+New-IdentityNowAPIClient 
+```
+
+Remove a v2 API Client
+
+Example
+```
+Remove-IdentityNowAPIClient -ID 123
+```
+
+### Create / Get / Remove oAuth API Clients ###
+Get oAuth API (v3) Clients
+
+Example
+```
+Get-IdentityNowOAuthAPIClient 
+```
+
+Get an oAuth API (v3) Client
+
+Example
+```
+Get-IdentityNowOAuthAPIClient -clientID '8432e57d-5f8f-dead-beef-a7bf123456a1'
+```
+
+Create an oAuth API Client (v3)
+
+Example
+```
+New-IdentityNowOAuthAPIClient -description 'oAuth Client' -grantTypes 'AUTHORIZATION_CODE,CLIENT_CREDENTIALS,REFRESH_TOKEN,PASSWORD' -redirectUris 'https://localhost,https://myapp.com.au'
+```
+
+Remove an oAuth API Client (v3)
+
+Example
+```
+Remove-IdentityNowOAuthAPIClient -ID '9e23deaf-48aa-dead-beef-ab6821a12ab2'
 ```
 
 ### ... and the ultimate flexible cmdlet Invoke-IdentityNowRequest ###

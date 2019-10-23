@@ -1,4 +1,4 @@
-$IdentityNowConfiguration = @{    
+$IdentityNowConfiguration = @{
     orgName = $null 
     v2  = $null
     v3  = $null

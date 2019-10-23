@@ -20,7 +20,8 @@ function Get-IdentityNowSourceAccounts {
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$sourceID
+        [string]$sourceID,
+        [switch]$attributes
     )
 
     # v2 Auth
@@ -42,13 +43,24 @@ function Get-IdentityNowSourceAccounts {
             do { 
                 if ($results.Count -eq $searchLimit) {
                     # Get Next Page
-                    [int]$offset = $offset + $searchLimit 
-                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceID)&limit=$($searchLimit)&offset=$($offset)&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2      
+                    [int]$offset = $offset + $searchLimit
+                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceID)&limit=$($searchLimit)&offset=$($offset)&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2
                     if ($results) {
-                        $sourceObjects += $results
+                        $sourceObjects += $results                        
                     }
                 }
             } until ($results.Count -lt $searchLimit)
+            if ($attributes){
+                $temp=$sourceObjects
+                $sourceObjects=@()
+                $i=0
+                foreach ($Object in $temp){
+                    $i++
+                    Write-Progress -Activity "fetching account attributes $($i) of $($temp.count)" -PercentComplete ($i/$temp.count*100)
+                    $result=Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts/$($object.id)" -Headers $Headersv2
+                    $sourceObjects+=$result
+                }
+            }
             return $sourceObjects
         }
     }

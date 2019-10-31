@@ -126,7 +126,9 @@ install-module -name SailPointIdentityNow
     Remove-IdentityNowTransform         Delete an IdentityNow Transform.
     Remove-IdentityNowUserSourceAccount Delete an IdentityNow User Account on a Flat File Source.
     Save-IdentityNowConfiguration       Saves default IdentityNow configuration to a file in the current users Profile.
-    Search-IdentityNowEntitlements      Get IdentityNow Entitlements.
+    Search-IdentityNowAuditEvents       Search IdentityNow Audit Event(s) using the v2 API.
+    Search-IdentityNowEntitlements      Get IdentityNow Entitlements.    
+    Search-IdentityNowAuditEvents       Search IdentityNow Event(s) using Elasticsearch queries.
     Search-IdentityNowUserProfile       Get an IdentityNow Users Identity Profile.
     Search-IdentityNowUsers             Get IdentityNow Users.
     Set-IdentityNowCredential           Sets the default IdentityNow API credentials.

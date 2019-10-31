@@ -34,6 +34,8 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Get / Update IdentityNow Profiles Order
 * Create / Get / Remove API Management Clients (Legacy v2)
 * Create / Get / Remove oAuth API Clients (v3)
+* Search Audit Events (v2)
+* Search Events (Beta) - Elasticsearch
 * .... and if they don't fit Invoke-IdentityNowRequest to make any other API call (examples for Get Source Schema, Get IdentityNow Profiles, Get IdentityNow Identity Attributes)
 
 ## Installation ##
@@ -848,6 +850,64 @@ Remove an oAuth API Client (v3)
 Example
 ```
 Remove-IdentityNowOAuthAPIClient -ID '9e23deaf-48aa-dead-beef-ab6821a12ab2'
+```
+
+### Search Audit Events (v2) ###
+Search IdentityNow Audit Events using the v2 API 
+
+Example
+```
+Search-Search-IdentityNowAuditEvents 
+
+Search-Search-IdentityNowAuditEvents -action USER_STEP_UP_AUTH
+
+Search-IdentityNowAuditEvents -since '2019-09-30T12:30:50.450Z'
+Search-IdentityNowAuditEvents -since '2019-09-30T12:30:50.450Z' -searchLimit 10  
+Search-IdentityNowAuditEvents -since '2019-09-30T12:30:50.450Z' -searchLimit 2501 
+
+Search-IdentityNowAuditEvents -days 1 
+Search-IdentityNowAuditEvents -days 1 -searchLimit 5000 
+Search-IdentityNowAuditEvents -days 1 -action 'AUTHENTICATION-103'
+
+Search-IdentityNowAuditEvents -type AUTH
+Search-IdentityNowAuditEvents -type AUTH -days 1 
+Search-IdentityNowAuditEvents -type AUTH -days 1 -searchLimit 5000
+Search-IdentityNowAuditEvents -type AUTH -days 1 -action 'AUTHENTICATION-103'
+
+Search-IdentityNowAuditEvents -user 'customer_admin'
+Search-IdentityNowAuditEvents -user 'customer_admin' -searchLimit 10
+Search-IdentityNowAuditEvents -user 'customer_admin' -since '2019-10-30T12:30:50.450Z'
+Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 
+Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -searchLimit 2510
+Search-IdentityNowAuditEvents -user 'customer_admin' -action 'AUTHENTICATION-103'
+Search-IdentityNowAuditEvents -user 'customer_admin' -type 'AUTH'
+Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -action 'AUTHENTICATION-103'
+Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -type 'AUTH'
+Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -type 'AUTH' -action 'AUTHENTICATION-103' 
+Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -type 'AUTH' -action 'AUTHENTICATION-103' -searchLimit 50
+Search-IdentityNowAuditEvents -user 'customer_admin' -since '2019-10-30T12:30:50.450Z' -action 'AUTHENTICATION-103'
+Search-IdentityNowAuditEvents -user 'customer_admin' -since '2019-10-30T12:30:50.450Z'  -type 'AUTH' -action 'AUTHENTICATION-103' 
+
+Search-IdentityNowAuditEvents -application 'Workday (Dev)'
+Search-IdentityNowAuditEvents -application 'Workday (Dev)' -days 2
+Search-IdentityNowAuditEvents -application 'Workday (Dev)' -action 'SOURCE_ACCOUNT_AGGREGATION'
+Search-IdentityNowAuditEvents -application 'Workday (Dev)' -action 'SOURCE_ACCOUNT_AGGREGATION' -days 2
+Search-IdentityNowAuditEvents -application 'Workday (Dev)' -type 'PROVISIONING'
+
+Search-IdentityNowAuditEvents -application 'Workday (Dev)' -since '2019-10-30T12:30:50.450Z'
+Search-IdentityNowAuditEvents -application 'Workday (Dev)' -since '2019-10-30T12:30:50.450Z' -action 'SOURCE_ACCOUNT_AGGREGATION'
+Search-IdentityNowAuditEvents -application 'Workday (Dev)' -since '2019-10-30T12:30:50.450Z' -action 'SOURCE_ACCOUNT_AGGREGATION' -type 'PROVISIONING'
+
+```
+
+### Search Events (Beta) - Elasticsearch ###
+Search IdentityNow Events using the new IdentityNow Search (Elasticsearch)
+
+Example
+```
+$query = @{query = 'technicalName:USER_AUTHENTICATION_STEP_UP_SETUP_*'; type = 'USER_MANAGEMENT'}
+$queryFilter = @{query = $query}
+Search-IdentityNowEvents -filter ($queryFilter | convertto-json)
 ```
 
 ### ... and the ultimate flexible cmdlet Invoke-IdentityNowRequest ###

@@ -1,6 +1,6 @@
 @{
     RootModule        = 'SailPointIdentityNow.psm1'
-    ModuleVersion     = '1.0.3'
+    ModuleVersion     = '1.0.4'
     GUID              = 'f82fe16a-7702-46f3-ab86-5de11b7305de'
     Author            = 'Darren J Robinson'
     Copyright         = '(c) 2019 . All rights reserved.'
@@ -44,7 +44,9 @@
         'Remove-IdentityNowTransform',
         'Remove-IdentityNowUserSourceAccount',
         'Save-IdentityNowConfiguration',
+        'Search-IdentityNowAuditEvents',
         'Search-IdentityNowEntitlements',
+        'Search-IdentityNowEvents',
         'Search-IdentityNowUserProfile',
         'Search-IdentityNowUsers',
         'Set-IdentityNowCredential',

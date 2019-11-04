@@ -51,12 +51,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
     # Get v3 oAuth Token
     # oAuth URI
     $oAuthURI = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/oauth/token"
-    $v3Token = Invoke-RestMethod -Method Post -Uri "$($oAuthURI)?grant_type=password&username=$($adminUSR)&password=$($adminPWD)" -Headers $Headersv3 -SessionVariable IDNv3
+    $v3Token = Invoke-RestMethod -Method Post -Uri "$($oAuthURI)?grant_type=password&username=$($adminUSR)&password=$($adminPWD)" -Headers $Headersv3 
 
     if ($v3Token.access_token) {
         try {                         
             # Get User Profiles Based on Query
-            #$results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/search/identities?limit=$($limit)&query=$($query)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                
             $userProfiles = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/cc/api/user/list?_dc=$($utime)&listErrorFirst=true&useSds=true&start=0&limit=$($limit)&sorters=%5B%7B%22property%22%3A%22name%22%2C%22direction%22%3A%22ASC%22%7D%5D&filters=%5B%7B%22property%22%3A%22username%22%2C%22value%22%3A%22$($query)%22%7D%5D" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } 
             return $userProfiles.items
         }

@@ -112,7 +112,6 @@ function Search-IdentityNowAuditEvents {
         
     try {
         $sourceObjects = @()   
-        # $searchLimit = 5010
         if ($searchLimit -gt 2500) {
             $iterations = $searchLimit / 2500
             $offset = 2500
@@ -162,7 +161,6 @@ function Search-IdentityNowAuditEvents {
             { $user -and $type } {
                 $searchURLBase = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/audit/auditEvents?limit=$($limit)&user=$($user)&type=$($type)" 
             }
-
             { $user -and $days -and $action}{
                 $searchURLBase = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/audit/auditEvents?limit=$($limit)&user=$($user)&days=$($days)&actn=$($action)" 
             }
@@ -172,7 +170,6 @@ function Search-IdentityNowAuditEvents {
             { $user -and $days -and $type -and $action}{
                 $searchURLBase = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/audit/auditEvents?limit=$($limit)&user=$($user)&days=$($days)&type=$($type)&actn=$($action)" 
             }
-
             { $user -and $since -and $action}{
                 $searchURLBase = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/audit/auditEvents?limit=$($limit)&user=$($user)&since=$($since)&actn=$($action)" 
             }
@@ -182,7 +179,6 @@ function Search-IdentityNowAuditEvents {
             { $user -and $since -and $type -and $action}{
                 $searchURLBase = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/audit/auditEvents?limit=$($limit)&user=$($user)&since=$($since)&type=$($type)&actn=$($action)" 
             }
-
             { $application } {
                 Add-Type -AssemblyName System.Web
                 $applicationEncoded = [System.Web.HttpUtility]::UrlEncode($application)                
@@ -203,7 +199,6 @@ function Search-IdentityNowAuditEvents {
                 $applicationEncoded = [System.Web.HttpUtility]::UrlEncode($application)                
                 $searchURLBase = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/audit/auditEvents?limit=$($limit)&application=$($applicationEncoded)&type=$($type)" 
             }
-
             { $application -and $days -and $action} {
                 Add-Type -AssemblyName System.Web
                 $applicationEncoded = [System.Web.HttpUtility]::UrlEncode($application)                
@@ -284,4 +279,3 @@ function Search-IdentityNowAuditEvents {
         Write-Error "Audit Event(s) not found? Check search criteria. $($_)" 
     }
 }
-

@@ -128,7 +128,7 @@ install-module -name SailPointIdentityNow
     Save-IdentityNowConfiguration       Saves default IdentityNow configuration to a file in the current users Profile.
     Search-IdentityNowAuditEvents       Search IdentityNow Audit Event(s) using the v2 API.
     Search-IdentityNowEntitlements      Get IdentityNow Entitlements.    
-    Search-IdentityNowAuditEvents       Search IdentityNow Event(s) using Elasticsearch queries.
+    Search-IdentityNowEvents            Search IdentityNow Event(s) using Elasticsearch queries.
     Search-IdentityNowUserProfile       Get an IdentityNow Users Identity Profile.
     Search-IdentityNowUsers             Get IdentityNow Users.
     Set-IdentityNowCredential           Sets the default IdentityNow API credentials.
@@ -547,6 +547,14 @@ Example
 Get-IdentityNowSourceAccounts -sourceID 40113
 ```
 
+Get Source Accounts with all their attributes. Defaults to False. Set to True. 
+<b>Note:</b> Each account is a sepearte API call. Large sources will take time to return all accounts with attributes.
+
+Example
+```
+Get-IdentityNowSourceAccounts -sourceID 40113 -attributes $true
+```
+
 ### Create / Update / Remove IdentityNow Source Account (Flat File / Delimited Sources)  ###
 Create an account on an indirect IdentityNow Source
 [Reference post](https://blog.darrenjrobinson.com/authoring-identities-in-sailpoint-identitynow-via-the-api-and-powershell/)
@@ -856,12 +864,21 @@ Remove-IdentityNowOAuthAPIClient -ID '9e23deaf-48aa-dead-beef-ab6821a12ab2'
 
 ### Search Audit Events (v2) ###
 Search IdentityNow Audit Events using the v2 API 
+Search options (except Filter) as per the [v2/Audit documentation](https://community.sailpoint.com/t5/Admin-Help/Rest-API-to-View-Audit-Entries/ta-p/73965)
+For Filter (JSON) Audit Event queries use the Search-IdentityNowEvents cmdlet
+
+* actn (Exact match of the “action” property.  Eg: -actn USER_STEP_UP_AUTH)
+* application (Case insensitive name of the source you're querying for  Eg: -application "Corporate AD")
+* type (the audit category. Valid values are “AUTH”, “SSO”, “PROVISIONING”, “PASSWORD_CHANGE” or “SOURCE” Eg: -type AUTH)
+* user (Case insensitive exact match of the UID of an identity contained in either “source” or “target” properties in the logs where source indicates the person who took the action and target indicates the person who was affected by the action. Eg: -user darren.robinson)
+* days (Only return results whose timestamp is within this previous number of days; defaults to 7.  Eg: -days 3)
+* searchLimit (Maximum number of items to return, used for paging; defaults to 200. Maximum value of 2500. Eg. -searchlimit 50)
+* since (Returns only results from days since the entered date, or date and time combination, in ISO-8601 format.) Eg. -since '2019-09-30T12:30:50.450Z'
 
 Example
 ```
-Search-Search-IdentityNowAuditEvents 
-
-Search-Search-IdentityNowAuditEvents -action USER_STEP_UP_AUTH
+Search-IdentityNowAuditEvents 
+Search-IdentityNowAuditEvents -action USER_STEP_UP_AUTH
 
 Search-IdentityNowAuditEvents -since '2019-09-30T12:30:50.450Z'
 Search-IdentityNowAuditEvents -since '2019-09-30T12:30:50.450Z' -searchLimit 10  
@@ -904,12 +921,21 @@ Search-IdentityNowAuditEvents -application 'Workday (Dev)' -since '2019-10-30T12
 
 ### Search Events (Beta) - Elasticsearch ###
 Search IdentityNow Events using the new IdentityNow Search (Elasticsearch)
+Results defaults to 2500. If you want more or less use the -searchLimit option
+[Search Event Names](https://community.sailpoint.com/t5/IdentityNow-Forum/Audit-Events-and-Search-Equivalents/m-p/148204#feedback-success)
 
 Example
 ```
 $query = @{query = 'technicalName:USER_AUTHENTICATION_STEP_UP_SETUP_*'; type = 'USER_MANAGEMENT'}
 $queryFilter = @{query = $query}
 Search-IdentityNowEvents -filter ($queryFilter | convertto-json)
+```
+
+Example
+```
+$query = @{query = 'technicalName:USER_AUTHENTICATION_*'; type = 'USER_MANAGEMENT'}
+$queryFilter = @{query = $query}
+Search-IdentityNowEvents -filter ($queryFilter | convertto-json) -searchLimit 5500
 ```
 
 ### ... and the ultimate flexible cmdlet Invoke-IdentityNowRequest ###

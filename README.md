@@ -36,6 +36,8 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Create / Get / Remove oAuth API Clients (v3)
 * Search Audit Events (v2)
 * Search Events (Beta) - Elasticsearch
+* List Account Activities
+* Get Account Activity 
 * .... and if they don't fit Invoke-IdentityNowRequest to make any other API call (examples for Get Source Schema, Get IdentityNow Profiles, Get IdentityNow Identity Attributes)
 
 ## Installation ##
@@ -916,7 +918,6 @@ Search-IdentityNowAuditEvents -application 'Workday (Dev)' -type 'PROVISIONING'
 Search-IdentityNowAuditEvents -application 'Workday (Dev)' -since '2019-10-30T12:30:50.450Z'
 Search-IdentityNowAuditEvents -application 'Workday (Dev)' -since '2019-10-30T12:30:50.450Z' -action 'SOURCE_ACCOUNT_AGGREGATION'
 Search-IdentityNowAuditEvents -application 'Workday (Dev)' -since '2019-10-30T12:30:50.450Z' -action 'SOURCE_ACCOUNT_AGGREGATION' -type 'PROVISIONING'
-
 ```
 
 ### Search Events (Beta) - Elasticsearch ###
@@ -931,11 +932,40 @@ $queryFilter = @{query = $query}
 Search-IdentityNowEvents -filter ($queryFilter | convertto-json)
 ```
 
+Use -searchLimit option to return more (or less) than 2500 results.
 Example
 ```
 $query = @{query = 'technicalName:USER_AUTHENTICATION_*'; type = 'USER_MANAGEMENT'}
 $queryFilter = @{query = $query}
 Search-IdentityNowEvents -filter ($queryFilter | convertto-json) -searchLimit 5500
+```
+
+### List Account Activities ###
+Get Account Activities by Type, Requested By, Requested For, 
+
+Example
+    Get-IdentityNowAccountActivities -type appRequest -searchLimit 1000
+
+Example
+    $user = Search-IdentityNowUsers -query "@accounts(accountId:darren.robinson)"    
+    Get-IdentityNowAccountActivities -requestedFor $user.id
+
+Example
+    $user = Search-IdentityNowUsers -query "@accounts(accountId:darren.robinson)"
+    $mgr = Search-IdentityNowUsers -query "@accounts(accountId:rick.sanchez)"
+    Get-IdentityNowAccountActivities -requestedFor $user.id -requestedBy $mgr.id 
+
+
+### Get Account Activity ###
+Get an Account Activity item. 
+
+Incomplete AppRequests submitted today
+
+Example
+
+```
+$appRequestsIncompleteToday = $today | Where-Object { $_.type -eq 'appRequest' -and $_.completionStatus -eq 'INCOMPLETE' -and $_.created -like "*2019-02-25*" } | Select-Object id 
+$appRequestsIncompleteToday | ForEach-Object $_.id | Get-IdentityNowAccountActivity
 ```
 
 ### ... and the ultimate flexible cmdlet Invoke-IdentityNowRequest ###

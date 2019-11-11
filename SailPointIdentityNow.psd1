@@ -8,6 +8,8 @@
     PowerShellVersion = '5.0'
     FunctionsToExport = @('Complete-IdentityNowTask',
         'Get-IdentityNowAccessProfile',
+        'Get-IdentityNowAccountActivities',
+        'Get-IdentityNowAccountActivity',        
         'Get-IdentityNowAPIClient',
         'Get-IdentityNowApplication',
         'Get-IdentityNowCertCampaign',

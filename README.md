@@ -21,7 +21,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Get IdentityNow Certification Campaign Reports (output to file or return as PSObject)
 * Create / Get / Update / Remove IdentityNow Governance Groups
 * Create / Get / Update / Remove IdentityNow Roles
-* Get / IdentityNow Sources
+* Get / Update IdentityNow Sources
 * Get Accounts from an IdentityNow Source
 * Create / Update / Remove IdentityNow Source Account (Flat File / Delimited Sources)
 * Get / Complete IdentityNow Tasks
@@ -90,8 +90,12 @@ install-module -name SailPointIdentityNow
 ```
     Get-Command -Module SailPointIdentityNow | Sort-Object Name | Get-Help | Format-Table Name, Synopsis -Autosize
 
+    Name                                Synopsis
+    ----                                --------
     Complete-IdentityNowTask            Complete an IdentityNow Task.
     Get-IdentityNowAccessProfile        Get an IdentityNow Access Profile(s).
+    Get-IdentityNowAccountActivities    Get IdentityNow Activities.
+    Get-IdentityNowAccountActivity      Get IdentityNow Activity for an account.
     Get-IdentityNowAPIClient            Get IdentityNow API Client(s).
     Get-IdentityNowApplication          Get IdentityNow Application(s).
     Get-IdentityNowCertCampaign         Get IdentityNow Certification Campaign(s).
@@ -129,7 +133,7 @@ install-module -name SailPointIdentityNow
     Remove-IdentityNowUserSourceAccount Delete an IdentityNow User Account on a Flat File Source.
     Save-IdentityNowConfiguration       Saves default IdentityNow configuration to a file in the current users Profile.
     Search-IdentityNowAuditEvents       Search IdentityNow Audit Event(s) using the v2 API.
-    Search-IdentityNowEntitlements      Get IdentityNow Entitlements.    
+    Search-IdentityNowEntitlements      Get IdentityNow Entitlements.
     Search-IdentityNowEvents            Search IdentityNow Event(s) using Elasticsearch queries.
     Search-IdentityNowUserProfile       Get an IdentityNow Users Identity Profile.
     Search-IdentityNowUsers             Get IdentityNow Users.
@@ -143,6 +147,7 @@ install-module -name SailPointIdentityNow
     Update-IdentityNowOrgConfig         Update IdentityNow Org Global Reminders and Escalation Policies Configuration.
     Update-IdentityNowProfileOrder      Update IdentityNow Profile Order.
     Update-IdentityNowRole              Update an IdentityNow Role.
+    Update-IdentityNowSource            Update the configuration of an IdentityNow Source.
     Update-IdentityNowTransform         Update an IdentityNow Transform.
     Update-IdentityNowUserSourceAccount Update an IdentityNow User Account on a Flat File Source.
 ```
@@ -525,7 +530,7 @@ Example
 Remove-IdentityNowRole -roleID 2c9180886cd58059016d1a5a23f609a8
 ```
 
-### Get / IdentityNow Sources ###
+### Get / Update IdentityNow Sources ###
 Get all IdentityNow Sources
 [Reference post](https://blog.darrenjrobinson.com/managing-sailpoint-identitynow-sources-via-the-api-with-powershell/)
 
@@ -538,6 +543,29 @@ Get a specific IdentityNow Source
 Example
 ```
 Get-IdentityNowSource -sourceID 12345
+```
+
+Update an IdentityNow Source
+[Reference](https://blog.darrenjrobinson.com/managing-sailpoint-identitynow-sources-via-the-api-with-powershell/)
+
+<b>Note:</b> the format is dependant on the update to the source. 
+e.g Updating a simple attribute is x=value (name=new name). 
+Multiple updates us & to join. e.g name=new name&description=new description
+Values with special characters need to be URL encoded before sending. 
+Updates to Sources for items such as Filters often require 'connector_' prepended. e.g 
+
+Example
+```
+Update-IdentityNowSource -sourceID 12345 -update 'description=Attributes that drive Lifecycle and Certification Logic'
+```
+
+Updating a Workday Source Reponse Group 
+e.g 'connector_Configure_Response_Group=@{Exclude_Companies=false; Exclude_Company_Hierarchies=true; Exclude_Contingent_Workers=false; Exclude_Cost_Center_Hierarchies=false; Exclude_Cost_Centers=false; Exclude_Custom_Organizations=false; Exclude_Employees=false; Exclude_Location_Hierarchies=true; Exclude_Matrix_Organizations=true; Exclude_Organization_Support_Role_Data=true; Exclude_Pay_Groups=true; Exclude_Region_Hierarchies=true; Exclude_Regions=true; Exclude_Supervisory_Organizations=true; Exclude_Teams=true; Include_Account_Provisioning=true; Include_Background_Check_Data=true; Include_Benefit_Eligibility=false; Include_Benefit_Enrollments=false; Include_Career=false;Include_Compensation=false; Include_Development_Items=false; Include_Employee_Contract_Data=false; Include_Employee_Review=false; Include_Employment_Information=true; Include_Feedback_Received=false; Include_Goals=false; Include_Management_Chain_Data=true; Include_Organizations=true; Include_Personal_Information=true; Include_Qualifications=false; Include_Reference=true; Include_Related_Persons=false; Include_Roles=false; Include_Skills=false; Include_Succession_Profile=false; Include_Talent_Assessment=false; Include_User_Account=false; Include_Worker_Documents=false}'
+Example
+```
+$ResponseGroup ='connector_Configure_Response_Group=@{Exclude_Companies=false; Exclude_Company_Hierarchies=true; Exclude_Contingent_Workers=false; Exclude_Cost_Center_Hierarchies=false; Exclude_Cost_Centers=false; Exclude_Custom_Organizations=false; Exclude_Employees=false; Exclude_Location_Hierarchies=true; Exclude_Matrix_Organizations=true; Exclude_Organization_Support_Role_Data=true; Exclude_Pay_Groups=true; Exclude_Region_Hierarchies=true; Exclude_Regions=true; Exclude_Supervisory_Organizations=true; Exclude_Teams=true; Include_Account_Provisioning=true; Include_Background_Check_Data=true; Include_Benefit_Eligibility=false; Include_Benefit_Enrollments=false; Include_Career=false;Include_Compensation=false; Include_Development_Items=false; Include_Employee_Contract_Data=false; Include_Employee_Review=false; Include_Employment_Information=true; Include_Feedback_Received=false; Include_Goals=false; Include_Management_Chain_Data=true; Include_Organizations=true; Include_Personal_Information=true; Include_Qualifications=false; Include_Reference=true; Include_Related_Persons=false; Include_Roles=false; Include_Skills=false; Include_Succession_Profile=false; Include_Talent_Assessment=false; Include_User_Account=false; Include_Worker_Documents=false}'
+
+Update-IdentityNowSource -sourceID 12345 -update $ResponseGroup
 ```
 
 ### Get Accounts from an IdentityNow Source ###

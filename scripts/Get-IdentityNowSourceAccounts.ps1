@@ -9,6 +9,10 @@ function Get-IdentityNowSourceAccounts {
 .PARAMETER sourceID
     (required) The ID of an IdentityNow Source. eg. 45678
 
+.PARAMETER attributes
+    (optional -Switch) defaults to False. If specified each account on the Source is queried to obtain their attributes
+    NOTE: For large sources this will take time. 
+
 .EXAMPLE
     Get-IdentityNowSourceAccounts -sourceID 12345
 
@@ -50,15 +54,15 @@ function Get-IdentityNowSourceAccounts {
                     }
                 }
             } until ($results.Count -lt $searchLimit)
-            if ($attributes){
-                $temp=$sourceObjects
-                $sourceObjects=@()
-                $i=0
-                foreach ($Object in $temp){
+            if ($attributes) {
+                $temp = $sourceObjects
+                $sourceObjects = @()
+                $i = 0
+                foreach ($object in $temp) {
                     $i++
-                    Write-Progress -Activity "fetching account attributes $($i) of $($temp.count)" -PercentComplete ($i/$temp.count*100)
-                    $result=Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts/$($object.id)" -Headers $Headersv2
-                    $sourceObjects+=$result
+                    Write-Progress -Activity "fetching account attributes $($i) of $($temp.count)" -PercentComplete ($i / $temp.count * 100)
+                    $result = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts/$($object.id)" -Headers $Headersv2
+                    $sourceObjects += $result
                 }
             }
             return $sourceObjects

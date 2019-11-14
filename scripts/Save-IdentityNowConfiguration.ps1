@@ -17,7 +17,8 @@ function Save-IdentityNowConfiguration {
 #>
 
     [CmdletBinding()]
-    param ()
+    param ([switch]$default)
+    if ($default){$IdentityNowConfiguration.DefaultOrg=$IdentityNowConfiguration.orgName}
     $IdentityNowConfiguration.($IdentityNowConfiguration.orgName)=@{
         orgName = $IdentityNowConfiguration.orgName 
         v2  = $IdentityNowConfiguration.v2

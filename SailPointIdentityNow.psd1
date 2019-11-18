@@ -33,6 +33,7 @@
         'New-IdentityNowAccessProfile',
         'New-IdentityNowAPIClient',
         'New-IdentityNowCertCampaign',
+        'New-IdentityNowConfigReport',
         'New-IdentityNowGovernanceGroup',
         'New-IdentityNowOAuthAPIClient',
         'New-IdentityNowRole',

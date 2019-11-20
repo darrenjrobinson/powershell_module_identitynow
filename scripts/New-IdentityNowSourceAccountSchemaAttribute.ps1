@@ -36,6 +36,8 @@ written by Sean McGovern 11/20/2019 (twitter @410sean)
 #>
     [cmdletbinding()]
         param(
+            [Parameter(Mandatory = $true)]
+            [string]$sourceid,
             [Parameter(ParameterSetName='Discover',Mandatory = $true)]
             [switch]$discover,
             [Parameter(ParameterSetName='Add',Mandatory = $true, ValueFromPipeline = $true)]
@@ -68,27 +70,33 @@ written by Sean McGovern 11/20/2019 (twitter @410sean)
     $oAuthURI = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/oauth/token"
     $v3Token = Invoke-RestMethod -Method Post -Uri "$($oAuthURI)?grant_type=password&username=$($adminUSR)&password=$($adminPWD)" -Headers $Headersv3 
     if ($v3Token.access_token) {
-        try {
-            $privateuribase="https://$($IdentityNowConfiguration.orgName).api.identitynow.com"
-            if ($discover){
+        
+        $privateuribase="https://$($IdentityNowConfiguration.orgName).api.identitynow.com"
+        if ($discover){
+            try {
                 $url="$privateuribase/cc/api/source/discoverSchema/$sourceid"
-                $response=Invoke-WebRequest -Uri $url -Method Post -UseBasicParsing -Headers $headerv3
+                $response=Invoke-WebRequest -Uri $url -Method Post -UseBasicParsing -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"}
                 $sourceSchema=$response.Content | ConvertFrom-Json
                 return $sourceSchema
-            }else{
+            }
+            catch {
+                Write-Error "discover of Source failed. $($_)" 
+            }
+        }else{
+            try {
                 $url="$privateuribase/cc/api/source/createSchemaAttribute/$sourceid"
                 if ($multivalued -ne $true){
                     $body="name=$name&description=$description&type=$type&objectType=account"
                 }else{
                     $body="name=$name&description=$description&type=$type&multi=true&objectType=account"
                 }
-                $response=Invoke-WebRequest -Uri $url -Method Post -UseBasicParsing -Headers $headerv3 -Body $body
+                $response=Invoke-WebRequest -Uri $url -Method Post -UseBasicParsing -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"} -Body $body
                 $sourceSchema=$response.Content | ConvertFrom-Json
                 return $sourceSchema
             }
-        }
-        catch {
-            Write-Error "Creation of new Source failed. Check Source Configuration. $($_)" 
+            catch {
+                Write-Error "adding attribute to Source account schema failed. $($_)" 
+            }
         }
     }
     else {

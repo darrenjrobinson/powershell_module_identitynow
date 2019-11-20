@@ -1,4 +1,4 @@
-function new-IdentityNowSource {
+function New-IdentityNowSource {
         <#
 .SYNOPSIS
 Create an IdentityNow Source.

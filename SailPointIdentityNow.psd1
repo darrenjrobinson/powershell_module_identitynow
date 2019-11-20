@@ -1,10 +1,10 @@
 @{
     RootModule        = 'SailPointIdentityNow.psm1'
-    ModuleVersion     = '1.0.4'
+    ModuleVersion     = '1.0.5'
     GUID              = 'f82fe16a-7702-46f3-ab86-5de11b7305de'
     Author            = 'Darren J Robinson'
     Copyright         = '(c) 2019 . All rights reserved.'
-    Description       = "Orchestration of SailPoint IdentityNow via REST API's using Powershell"
+    Description       = "Orchestration of SailPoint IdentityNow"
     PowerShellVersion = '5.0'
     RequiredModules   = @(@{ModuleName="pscx"; ModuleVersion="3.3.2"})
     FunctionsToExport = @('Complete-IdentityNowTask',
@@ -33,11 +33,13 @@
         'Invoke-IdentityNowRequest',
         'New-IdentityNowAccessProfile',
         'New-IdentityNowAPIClient',
-        'New-IdentityNowCertCampaign',
+        'New-IdentityNowCertCampaign',        
         'New-IdentityNowGovernanceGroup',
+        'New-IdentityNowIdentityProfilesReport',
         'New-IdentityNowOAuthAPIClient',
         'New-IdentityNowRole',
         'New-IdentityNowSource'
+        'New-IdentityNowSourceConfigReport',
         'New-IdentityNowUserSourceAccount',
         'New-IdentityNowTransform',
         'Remove-IdentityNowAccessProfile',
@@ -45,6 +47,7 @@
         'Remove-IdentityNowGovernanceGroup',
         'Remove-IdentityNowOAuthAPIClient',
         'Remove-IdentityNowRole',
+        'Remove-IdentityNowSource'
         'Remove-IdentityNowTransform',
         'Remove-IdentityNowUserSourceAccount',
         'Save-IdentityNowConfiguration',
@@ -63,6 +66,7 @@
         'Update-IdentityNowOrgConfig',
         'Update-IdentityNowProfileOrder',
         'Update-IdentityNowRole',
+        'Update-IdentityNowSource',
         'Update-IdentityNowUserSourceAccount',
         'Update-IdentityNowTransform'
     )

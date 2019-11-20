@@ -38,7 +38,8 @@
         'New-IdentityNowIdentityProfilesReport',
         'New-IdentityNowOAuthAPIClient',
         'New-IdentityNowRole',
-        'New-IdentityNowSource'
+        'New-IdentityNowSource',
+        'New-IdentityNowSourceAccountSchemaAttribute',
         'New-IdentityNowSourceConfigReport',
         'New-IdentityNowUserSourceAccount',
         'New-IdentityNowTransform',

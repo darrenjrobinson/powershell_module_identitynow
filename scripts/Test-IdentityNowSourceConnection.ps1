@@ -1,16 +1,16 @@
-function Remove-IdentityNowSource {
+function Test-IdentityNowSourceConnection {
     <#
 .SYNOPSIS
-Deletes an IdentityNow Source.
+Tests connection on an IdentityNow Source.
 
 .DESCRIPTION
-Deletes an IdentityNow Source. this will often fail if tasks are running or the source is in use by a transform or access profile
+Test connection an IdentityNow Source.
 
 .PARAMETER sourceid
 (Required) The ID of the IdentityNow Source.
 
 .EXAMPLE
-Remove-IdentityNowSource -sourceid 115737
+Test-IdentityNowSourceConnection -sourceid 115340
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -47,13 +47,13 @@ $v3Token = Invoke-RestMethod -Method Post -Uri "$($oAuthURI)?grant_type=password
 if ($v3Token.access_token) {
     try {
         $privateuribase="https://$($IdentityNowConfiguration.orgName).api.identitynow.com"
-        $url="$privateuribase/cc/api/source/delete/$sourceid"
+        $url="$privateuribase/cc/api/source/testConnection/$sourceid"
         $response=Invoke-WebRequest -Uri $url -Method Post -UseBasicParsing -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"}
-        $sourceAccountProfile=$response.Content | ConvertFrom-Json
-        return $sourceAccountProfile
+        $source=$response.Content | ConvertFrom-Json
+        return $source
     }
     catch {
-        Write-Error "deletion of Source failed. if the following error message states 'currently in use' that could be equivalent to 'tasks are running' $($_)" 
+        Write-Error "test connection of Source failed. $($_)" 
     }
 }
 else {

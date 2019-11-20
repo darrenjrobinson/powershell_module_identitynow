@@ -37,6 +37,7 @@
         'New-IdentityNowGovernanceGroup',
         'New-IdentityNowOAuthAPIClient',
         'New-IdentityNowRole',
+        'New-IdentityNowSource'
         'New-IdentityNowUserSourceAccount',
         'New-IdentityNowTransform',
         'Remove-IdentityNowAccessProfile',

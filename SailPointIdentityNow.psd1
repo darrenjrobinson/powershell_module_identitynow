@@ -6,7 +6,6 @@
     Copyright         = '(c) 2019 . All rights reserved.'
     Description       = "Orchestration of SailPoint IdentityNow"
     PowerShellVersion = '5.0'
-    RequiredModules   = @(@{ModuleName="pscx"; ModuleVersion="3.3.2"})
     FunctionsToExport = @('Complete-IdentityNowTask',
         'Get-IdentityNowAccessProfile',
         'Get-IdentityNowAccountActivities',

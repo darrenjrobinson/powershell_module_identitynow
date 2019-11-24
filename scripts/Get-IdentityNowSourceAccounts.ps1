@@ -47,8 +47,8 @@ function Get-IdentityNowSourceAccounts {
             do { 
                 if ($results.Count -eq $searchLimit) {
                     # Get Next Page
-                    [int]$offset = $offset + $searchLimit 
-                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceID)&limit=$($searchLimit)&offset=$($offset)&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2      
+                    [int]$offset = $offset + $searchLimit
+                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceID)&limit=$($searchLimit)&offset=$($offset)&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2
                     if ($results) {
                         $sourceObjects += $results
                     }

@@ -44,7 +44,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 
 ## Installation ##
 
-The dependencies are PowerShell version 5 and the PowerShell Community eXtension. The manual installation and module scripts should install the PSCx module automatically for you. If for some reason (like you're on an airgapped network), you can get [PSCx it from here](https://github.com/Pscx/Pscx)
+The dependencies are PowerShell version 5 and the PowerShell Community eXtension. If for some reason (like you're on an airgapped network), you can get [PSCx it from here](https://github.com/Pscx/Pscx)
 
 To install either...
 
@@ -55,7 +55,7 @@ or
 
 * From an Admin PowerShell session, install from the PowerShell Gallery 
 ```
-install-module -name SailPointIdentityNow
+install-module -name pscx
 ```
 
 ## Examples ##
@@ -85,6 +85,18 @@ install-module -name SailPointIdentityNow
     $v2Creds = [pscredential]::new($clientID, ($clientSecret | ConvertTo-SecureString -AsPlainText -Force))
 
     Set-IdentityNowCredential -AdminCredential $adminCreds -v2APIKey $v2Creds -v3APIKey $v3Creds 
+    Save-IdentityNowConfiguration
+```
+
+or with credential prompts
+
+```
+    Set-IdentityNowOrg 'myPrimaryIDNOrg'
+    Set-IdentityNowCredential
+    Save-IdentityNowConfiguration -default
+
+    Set-IdentityNowOrg 'mySecondaryIDNOrg'
+    Set-IdentityNowCredential
     Save-IdentityNowConfiguration
 ```
 

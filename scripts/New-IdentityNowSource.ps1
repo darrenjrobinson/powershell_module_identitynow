@@ -19,7 +19,7 @@ Create an IdentityNow Source.
 (Required) must be 'DIRECT_CONNECT' for connecting to a source or 'DELIMITED_FILE' for flat file source
 
 .EXAMPLE
-new-IdentityNowSource -name 'Dev - JDBC - ASQL - Users Table' -description 'Azure SQL users table' -connectorname 'JDBC' -sourcetype DIRECT_CONNECT
+New-IdentityNowSource -name 'Dev - JDBC - ASQL - Users Table' -description 'Azure SQL users table' -connectorname 'JDBC' -sourcetype DIRECT_CONNECT
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow

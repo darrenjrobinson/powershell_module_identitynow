@@ -1,5 +1,5 @@
 function Set-IdentityNowCredential {
-<#
+    <#
 .SYNOPSIS
     Sets the default IdentityNow API credentials.
 

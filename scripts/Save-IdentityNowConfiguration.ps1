@@ -1,5 +1,5 @@
 function Save-IdentityNowConfiguration {
-<#
+    <#
 .SYNOPSIS
     Saves default IdentityNow configuration to a file in the current users Profile.
 
@@ -18,11 +18,11 @@ function Save-IdentityNowConfiguration {
 
     [CmdletBinding()]
     param ([switch]$default)
-    if ($default){$IdentityNowConfiguration.DefaultOrg=$IdentityNowConfiguration.orgName}
-    $IdentityNowConfiguration.($IdentityNowConfiguration.orgName)=@{
-        orgName = $IdentityNowConfiguration.orgName 
-        v2  = $IdentityNowConfiguration.v2
-        v3  = $IdentityNowConfiguration.v3
+    if ($default) { $IdentityNowConfiguration.DefaultOrg = $IdentityNowConfiguration.orgName }
+    $IdentityNowConfiguration.($IdentityNowConfiguration.orgName) = @{
+        orgName         = $IdentityNowConfiguration.orgName 
+        v2              = $IdentityNowConfiguration.v2
+        v3              = $IdentityNowConfiguration.v3
         AdminCredential = $IdentityNowConfiguration.AdminCredential
     }
     Export-Clixml -Path $IdentityNowConfigurationFile -InputObject $IdentityNowConfiguration

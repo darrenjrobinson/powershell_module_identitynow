@@ -1,41 +1,31 @@
-function New-IdentityNowSource {
+function Get-IdentityNowIdentityAttribute {
     <#
 .SYNOPSIS
-Create an IdentityNow Source.
+Get an IdentityNow Identity Attribute(s).
 
 .DESCRIPTION
-Create an IdentityNow Source.
+Get an IdentityNow Identity Attribute(s).
 
-.PARAMETER name
-(Required - string) The name of the new IdentityNow Source.
-
-.PARAMETER description
-(string) The description of the new IdentityNow Source. 
-
-.PARAMETER connectorname
-(Required) name of an available connector this source will use, for instance 'JDBC', 'Active Directory', 'Azure Active Directory', 'Web Services', or 'ServiceNow'
-
-.PARAMETER sourcetype
-(Required) must be 'DIRECT_CONNECT' for connecting to a source or 'DELIMITED_FILE' for flat file source
+.PARAMETER attribute
+(optional) The identity attribue to retrieve.
 
 .EXAMPLE
-new-IdentityNowSource -name 'Dev - JDBC - ASQL - Users Table' -description 'Azure SQL users table' -connectorname 'JDBC' -sourcetype DIRECT_CONNECT
+Get-IdentityNowIdentityAttribute 
+
+.EXAMPLE
+Get-IdentityNowGovernanceGroup -attribute firstname
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
 
-.NOTES
-written by Sean McGovern 11/20/2019 (twitter @410sean)
-
 #>
+
     [cmdletbinding()]
     param(
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$name, 
-        [string]$description, 
-        [string]$connectorname, 
-        [validateset('DIRECT_CONNECT', 'DELIMITED_FILE')][string]$sourcetype
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [string]$attribute
     )
+
     # IdentityNow Admin User
     $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
     $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
@@ -56,17 +46,20 @@ written by Sean McGovern 11/20/2019 (twitter @410sean)
     # oAuth URI
     $oAuthURI = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/oauth/token"
     $v3Token = Invoke-RestMethod -Method Post -Uri "$($oAuthURI)?grant_type=password&username=$($adminUSR)&password=$($adminPWD)" -Headers $Headersv3 
+
     if ($v3Token.access_token) {
         try {
-            $privateuribase = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com"
-            $url = "$privateuribase/cc/api/source/create"
-            $body = "serviceDefinitionName=$connectorname&name=$name&description=$description&sourceType=$sourcetype&serviceType=app"
-            $response = Invoke-WebRequest -Uri $url -Method Post -UseBasicParsing -Body $body -ContentType 'application/x-www-form-urlencoded' -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-            $sourceAccountProfile = $response.Content | ConvertFrom-Json
-            return $sourceAccountProfile
+            if ($attribute) {                
+                $IdentityAttr = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/identityAttribute/get?name=$($attribute)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+                return $IdentityAttr
+            }
+            else {                
+                $IdentityAttr = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/identityAttribute/list" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+                return $IdentityAttr
+            }
         }
         catch {
-            Write-Error "Creation of new Source failed. Check Source Configuration. $($_)" 
+            Write-Error "Identity Attribute doesn't exist. Check attribue name. $($_)" 
         }
     }
     else {
@@ -74,3 +67,4 @@ written by Sean McGovern 11/20/2019 (twitter @410sean)
         return $v3Token
     } 
 }
+

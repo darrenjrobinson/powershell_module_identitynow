@@ -1,5 +1,5 @@
 function Set-IdentityNowOrg {
-<#
+    <#
 .SYNOPSIS
     Sets the default Organisation name for an IdentityNow Tenant.
 
@@ -20,15 +20,15 @@ function Set-IdentityNowOrg {
 
     [CmdletBinding()]
     param (
-        [parameter(Mandatory=$true,
-        ValueFromPipelineByPropertyName=$true)]
+        [parameter(Mandatory = $true,
+            ValueFromPipelineByPropertyName = $true)]
         [string]$orgName
     )
 
     process {
         $IdentityNowConfiguration.OrgName = $orgName
-        if ($null -ne $IdentityNowConfiguration.($orgName).AdminCredential){$IdentityNowConfiguration.AdminCredential = $IdentityNowConfiguration.($orgName).AdminCredential}
-        if ($null -ne $IdentityNowConfiguration.($orgName).v2){$IdentityNowConfiguration.v2 = $IdentityNowConfiguration.($orgName).v2}
-        if ($null -ne $IdentityNowConfiguration.($orgName).v3){$IdentityNowConfiguration.v3 = $IdentityNowConfiguration.($orgName).v3}
+        if ($null -ne $IdentityNowConfiguration.($orgName).AdminCredential) { $IdentityNowConfiguration.AdminCredential = $IdentityNowConfiguration.($orgName).AdminCredential }
+        if ($null -ne $IdentityNowConfiguration.($orgName).v2) { $IdentityNowConfiguration.v2 = $IdentityNowConfiguration.($orgName).v2 }
+        if ($null -ne $IdentityNowConfiguration.($orgName).v3) { $IdentityNowConfiguration.v3 = $IdentityNowConfiguration.($orgName).v3 }
     }
 }

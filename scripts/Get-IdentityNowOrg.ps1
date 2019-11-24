@@ -1,5 +1,5 @@
 function Get-IdentityNowOrg {
-<#
+    <#
 .SYNOPSIS
     Displays the default Uri value for all or a particular Organisation based on configured OrgName.
 

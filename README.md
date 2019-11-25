@@ -16,6 +16,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Search IdentityNow Users
 * Search IdentityNow Users Profiles
 * Search IdentityNow Entitlements
+* Search IdentityNow Identities
 * Create / Get / Update / Remove IdentityNow Access Profiles
 * Create / Get / Start IdentityNow Certification Campaigns
 * Get IdentityNow Certification Campaign Reports (output to file or return as PSObject)
@@ -76,12 +77,12 @@ install-module -name SailPointIdentityNow
     $adminPWD = 'idnAdminUserPassword'
     $adminCreds = [pscredential]::new($adminUSR, ($adminPWD | ConvertTo-SecureString -AsPlainText -Force))
 
-    # Customer IdentityNow Org v3 API Creds generated from the Security Settings => API Management section of the IdentityNow Admin Portal 
+    # IdentityNow Org v3 API Creds generated from the Security Settings => API Management section of the IdentityNow Admin Portal 
     $clientIDv3 = "badbeef6-5f24-4448-ac0b-abcdefG"
     $clientSecretv3 = "770a71abcdef5301848d00000d8760fe0d9f632383775b315aa1234567890"
     $v3Creds = [pscredential]::new($clientIDv3, ($clientSecretv3 | ConvertTo-SecureString -AsPlainText -Force))
 
-    # Customer IdentityNow API Client ID & Secret generated in IdentityNow Portal
+    # IdentityNow API Client ID & Secret generated using New-IdentityNowAPIClient
     $clientID = 'zo7ABCDaTHjA0Rwv'
     # Your API Client Secret
     $clientSecret = '3Zm9Qod4sWhihABCdefgCX9DIfmwAZiP'
@@ -90,6 +91,8 @@ install-module -name SailPointIdentityNow
     Set-IdentityNowCredential -AdminCredential $adminCreds -v2APIKey $v2Creds -v3APIKey $v3Creds 
     Save-IdentityNowConfiguration
 ```
+
+<b>Note:</b> you can use New-IdentityNowAPIClient to generate v2 crednetials after setting just the v3 credentials (via the IdentityNow Portal for your first API key).
 
 or with credential prompts
 
@@ -101,6 +104,21 @@ or with credential prompts
     Set-IdentityNowOrg 'mySecondaryIDNOrg'
     Set-IdentityNowCredential
     Save-IdentityNowConfiguration
+```
+
+Switch IdentityNow Credentials. From v1.0.5 if you have multiple credentials save you can switch the credentials used (to switch IdentityNow Org's). 
+
+Example
+```
+Set-IdentityNowOrg 'otherOrg'
+```
+
+Switch IdentityNow Credentials and make them the default configuration. From v1.0.5 if you have multiple credentials save you can switch the credentials used (to switch IdentityNow Org's). 
+
+Example
+```
+Set-identitynoworg 'otherOrg'
+Save-IdentityNowConfiguration -default
 ```
 
 ### IdentityNow PowerShell Module Cmdlets ###
@@ -158,6 +176,7 @@ Save-IdentityNowConfiguration               Saves default IdentityNow configurat
 Search-IdentityNowAuditEvents               Search IdentityNow Audit Event(s) using the v2 API.
 Search-IdentityNowEntitlements              Get IdentityNow Entitlements.
 Search-IdentityNowEvents                    Search IdentityNow Event(s) using Elasticsearch queries.
+Search-IdentityNowIdentities                Search IdentityNow Identitie(s) using Elasticsearch queries.
 Search-IdentityNowUserProfile               Get an IdentityNow Users Identity Profile.
 Search-IdentityNowUsers                     Get IdentityNow Users.
 Set-IdentityNowCredential                   Sets the default IdentityNow API credentials.
@@ -248,6 +267,28 @@ Search for Entitlements associated with IdentityNow Sources
 Example
 ```
 Search-IdentityNowEntitlements -query "File_Share_Sydney"
+```
+
+### Search IdentityNow Identities (Beta - Elasticsearch) ###
+Search IdentityNow Identities using the new IdentityNow Search (Elasticsearch).
+Results defaults to 2500. If you want more or less use the -searchLimit option.
+
+[Reference Elasticsearch Syntax](https://community.sailpoint.com/t5/Admin-Help/How-do-I-use-Search-in-IdentityNow/ta-p/76960)
+
+Search for Entitlements that include the name 'File Share' including nested groups.
+
+Example
+```
+$queryFilter = '{"query":{"query":"@access(type:ENTITLEMENT AND name:*File Share*)"},"includeNested":true}'
+Search-IdentityNowIdentities -filter $queryFilter 
+```
+
+Search for Entitlements that include the name 'File Share' including nested groups but only return 100 results
+
+Example
+```
+$queryFilter = '{"query":{"query":"@access(type:ENTITLEMENT AND name:*File Share*)"},"includeNested":true}'
+Search-IdentityNowIdentities -filter $queryFilter -searchLimit 100
 ```
 
 ### Create / Get / Update / Remove IdentityNow Access Profiles ###

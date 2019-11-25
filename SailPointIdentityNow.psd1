@@ -56,6 +56,7 @@
         'Search-IdentityNowAuditEvents',
         'Search-IdentityNowEntitlements',
         'Search-IdentityNowEvents',
+        'Search-IdentityNowIdentities',
         'Search-IdentityNowUserProfile',
         'Search-IdentityNowUsers',
         'Set-IdentityNowCredential',

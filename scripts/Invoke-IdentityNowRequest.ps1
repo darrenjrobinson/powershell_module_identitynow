@@ -79,13 +79,13 @@ http://darrenjrobinson.com/sailpoint-identitynow
             $requestHeaders = @{Authorization = "Basic $($encodedAuth)" }
         }
         HeadersV3 { 
-            $requestHeaders = @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+            $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)" }
         }
         Headersv2_JSON { 
-            $requestHeaders = @{Authorization = "Basic $($encodedAuth)" ; "Content-Type" = "application/json" }
+            $requestHeaders = @{Authorization = "Basic $($encodedAuth)"; "Content-Type" = "application/json" }
         }
         Headersv3_JSON { 
-            $requestHeaders = @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" ; "Content-Type" = "application/json" }
+            $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json" }
         }
         default { 
             $requestHeaders = $headers 

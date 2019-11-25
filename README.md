@@ -154,7 +154,6 @@ Invoke-IdentityNowRequest                   Submit an IdentityNow API Request.
 New-IdentityNowAccessProfile                Create an IdentityNow Access Profile.
 New-IdentityNowAPIClient                    Create an IdentityNow v2 API Client.
 New-IdentityNowCertCampaign                 Create an IdentityNow Certification Campaign.
-New-IdentityNowConfigReport                 Generate a HTML Report of IdentityNow Sources configuration and export each Source and Schema config.
 New-IdentityNowGovernanceGroup              Create a new IdentityNow Governance Group.
 New-IdentityNowIdentityProfilesReport       Generate a HTML Report of IdentityNow Identity Profiles and export each Identity Profile config.     
 New-IdentityNowOAuthAPIClient               Create an IdentityNow v3 oAuth API Client.

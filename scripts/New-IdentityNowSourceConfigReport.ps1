@@ -117,7 +117,14 @@ http://darrenjrobinson.com/sailpoint-identitynow
             $H4Text = "$($source.name) Details"
             $div = $H4Text.Replace(" ", "_")
             $htmlFragments += "<a href='javascript:toggleDiv(""$div"");' title='click to collapse or expand this section'><center><h4>$H4Text</h4></center></a><div id=""$div"" style=""display: none;"">"        
-            $htmlFragments += "<center>"                                                                                                                                                
+            $htmlFragments += "<center>"         
+            
+            $attrObjects = $sourceDetails | Get-Member | Where-Object { $_.Definition.contains("Object[]") } | Select-Object  
+            foreach ($attrObj in $attrObjects) {
+                $attrName = $attrObj.name     
+                $sourceDetails.$attrName = $sourceDetails.$attrName -join ','
+            }
+
             $htmlFragments += $sourceDetails | ConvertTo-Html -As LIST 
             $htmlFragments += "</center>"
             $htmlFragments += "</div>"
@@ -134,7 +141,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         }
     }      
     # Footer
-    $htmlFragments += "<center><p class='footer'>Report Generated $(get-date)</p></center>"
+    $htmlFragments += "<center><p class='footer'>Report Generated $($reportDate)</p></center>"
     # Header
     $head = @"
 <Title>SailPoint IdentityNow Source(s) Report - $($orgName.ToUpper())</Title>

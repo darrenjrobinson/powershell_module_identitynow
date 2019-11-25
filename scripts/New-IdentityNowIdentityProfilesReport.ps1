@@ -129,7 +129,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
     }     
 
     # Footer
-    $htmlFragments += "<center><p class='footer'>Report Generated $(get-date)</p></center>"
+    $htmlFragments += "<center><p class='footer'>Report Generated $($reportDate)</p></center>"
     # Header
     $head = @"
 <Title>SailPoint IdentityNow Identity Profiles Report - $($orgName.ToUpper())</Title>

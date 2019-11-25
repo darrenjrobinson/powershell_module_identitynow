@@ -171,6 +171,6 @@ var div = divs[i];
         head = $head 
         body = $htmlFragments
     }   
-    convertto-html @convertParams | out-file -FilePath "$($dir)\$($IdentityNowConfiguration.orgName)-ConfigReport-$($reportDate).html"    
-    write-output "Identity Profile(s) configuration report generated to $($dir)\$($IdentityNowConfiguration.orgName)-ConfigReport-$($reportDate).html"
+    convertto-html @convertParams | out-file -FilePath "$($dir)\$($IdentityNowConfiguration.orgName)-ProfilesConfigReport-$($reportDate).html"    
+    write-output "Identity Profile(s) configuration report generated to $($dir)\$($IdentityNowConfiguration.orgName)-ProfilesConfigReport-$($reportDate).html"
 }

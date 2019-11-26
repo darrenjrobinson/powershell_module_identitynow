@@ -633,7 +633,10 @@ $RGroups.Include_Background_Check_Data = "true"
 $RGroups.Include_Account_Provisioning = "true"
 
 $update = ("connector_Configure_Response_Group=$RGroups").Replace("@","")
-Update-IdentityNowSource -sourceID 44000 -update $update 
+$update = $update.Replace("true","'true'")
+$update = $update.Replace("false","'false'")
+
+Update-IdentityNowSource -sourceID 12345 -update $update 
 ```
 
 Test an IdentityNow Source (Health Check)

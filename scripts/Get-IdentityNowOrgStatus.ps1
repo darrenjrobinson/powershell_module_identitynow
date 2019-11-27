@@ -52,4 +52,3 @@ http://darrenjrobinson.com/sailpoint-identitynow
         return $v3Token
     } 
 }
-

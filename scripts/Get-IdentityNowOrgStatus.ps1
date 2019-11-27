@@ -44,7 +44,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
             return $status
         }
         catch {
-            Write-Error "Problem getting Queue. $($_)" 
+            Write-Error "Problem getting system status. $($_)" 
         }
     }
     else {

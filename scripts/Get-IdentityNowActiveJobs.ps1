@@ -44,7 +44,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
             return $Jobs
         }
         catch {
-            Write-Error "Problem getting Queue. $($_)" 
+            Write-Error "Problem getting Active Jobs. $($_)" 
         }
     }
     else {

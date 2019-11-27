@@ -22,6 +22,7 @@
         'Get-IdentityNowOrgConfig',
         'Get-IdentityNowProfile',
         'Get-IdentityNowProfileOrder',
+        'Get-IdentityNowQueue',
         'Get-IdentityNowRole',
         'Get-IdentityNowRule',
         'Get-IdentityNowSource',

@@ -9,7 +9,8 @@
     FunctionsToExport = @('Complete-IdentityNowTask',
         'Get-IdentityNowAccessProfile',
         'Get-IdentityNowAccountActivities',
-        'Get-IdentityNowAccountActivity',        
+        'Get-IdentityNowAccountActivity',
+        'Get-IdentityNowActiveJobs',
         'Get-IdentityNowAPIClient',
         'Get-IdentityNowApplication',
         'Get-IdentityNowCertCampaign',
@@ -20,8 +21,10 @@
         'Get-IdentityNowOAuthAPIClient',
         'Get-IdentityNowOrg',
         'Get-IdentityNowOrgConfig',
+        'Get-IdentityNowOrgStatus',
         'Get-IdentityNowProfile',
         'Get-IdentityNowProfileOrder',
+        'Get-IdentityNowQueue',
         'Get-IdentityNowRole',
         'Get-IdentityNowRule',
         'Get-IdentityNowSource',
@@ -62,6 +65,7 @@
         'Set-IdentityNowCredential',
         'Set-IdentityNowOrg',
         'Start-IdentityNowCertCampaign',
+        'Test-IdentityNowCredentials',
         'Test-IdentityNowSourceConnection',
         'Update-IdentityNowAccessProfile',
         'Update-IdentityNowApplication',
@@ -81,4 +85,3 @@
         } 
     } 
 }
-

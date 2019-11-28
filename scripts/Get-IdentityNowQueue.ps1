@@ -1,10 +1,10 @@
 function Get-IdentityNowQueue {
     <#
 .SYNOPSIS
-Get an IdentityNow Queues.
+Get IdentityNow Queues.
 
 .DESCRIPTION
-Get an IdentityNow Queues.
+Get IdentityNow Queues.
 
 .EXAMPLE
 Get-IdentityNowQueue

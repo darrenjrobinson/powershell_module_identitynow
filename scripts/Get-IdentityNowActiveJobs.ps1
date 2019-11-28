@@ -1,10 +1,10 @@
 function Get-IdentityNowActiveJobs {
     <#
 .SYNOPSIS
-Get an IdentityNow Active Jobs.
+Get IdentityNow Active Jobs.
 
 .DESCRIPTION
-Get an IdentityNow Active Jobs.
+Get IdentityNow Active Jobs.
 
 .EXAMPLE
 Get-IdentityNowActiveJobs
@@ -13,7 +13,6 @@ Get-IdentityNowActiveJobs
 http://darrenjrobinson.com/sailpoint-identitynow
 
 #>
-
     [cmdletbinding()]
     param()
 

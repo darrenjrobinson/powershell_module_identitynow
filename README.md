@@ -13,6 +13,10 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 ## Features ##
 * Easy command-line use, after setting default configuration options and securely saving them to the current user's profile.
 * Get an IdentityNow Organisation and Get / Update an Organisation Configuration
+* Test IdentitNow Credentials
+* Get IdentityNow Queue
+* Get IdentityNow Active Jobs
+* Get IdentityNow Org Status
 * Search IdentityNow Users
 * Search IdentityNow Users Profiles
 * Search IdentityNow Entitlements
@@ -131,6 +135,7 @@ Complete-IdentityNowTask                    Complete an IdentityNow Task.
 Get-IdentityNowAccessProfile                Get an IdentityNow Access Profile(s).
 Get-IdentityNowAccountActivities            Get IdentityNow Activities.
 Get-IdentityNowAccountActivity              Get IdentityNow Activity for an account.
+Get-IdentityNowActiveJobs                   Get an IdentityNow Active Jobs.
 Get-IdentityNowAPIClient                    Get IdentityNow API Client(s).
 Get-IdentityNowApplication                  Get IdentityNow Application(s).
 Get-IdentityNowCertCampaign                 Get IdentityNow Certification Campaign(s).
@@ -140,8 +145,10 @@ Get-IdentityNowGovernanceGroup              Get an IdentityNow Governance Group.
 Get-IdentityNowOAuthAPIClient               Get IdentityNow oAuth API Client(s).
 Get-IdentityNowOrg                          Displays the default Uri value for all or a particular Organisation based on configured OrgName.     
 Get-IdentityNowOrgConfig                    Get IdentityNow Org Global Reminders and Escalation Policies Configuration.
+Get-IdentityNowOrgStatus                    Get an IdentityNow Org Status.
 Get-IdentityNowProfile                      Get IdentityNow Profile(s).
 Get-IdentityNowProfileOrder                 Get IdentityNow Profiles Order.
+Get-IdentityNowQueue                        Get an IdentityNow Queues.
 Get-IdentityNowRole                         Get an IdentityNow Role(s).
 Get-IdentityNowRule                         Get IdentityNow Rule(s).
 Get-IdentityNowSource                       Get IdentityNow Source(s).
@@ -181,6 +188,7 @@ Search-IdentityNowUsers                     Get IdentityNow Users.
 Set-IdentityNowCredential                   Sets the default IdentityNow API credentials.
 Set-IdentityNowOrg                          Sets the default Organisation name for an IdentityNow Tenant.
 Start-IdentityNowCertCampaign               Start an IdentityNow Certification Campaign that is currently 'Staged'.
+Test-IdentityNowCredentials                 Tests IdentityNow Live credentials.
 Test-IdentityNowSourceConnection            Tests connection on an IdentityNow Source.
 Update-IdentityNowAccessProfile             Update an IdentityNow Access Profile(s).
 Update-IdentityNowApplication               Update an IdentityNow Application.
@@ -236,6 +244,42 @@ $approvalConfigBody = @{"approvalConfig" = $approvalConfig }
 
 Update-IdentityNowOrgConfig -update ($approvalConfigBody | convertto-json)
 
+```
+
+### Test IdentitNow Credentials ###
+Test saved IdentityNow PowerShell Module credentials.
+Validates the saved credentials (v2 and v3) against the configured Org. 
+
+Example
+```
+Test-IdentityNowCredentials
+```
+
+### Get IdentityNow Queue ###
+Query the IdentityNow Org for currently queued events.
+Equivalent of the Portal Dashboard -> monitor, how busy in your tenant
+
+Example
+```
+Get-IdentityNowQueue
+```
+
+### Get IdentityNow Active Jobs ###
+Query the IdentityNow Org for Active Jobs.
+Equivalent of the Portal Dashboard -> monitor, how busy in your tenant
+
+Example
+```
+Get-IdentityNowActiveJobs
+```
+
+### Get IdentityNow Org Status ###
+Query the IdentityNow Org for current status.
+Equivalent of the info you see on the Overview page. A count of Identities, VAs, Sources, and Applications including any in an error state,
+
+Example
+```
+Get-IdentityNowOrgStatus
 ```
 
 ### Search IdentityNow Users ###

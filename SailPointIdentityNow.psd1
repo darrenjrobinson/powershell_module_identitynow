@@ -66,6 +66,7 @@
         'Set-IdentityNowCredential',
         'Set-IdentityNowOrg',
         'Start-IdentityNowCertCampaign',
+        'Start-IdentityNowProfileUserRefresh',
         'Test-IdentityNowCredentials',
         'Test-IdentityNowSourceConnection',
         'Update-IdentityNowAccessProfile',

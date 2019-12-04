@@ -41,6 +41,7 @@
         'New-IdentityNowGovernanceGroup',
         'New-IdentityNowIdentityProfilesReport',
         'New-IdentityNowOAuthAPIClient',
+        'New-IdentityNowProfile',
         'New-IdentityNowRole',
         'New-IdentityNowSource',
         'New-IdentityNowSourceAccountSchemaAttribute',

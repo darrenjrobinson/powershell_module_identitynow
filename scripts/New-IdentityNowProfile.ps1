@@ -1,19 +1,22 @@
-function Get-IdentityNowProfile {
+function New-IdentityNowProfile {
     <#
 .SYNOPSIS
-Get IdentityNow Identity Profile(s).
+Create new IdentityNow Identity Profile(s).
 
 .DESCRIPTION
-Get IdentityNow Identity Profile(s).
+Create new IdentityNow Identity Profile(s).
 
-.PARAMETER ID
-(optional) The ID of an IdentityNow Identity Profile.
+.PARAMETER Name
+The Name of the new IdentityNow Identity Profile.
+
+.PARAMETER SourceID
+The Source ID tied to the new IdentityNow Identity Profile.
 
 .EXAMPLE
-Get-IdentityNowProfile 
+New-IdentityNowProfile 
 
 .EXAMPLE
-Get-IdentityNowProfile -ID 1066 
+New-IdentityNowProfile -ID 1066 
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -23,7 +26,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$ID
+        [string]$Name,
+        [int]$SourceID
     )
 
     # IdentityNow Admin User
@@ -49,17 +53,12 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     if ($v3Token.access_token) {
         try {
-            if ($ID) {
-                $IDNProfile = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/get/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                                                                                     
-                return $IDNProfile
-            }
-            else {
-                $IDNProfile = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/list" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-                return $IDNProfile
-            }
+            $body="name=$name&sourceId=$sourceid"
+            $IDNProfile = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/profile/create/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } -Body $body
+            return $IDNProfile
         }
         catch {
-            Write-Error "Profile doesn't exist? $($_)" 
+            Write-Error "Problem Creating Profile. $($_)" 
         }
     }
     else {

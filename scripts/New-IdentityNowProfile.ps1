@@ -16,7 +16,7 @@ The Source ID tied to the new IdentityNow Identity Profile.
 New-IdentityNowProfile 
 
 .EXAMPLE
-New-IdentityNowProfile -ID 1066 
+New-IdentityNowProfile -Name Contractors -SourceID 116329
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow

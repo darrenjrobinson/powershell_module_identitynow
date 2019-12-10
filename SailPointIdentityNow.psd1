@@ -35,6 +35,7 @@
         'Invoke-IdentityNowAggregateSource',
         'Invoke-IdentityNowRequest',
         'Invoke-IdentityNowSourceReset',
+        'Join-IdentityNowAccount',
         'New-IdentityNowAccessProfile',
         'New-IdentityNowAPIClient',
         'New-IdentityNowCertCampaign',        

@@ -1,12 +1,13 @@
 @{
     RootModule        = 'SailPointIdentityNow.psm1'
-    ModuleVersion     = '1.0.5'
+    ModuleVersion     = '1.0.6'
     GUID              = 'f82fe16a-7702-46f3-ab86-5de11b7305de'
     Author            = 'Darren J Robinson'
     Copyright         = '(c) 2019 . All rights reserved.'
     Description       = "Orchestration of SailPoint IdentityNow"
     PowerShellVersion = '5.0'
     FunctionsToExport = @('Complete-IdentityNowTask',
+        'Get-HashString',
         'Get-IdentityNowAccessProfile',
         'Get-IdentityNowAccountActivities',
         'Get-IdentityNowAccountActivity',
@@ -35,14 +36,12 @@
         'Invoke-IdentityNowAggregateSource',
         'Invoke-IdentityNowRequest',
         'Invoke-IdentityNowSourceReset',
-        'Join-IdentityNowAccount',
         'New-IdentityNowAccessProfile',
         'New-IdentityNowAPIClient',
         'New-IdentityNowCertCampaign',        
         'New-IdentityNowGovernanceGroup',
         'New-IdentityNowIdentityProfilesReport',
         'New-IdentityNowOAuthAPIClient',
-        'New-IdentityNowProfile',
         'New-IdentityNowRole',
         'New-IdentityNowSource',
         'New-IdentityNowSourceAccountSchemaAttribute',
@@ -53,7 +52,6 @@
         'Remove-IdentityNowAPIClient',
         'Remove-IdentityNowGovernanceGroup',
         'Remove-IdentityNowOAuthAPIClient',
-        'Remove-IdentityNowProfile',
         'Remove-IdentityNowRole',
         'Remove-IdentityNowSource'
         'Remove-IdentityNowTransform',
@@ -68,7 +66,6 @@
         'Set-IdentityNowCredential',
         'Set-IdentityNowOrg',
         'Start-IdentityNowCertCampaign',
-        'Start-IdentityNowProfileUserRefresh',
         'Test-IdentityNowCredentials',
         'Test-IdentityNowSourceConnection',
         'Update-IdentityNowAccessProfile',

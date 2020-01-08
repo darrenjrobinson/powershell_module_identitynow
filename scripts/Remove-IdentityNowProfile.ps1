@@ -1,19 +1,21 @@
-function Get-IdentityNowTask {
+function Remove-IdentityNowProfile {
     <#
 .SYNOPSIS
-Get an IdentityNow Task(s).
+Delete an IdentityNow Identity Profile.
 
 .DESCRIPTION
-Get an IdentityNow Task(s).
+Delete an IdentityNow Identity Profile.
 
-.PARAMETER taskID
-(optional) The ID of an IdentityNow task.
-
-.EXAMPLE
-Get-IdentityNowTask 
+.PARAMETER profileIDs
+(required) The profile ID or IDs of the IdentityNow Identity Profile to delete.
 
 .EXAMPLE
-Get-IdentityNowTask -taskID 2c918084691120d0016926a6a94251d6
+Remove-IdentityNowProfile -profileIDs 1234
+
+.EXAMPLE
+$ExistingIDPs = Get-IdentityNowProfile
+$myIDP = $ExistingIDPs | Select-Object | Where-Object {$_.name -like "*My Identity Profile*"}
+Remove-IdentityNowProfile -profileIDs $myIDP.id
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -22,8 +24,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     [cmdletbinding()]
     param(
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$taskID
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]$profileIDs
     )
 
     # IdentityNow Admin User
@@ -32,7 +34,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     # Generate the account hash
     $hashUser = Get-HashString $adminUSR.ToLower() 
-    $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
+    $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)" 
 
     $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
     # Basic Auth
@@ -46,18 +48,13 @@ http://darrenjrobinson.com/sailpoint-identitynow
     $v3Token = Invoke-RestMethod -Method Post -Uri "$($oAuthURI)?grant_type=password&username=$($adminUSR)&password=$($adminPWD)" -Headers $Headersv3 
 
     if ($v3Token.access_token) {
-        try {
-            if ($taskID) {
-                $Task = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/task/get/$($taskID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                                                                                     
-                return $Task
-            }
-            else {
-                $tasksList = Invoke-RestMethod -method Get -uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/task/listAll" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-                return $tasksList.items
-            }
+        try {   
+            $profID = "profileIds=$($profileIds -join ',')"
+            $IDNDeleteIDP = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/profile/bulkDelete" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" ; "Content-Type" = "application/json" } -Body $profID
+            return $IDNDeleteIDP
         }
         catch {
-            Write-Error "Task doesn't exist. Check Task ID. $($_)" 
+            Write-Error "Deletion of Identity Profile failed. Check Identity Profile ID and format (JSON). $($_)" 
         }
     }
     else {

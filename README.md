@@ -32,13 +32,15 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Generate IdentityNow Identity Profiles Configuration Report
 * Get Accounts from an IdentityNow Source
 * Create / Update / Remove IdentityNow Source Account (Flat File / Delimited Sources)
+* Join IdentityNow Account
 * Get / Complete IdentityNow Tasks
 * Get IdentityNow Virtual Appliance Clusters (and clients (VA's))
 * Get / Update IdentityNow Applications
 * Create / Get / Update / Remove IdentityNow Transforms
 * Get IdentityNow Rules
 * Get / Update Email Templates
-* Get IdentityNow Profiles
+* Create / Get / Remove IdentityNow Identity Profiles
+* Refresh an IdentityNow Identity Profile
 * Get / Update IdentityNow Profiles Order
 * Get / Update Identity Attributes
 * Create / Get / Remove API Management Clients (Legacy v2)
@@ -48,10 +50,14 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * List Account Activities
 * Get Account Activity 
 * Reset an IdentityNow Source
-* .... and if they don't fit Invoke-IdentityNowRequest to make any other API call (examples for Get Source Schema, Get IdentityNow Profiles, Get IdentityNow Identity Attributes)
+* .... and if they don't fit Invoke-IdentityNowRequest to make any other API call (examples for Get Source Schema, Get IdentityNow Identity Profiles, Get IdentityNow Identity Attributes)
 
 ## Installation ##
 
+### v1.0.6 and later ##
+No dependencies. v1.0.6 and later is compatable with PowerShell Desktop 5+ and PowerShell Core 6+
+
+### v1.0.5 and earlier ##
 The dependencies are PowerShell version 5 and the PowerShell Community eXtension. If for some reason (like you're on an airgapped network), you can get [PSCx it from here](https://github.com/Pscx/Pscx)
 
 To install either...
@@ -132,23 +138,25 @@ Get-Command -Module SailPointIdentityNow | Sort-Object Name | Get-Help | Format-
 Name                                        Synopsis
 ----                                        --------
 Complete-IdentityNowTask                    Complete an IdentityNow Task.
+Get-HashString                              Generate IdentityNow Admin User Password Hash to obtain oAuth Access Token.
 Get-IdentityNowAccessProfile                Get an IdentityNow Access Profile(s).
 Get-IdentityNowAccountActivities            Get IdentityNow Activities.
 Get-IdentityNowAccountActivity              Get IdentityNow Activity for an account.
-Get-IdentityNowActiveJobs                   Get an IdentityNow Active Jobs.
+Get-IdentityNowActiveJobs                   Get IdentityNow Active Jobs.
 Get-IdentityNowAPIClient                    Get IdentityNow API Client(s).
 Get-IdentityNowApplication                  Get IdentityNow Application(s).
 Get-IdentityNowCertCampaign                 Get IdentityNow Certification Campaign(s).
 Get-IdentityNowCertCampaignReport           Get IdentityNow Certification Campaign Report(s).
 Get-IdentityNowEmailTemplate                Get IdentityNow Email Template(s).
 Get-IdentityNowGovernanceGroup              Get an IdentityNow Governance Group.
+Get-IdentityNowIdentityAttribute            Get an IdentityNow Identity Attribute(s).
 Get-IdentityNowOAuthAPIClient               Get IdentityNow oAuth API Client(s).
-Get-IdentityNowOrg                          Displays the default Uri value for all or a particular Organisation based on configured OrgName.     
+Get-IdentityNowOrg                          Displays the default Uri value for all or a particular Organisation based on configured OrgName.
 Get-IdentityNowOrgConfig                    Get IdentityNow Org Global Reminders and Escalation Policies Configuration.
 Get-IdentityNowOrgStatus                    Get an IdentityNow Org Status.
 Get-IdentityNowProfile                      Get IdentityNow Profile(s).
 Get-IdentityNowProfileOrder                 Get IdentityNow Profiles Order.
-Get-IdentityNowQueue                        Get an IdentityNow Queues.
+Get-IdentityNowQueue                        Get IdentityNow Queues.
 Get-IdentityNowRole                         Get an IdentityNow Role(s).
 Get-IdentityNowRule                         Get IdentityNow Rule(s).
 Get-IdentityNowSource                       Get IdentityNow Source(s).
@@ -158,15 +166,18 @@ Get-IdentityNowTransform                    Get IdentityNow Transform(s).
 Get-IdentityNowVACluster                    Get IdentityNow Virtual Appliance Cluster(s).
 Invoke-IdentityNowAggregateSource           Initiate Aggregation of an IdentityNow Source.
 Invoke-IdentityNowRequest                   Submit an IdentityNow API Request.
+Invoke-IdentityNowSourceReset               Reset an IdentityNow Source.
+Join-IdentityNowAccount                     Join an IdentityNow User Account to an Identity.
 New-IdentityNowAccessProfile                Create an IdentityNow Access Profile.
 New-IdentityNowAPIClient                    Create an IdentityNow v2 API Client.
 New-IdentityNowCertCampaign                 Create an IdentityNow Certification Campaign.
 New-IdentityNowGovernanceGroup              Create a new IdentityNow Governance Group.
-New-IdentityNowIdentityProfilesReport       Generate a HTML Report of IdentityNow Identity Profiles and export each Identity Profile config.     
+New-IdentityNowIdentityProfilesReport       Generate a HTML Report of IdentityNow Identity Profiles and export each Identity Profile config.
 New-IdentityNowOAuthAPIClient               Create an IdentityNow v3 oAuth API Client.
+New-IdentityNowProfile                      Create new IdentityNow Identity Profile(s).
 New-IdentityNowRole                         Create an IdentityNow Role.
 New-IdentityNowSource                       Create an IdentityNow Source.
-New-IdentityNowSourceAccountSchemaAttribute discover or add to a source's account schema.
+New-IdentityNowSourceAccountSchemaAttribute Discover or add to a sources' account schema.
 New-IdentityNowSourceConfigReport           Generate a HTML Report of IdentityNow Sources configuration and export each Source and Schema config.
 New-IdentityNowTransform                    Create an IdentityNow Transform.
 New-IdentityNowUserSourceAccount            Create an IdentityNow User Account on a Flat File Source.
@@ -174,6 +185,7 @@ Remove-IdentityNowAccessProfile             Delete an IdentityNow Access Profile
 Remove-IdentityNowAPIClient                 Delete an IdentityNow API Client.
 Remove-IdentityNowGovernanceGroup           Delete an IdentityNow Governance Group.
 Remove-IdentityNowOAuthAPIClient            Delete an IdentityNow oAuth API Client.
+Remove-IdentityNowProfile                   Delete an IdentityNow Identity Profile.
 Remove-IdentityNowRole                      Delete an IdentityNow Role.
 Remove-IdentityNowSource                    Deletes an IdentityNow Source.
 Remove-IdentityNowTransform                 Delete an IdentityNow Transform.
@@ -188,12 +200,14 @@ Search-IdentityNowUsers                     Get IdentityNow Users.
 Set-IdentityNowCredential                   Sets the default IdentityNow API credentials.
 Set-IdentityNowOrg                          Sets the default Organisation name for an IdentityNow Tenant.
 Start-IdentityNowCertCampaign               Start an IdentityNow Certification Campaign that is currently 'Staged'.
+Start-IdentityNowProfileUserRefresh         Triggers a user refresh for an IdentityNow Identity Profile(s).
 Test-IdentityNowCredentials                 Tests IdentityNow Live credentials.
 Test-IdentityNowSourceConnection            Tests connection on an IdentityNow Source.
 Update-IdentityNowAccessProfile             Update an IdentityNow Access Profile(s).
 Update-IdentityNowApplication               Update an IdentityNow Application.
 Update-IdentityNowEmailTemplate             Update an IdentityNow Email Template.
 Update-IdentityNowGovernanceGroup           Add or Remove member(s) from an IdentityNow Governance Group.
+Update-IdentityNowIdentityAttribute         Update an IdentityNow Identity Attribute to be listed in Identity Profiles.
 Update-IdentityNowOrgConfig                 Update IdentityNow Org Global Reminders and Escalation Policies Configuration.
 Update-IdentityNowProfileOrder              Update IdentityNow Profile Order.
 Update-IdentityNowRole                      Update an IdentityNow Role.
@@ -420,6 +434,7 @@ Remove-IdentityNowAccessProfile -profileID $myAP.id
 ```
 
 ### Create / Get / Start IdentityNow Certification Campaigns ###
+
 Get all (active and completed) IdentityNow Certification Campaigns
 [Reference post](https://blog.darrenjrobinson.com/accessing-sailpoint-identitynow-certification-campaigns-using-powershell/)
 
@@ -434,7 +449,7 @@ Example
 Get-IdentityNowCertCampaign -campaignID 2c9180856708ae38016709f4812345c3
 ```
 
-Create an IdentityNow Certification Campaign
+#### Create an IdentityNow Certification Campaign ####
 [Reference post](https://blog.darrenjrobinson.com/creating-sailpoint-identitynow-certification-campaigns-using-powershell/)
 
 Example
@@ -507,6 +522,23 @@ $campaignBody = $campaignOptions | ConvertTo-Json
 
 New-IdentityNowCertCampaign -start $true -campaign $campaignBody 
 
+```
+
+#### Start IdentityNow Certification Campaigns ####
+Start a Certification Campaign where the campaign(s) have been created using the module and you've looked at the preview via the portal etc and now want to start them.
+
+Start Certification Campaign using ID of the campaign (ID not campaignFilterId)
+
+Example
+```
+Start-IdentityNowCertCampaign -campaignID 2c9180856d17db72016d18ed75560036 -timezone GMT+1100
+```
+
+Example
+```
+$incompleteCampaigns = Get-IdentityNowCertCampaign -completed $false
+$myCampaign = $incompleteCampaigns | select-object | Where-Object {$_.name -like '*Restricted App X Campaign*'}
+Start-IdentityNowCertCampaign -campaignID $myCampaign.id -timezone "GMT+1100"
 ```
 
 ### Get IdentityNow Certification Campaign Reports ###
@@ -827,6 +859,14 @@ $account = $userIndirectAccounts.id
 Remove-IdentityNowUserSourceAccount -account $account 
 ```
 
+### Join IdentityNow Account ###
+Join an IdentityNow User Account to an Identity
+
+Example
+```
+Join-IdentityNowAccount -source 12345 -identity jsmith -account jsmith123
+```
+
 ### Get / Complete IdentityNow Tasks ###
 Get IdentityNow Tasks
 [Reference post](https://blog.darrenjrobinson.com/managing-sailpoint-identitynow-tasks-with-powershell/)
@@ -996,7 +1036,8 @@ $templateChanges.add("subject",'Access Request requires completion of Work Item 
 
 Update-IdentityNowEmailTemplate -template ($templateChanges | ConvertTo-Json)
 ```
-### Get IdentityNow Profiles ###
+
+### Get IdentityNow Identity Profiles ###
 Get IdentityNow Identity Profiles
 
 Example 
@@ -1009,6 +1050,35 @@ Get an IdentityNow Profile
 Example 
 ```
 Get-IdentityNowProfile -ID 1033
+```
+
+### Create an IdentityNow Identity Profile ###
+Create an IdentityNow Identity Profile. Requires the name for the Identity Profile and the ID of the IdentityNow Source to associated with the IdentityNow Profile
+
+Example 
+```
+New-IdentityNowProfile -Name Contractors -SourceID 116329
+```
+
+### Refresh an IdentityNow Identity Profile ###
+Trigger a user refresh for an IdentityNow Identity Profile. 
+
+Example
+```
+Start-IdentityNowProfileUserRefresh -ID 116329
+```
+
+### Remove IdentityNow Identity Profile(s)
+Remove a single or multiple IdentityNow Identity Profiles.
+
+Example -  Remove a single IdentityNow Identity Profile
+```
+Remove-IdentityNowProfile -profileIDs 1234
+```
+
+Example - Remove multiple IdentityNow Profiles
+```
+Remove-IdentityNowProfile -profileIDs 1234,1235,1236
 ```
 
 ### Get / Update IdentityNow Profiles Order ###

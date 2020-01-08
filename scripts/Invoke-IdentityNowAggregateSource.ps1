@@ -35,8 +35,9 @@ function Invoke-IdentityNowAggregateSource {
     $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
     $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
 
-    $passwordHash = Get-Hash -Algorithm SHA256 -StringEncoding utf8 -InputObject ($($adminPWDClear) + (Get-Hash -Algorithm SHA256 -StringEncoding utf8 -InputObject ($adminUSR)).HashString.ToLower())
-    $adminPWD = $passwordHash.ToString().ToLower() 
+    # Generate the account hash
+    $hashUser = Get-HashString $adminUSR.ToLower() 
+    $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
 
     $tokenURI = "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/oauth/token?grant_type=password&username=$($adminUSR)&password=$($adminPWD)"
     

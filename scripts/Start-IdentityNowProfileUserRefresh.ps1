@@ -1,19 +1,16 @@
-function Get-IdentityNowTask {
+function Start-IdentityNowProfileUserRefresh {
     <#
 .SYNOPSIS
-Get an IdentityNow Task(s).
+Triggers a user refresh for an IdentityNow Identity Profile(s).
 
 .DESCRIPTION
-Get an IdentityNow Task(s).
+Triggers a user refresh for an IdentityNow Identity Profile(s).
 
-.PARAMETER taskID
-(optional) The ID of an IdentityNow task.
-
-.EXAMPLE
-Get-IdentityNowTask 
+.PARAMETER ID
+The ID of the IdentityNow Identity Profile.
 
 .EXAMPLE
-Get-IdentityNowTask -taskID 2c918084691120d0016926a6a94251d6
+Start-IdentityNowProfileUserRefresh -ID 116329
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -22,8 +19,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     [cmdletbinding()]
     param(
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$taskID
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]$ID
     )
 
     # IdentityNow Admin User
@@ -47,17 +44,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     if ($v3Token.access_token) {
         try {
-            if ($taskID) {
-                $Task = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/task/get/$($taskID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                                                                                     
-                return $Task
-            }
-            else {
-                $tasksList = Invoke-RestMethod -method Get -uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/task/listAll" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-                return $tasksList.items
-            }
+            $IDNProfile = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/profile/refresh/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+            return $IDNProfile
         }
         catch {
-            Write-Error "Task doesn't exist. Check Task ID. $($_)" 
+            Write-Error "Problem Refreshing Profile. $($_)" 
         }
     }
     else {

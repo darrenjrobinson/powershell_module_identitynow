@@ -1,29 +1,23 @@
-function New-IdentityNowUserSourceAccount {
+function Join-IdentityNowAccount {
     <#
 .SYNOPSIS
-    Create an IdentityNow User Account on a Flat File Source.
+    Join an IdentityNow User Account to an Identity.
 
 .DESCRIPTION
-    Create an IdentityNow User Account on a Flat File Source
+    Manually correlate an IdentityNow User Account with an identity account.
 
 .PARAMETER source
     SailPoint IdentityNow Source ID
     e.g 12345
 
-.PARAMETER account
-    (required - JSON) Account details
-    e.g
-    {
-        "id":  "darrenjrobinson",
-        "name":  "darrenjrobinson",
-        "displayName":  "Darren Robinson",
-        "email":  "darren.robinson@customer.com.au",
-        "familyName":  "Robinson",
-        "givenName":  "Darren"
-    }
+.PARAMETER Identity
+    Identity UID
+
+.PARAMETER Account
+    Account ID
 
 .EXAMPLE
-    New-IdentityNowUserSourceAccount -source 12345 -account "{"id":  "darrenjrobinson","name":  "darrenjrobinson","displayName":  "Darren Robinson","email":  "darren.robinson@customer.com.au","familyName":  "Robinson","givenName":  "Darren"}"
+    Join-IdentityNowAccount -source 12345 -identity jsmith -account 012345
 
 .LINK
     http://darrenjrobinson.com/sailpoint-identitynow
@@ -35,7 +29,9 @@ function New-IdentityNowUserSourceAccount {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$account,
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$sourceID
+        [string]$source,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]$Identity
     )
 
     # IdentityNow Admin User
@@ -45,7 +41,7 @@ function New-IdentityNowUserSourceAccount {
     # Generate the account hash
     $hashUser = Get-HashString $adminUSR.ToLower() 
     $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
-
+        
     $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
     # Basic Auth
     $Bytesv3 = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v3.UserName):$($clientSecretv3)")
@@ -58,12 +54,20 @@ function New-IdentityNowUserSourceAccount {
     $v3Token = Invoke-RestMethod -Method Post -Uri "$($oAuthURI)?grant_type=password&username=$($adminUSR)&password=$($adminPWD)" -Headers $Headersv3 
 
     if ($v3Token.access_token) {
-        try {                         
-            $createAccount = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceId)&org=$($IdentityNowConfiguration.orgName)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json"} -Body $account 
-            return $createAccount           
+        try {
+            $csv = @()
+            $csv = $csv + 'account,displayName,userName,type'
+            $csv = $csv + "$account,$account,$identity,"
+            $result = Invoke-restmethod -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/source/loadUncorrelatedAccounts/$source" `
+                -Method "POST" `
+                -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Accept-Encoding" = "gzip, deflate, br" } `
+                -ContentType "multipart/form-data; boundary=----WebKitFormBoundaryU1hSZTy7cff3WW27" `
+                -Body ([System.Text.Encoding]::UTF8.GetBytes("------WebKitFormBoundaryU1hSZTy7cff3WW27$([char]13)$([char]10)Content-Disposition: form-data; name=`"file`"; filename=`"temp.csv`"$([char]13)$([char]10)Content-Type: application/vnd.ms-excel$([char]13)$([char]10)$([char]13)$([char]10)$($csv | out-string)$([char]13)$([char]10)------WebKitFormBoundaryU1hSZTy7cff3WW27--$([char]13)$([char]10)")) `
+                -UseBasicParsing
+            return $result           
         }
         catch {
-            Write-Error "Account couldn't be created. $($_)" 
+            Write-Error "Account couldn't be joined. $($_)" 
         }
     }
     else {

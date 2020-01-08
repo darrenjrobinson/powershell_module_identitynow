@@ -21,13 +21,8 @@ if (Test-Path $InstallPath) {
 }
 
 Push-Location $PSScriptRoot
-
 Copy-Item -Path $sourceFiles -Destination $InstallPath -Recurse
-
 Pop-Location
-
-# Get-Hash required for IdentityNow Authorization Headers
-if (-not(Get-Module -ListAvailable -Name pscx)) {Install-Module -Name Pscx -RequiredVersion 3.3.2 -Force -AllowClobber -scope AllUsers}
 
 Import-Module -Name SailPointIdentityNow 
 Get-Command -Module SailPointIdentityNow | Sort-Object Name | Get-Help | Format-Table Name, Synopsis -AutoSize

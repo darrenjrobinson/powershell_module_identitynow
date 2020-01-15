@@ -21,9 +21,7 @@ if (Test-Path $InstallPath) {
 }
 
 Push-Location $PSScriptRoot
-
 Copy-Item -Path $sourceFiles -Destination $InstallPath -Recurse
-
 Pop-Location
 
 Import-Module -Name SailPointIdentityNow 

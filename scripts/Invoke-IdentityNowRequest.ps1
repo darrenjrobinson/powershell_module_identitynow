@@ -84,6 +84,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
         }
         Headersv3_JSON { 
             $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json" }
+            Write-Verbose "Authorization = Bearer $($v3Token.access_token)"
+            Write-verbose ($v3Token | convertTo-json)
         }
         default { 
             $requestHeaders = $headers 

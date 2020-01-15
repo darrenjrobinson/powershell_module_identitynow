@@ -30,7 +30,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
     $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
     $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
 
-    # Generate the account hash
+    # Generate the password hash
     $hashUser = Get-HashString $adminUSR.ToLower() 
     $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"    
 

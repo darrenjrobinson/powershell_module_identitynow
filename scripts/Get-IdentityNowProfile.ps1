@@ -1,13 +1,13 @@
 function Get-IdentityNowProfile {
     <#
 .SYNOPSIS
-Get IdentityNow Profile(s).
+Get IdentityNow Identity Profile(s).
 
 .DESCRIPTION
-Get IdentityNow Profile(s).
+Get IdentityNow Identity Profile(s).
 
 .PARAMETER ID
-(optional) The ID of an IdentityNow Profile.
+(optional) The ID of an IdentityNow Identity Profile.
 
 .EXAMPLE
 Get-IdentityNowProfile 

@@ -19,7 +19,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     [cmdletbinding()]
     param(
+<<<<<<< HEAD
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+=======
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+>>>>>>> master
         [string]$ID
     )
 
@@ -27,9 +31,17 @@ http://darrenjrobinson.com/sailpoint-identitynow
     $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
     $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
 
+<<<<<<< HEAD
     # Generate the account hash
     $hashUser = Get-HashString $adminUSR.ToLower() 
     $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
+=======
+    # Generate the password hash
+    # Requires Get-Hash from PowerShell Community Extensions (PSCX) Module 
+    # https://www.powershellgallery.com/packages/Pscx/3.2.2
+    $passwordHash = Get-Hash -Algorithm SHA256 -StringEncoding utf8 -InputObject ($($adminPWDClear) + (Get-Hash -Algorithm SHA256 -StringEncoding utf8 -InputObject ($adminUSR)).HashString.ToLower())
+    $adminPWD = $passwordHash.ToString().ToLower() 
+>>>>>>> master
 
     $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
     # Basic Auth

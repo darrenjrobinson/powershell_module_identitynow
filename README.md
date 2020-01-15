@@ -200,7 +200,10 @@ Search-IdentityNowUsers                     Get IdentityNow Users.
 Set-IdentityNowCredential                   Sets the default IdentityNow API credentials.
 Set-IdentityNowOrg                          Sets the default Organisation name for an IdentityNow Tenant.
 Start-IdentityNowCertCampaign               Start an IdentityNow Certification Campaign that is currently 'Staged'.
+<<<<<<< HEAD
 Start-IdentityNowProfileUserRefresh         Triggers a user refresh for an IdentityNow Identity Profile(s).
+=======
+>>>>>>> master
 Test-IdentityNowCredentials                 Tests IdentityNow Live credentials.
 Test-IdentityNowSourceConnection            Tests connection on an IdentityNow Source.
 Update-IdentityNowAccessProfile             Update an IdentityNow Access Profile(s).

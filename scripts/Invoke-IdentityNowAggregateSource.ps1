@@ -10,13 +10,13 @@ function Invoke-IdentityNowAggregateSource {
     (required) The ID of an IdentityNow Source. eg. 45678
 
 .PARAMETER disableOptimization
-    (optional - Boolean) Disable Optimization for a full source aggregation
+    (optional - switch) Disable Optimization for a full source aggregation
 
 .EXAMPLE
     Invoke-IdentityNowAggregateSource -sourceID 12345
 
 .EXAMPLE
-    Invoke-IdentityNowAggregateSource -sourceID 12345 -disableOptimization $true 
+    Invoke-IdentityNowAggregateSource -sourceID 12345 -disableOptimization
 
 .LINK
     http://darrenjrobinson.com/sailpoint-identitynow
@@ -28,7 +28,7 @@ function Invoke-IdentityNowAggregateSource {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$sourceID,
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [boolean]$disableOptimization = $false
+        [switch]$disableOptimization = $false
     )
 
     # IdentityNow Admin User

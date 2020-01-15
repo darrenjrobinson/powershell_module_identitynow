@@ -35,7 +35,3 @@ http://darrenjrobinson.com/sailpoint-identitynow
     } 
     return $StringBuilder.ToString()  
 }
-<<<<<<< HEAD
-=======
-
->>>>>>> master

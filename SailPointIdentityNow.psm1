@@ -10,9 +10,10 @@ $IdentityNowConfigurationFile = Join-Path $env:LOCALAPPDATA IdentityNowConfigura
 if (Test-Path $IdentityNowConfigurationFile) {
     $IdentityNowConfiguration = Import-Clixml $IdentityNowConfigurationFile
 }
-if ($null -ne $IdentityNowConfiguration.DefaultOrg){
-    Set-IdentityNowOrg -orgName $IdentityNowConfiguration.DefaultOrg
-}
 
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
 Get-ChildItem "$PSScriptRoot/scripts/*.ps1" | ForEach-Object { . $_ }
+
+if ($null -ne $IdentityNowConfiguration.DefaultOrg){
+    Set-IdentityNowOrg -orgName $IdentityNowConfiguration.DefaultOrg
+}

@@ -72,6 +72,7 @@
         'Start-IdentityNowProfileUserRefresh',
         'Test-IdentityNowCredentials',
         'Test-IdentityNowSourceConnection',
+        'Test-IdentityNowTransforms',
         'Update-IdentityNowAccessProfile',
         'Update-IdentityNowApplication',
         'Update-IdentityNowEmailTemplate',

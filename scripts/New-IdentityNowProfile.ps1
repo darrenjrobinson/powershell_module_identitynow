@@ -10,10 +10,7 @@ Create new IdentityNow Identity Profile(s).
 The Name of the new IdentityNow Identity Profile.
 
 .PARAMETER SourceID
-The Source ID tied to the new IdentityNow Identity Profile.
-
-.EXAMPLE
-New-IdentityNowProfile 
+The ID of the Source tied to the new IdentityNow Identity Profile.
 
 .EXAMPLE
 New-IdentityNowProfile -Name Contractors -SourceID 116329
@@ -25,7 +22,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     [cmdletbinding()]
     param(
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$Name,
         [int]$SourceID
     )
@@ -34,11 +31,9 @@ http://darrenjrobinson.com/sailpoint-identitynow
     $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
     $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
 
-    # Generate the password hash
-    # Requires Get-Hash from PowerShell Community Extensions (PSCX) Module 
-    # https://www.powershellgallery.com/packages/Pscx/3.2.2
-    $passwordHash = Get-Hash -Algorithm SHA256 -StringEncoding utf8 -InputObject ($($adminPWDClear) + (Get-Hash -Algorithm SHA256 -StringEncoding utf8 -InputObject ($adminUSR)).HashString.ToLower())
-    $adminPWD = $passwordHash.ToString().ToLower() 
+    # Generate the account hash
+    $hashUser = Get-HashString $adminUSR.ToLower()
+    $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"
 
     $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
     # Basic Auth
@@ -53,7 +48,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     if ($v3Token.access_token) {
         try {
-            $body="name=$name&sourceId=$sourceid"
+            $body="name=$Name&sourceId=$SourceID"
             $IDNProfile = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/profile/create/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } -Body $body
             return $IDNProfile
         }

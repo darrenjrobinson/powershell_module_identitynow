@@ -24,6 +24,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$Name,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [int]$SourceID
     )
 
@@ -49,7 +50,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
     if ($v3Token.access_token) {
         try {
             $body="name=$Name&sourceId=$SourceID"
-            $IDNProfile = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/profile/create/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } -Body $body
+            $IDNProfile = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/profile/create" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } -Body $body
             return $IDNProfile
         }
         catch {

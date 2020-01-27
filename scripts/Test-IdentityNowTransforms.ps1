@@ -1,4 +1,4 @@
-function test-transforms{
+function test-IdentityNowTransforms{
     <#
 .SYNOPSIS
 Tests transforms on IdentityNow to detect common problems.

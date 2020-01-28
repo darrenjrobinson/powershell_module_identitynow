@@ -17,6 +17,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Get IdentityNow Queue
 * Get IdentityNow Active Jobs
 * Get IdentityNow Org Status
+* Get / Set IdentityNow TimeZone
 * Search IdentityNow Users
 * Search IdentityNow Users Profiles
 * Search IdentityNow Entitlements
@@ -162,6 +163,7 @@ Get-IdentityNowRule                         Get IdentityNow Rule(s).
 Get-IdentityNowSource                       Get IdentityNow Source(s).
 Get-IdentityNowSourceAccounts               Get IdentityNow Accounts on a Source.
 Get-IdentityNowTask                         Get an IdentityNow Task(s).
+Get-IdentityNowTimeZone                     Get IdentityNow Time Zone(s).
 Get-IdentityNowTransform                    Get IdentityNow Transform(s).
 Get-IdentityNowVACluster                    Get IdentityNow Virtual Appliance Cluster(s).
 Invoke-IdentityNowAggregateSource           Initiate Aggregation of an IdentityNow Source.
@@ -199,6 +201,7 @@ Search-IdentityNowUserProfile               Get an IdentityNow Users Identity Pr
 Search-IdentityNowUsers                     Get IdentityNow Users.
 Set-IdentityNowCredential                   Sets the default IdentityNow API credentials.
 Set-IdentityNowOrg                          Sets the default Organisation name for an IdentityNow Tenant.
+Set-IdentityNowTimeZone                     Set IdentityNow Time Zone.
 Start-IdentityNowCertCampaign               Start an IdentityNow Certification Campaign that is currently 'Staged'.
 Start-IdentityNowProfileUserRefresh         Triggers a user refresh for an IdentityNow Identity Profile(s).
 Test-IdentityNowCredentials                 Tests IdentityNow Live credentials.
@@ -294,6 +297,29 @@ Equivalent of the info you see on the Overview page. A count of Identities, VAs,
 Example
 ```
 Get-IdentityNowOrgStatus
+```
+
+### Get IdentityNow TimeZone(s) ###
+Get the configured Organisation Time Zone configuration
+
+Example
+```
+Get-IdentityNowTimeZone
+```
+
+Get a list of time zones that can be configured.
+
+Example 
+```
+Get-IdentityNowTimeZone -list
+```
+
+### Set IdentityNow Time Zone
+Set the time zone for an IdentityNow Organisation to a valid value (as retrieved using Get-IdentityNowTimeZone - list)
+
+Example
+```
+Set-IdentityNowTimeZone -tz 'Australia/Sydney'
 ```
 
 ### Search IdentityNow Users ###

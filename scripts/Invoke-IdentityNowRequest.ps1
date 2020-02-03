@@ -43,7 +43,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         [string][ValidateSet("Get", "Put", "Patch", "Delete", "Post")]$method,
         [ValidateNotNullOrEmpty()]
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string][ValidateSet("HeadersV2", "HeadersV3", "Headersv2_JSON", "Headersv3_JSON")]$headers,
+        [string][ValidateSet("HeadersV2", "HeadersV3", "Headersv2_JSON", "Headersv3_JSON", "Headersv3_JSON-Patch")]$headers,
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
         [string]$body
     )
@@ -75,16 +75,24 @@ http://darrenjrobinson.com/sailpoint-identitynow
     switch ($headers) {
         HeadersV2 { 
             $requestHeaders = @{Authorization = "Basic $($encodedAuth)" }
+            Write-Verbose "Authorization = Basic $($encodedAuth)"
         }
         HeadersV3 { 
             $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)" }
+            Write-Verbose "Authorization = Bearer $($v3Token.access_token)"
         }
         Headersv2_JSON { 
             $requestHeaders = @{Authorization = "Basic $($encodedAuth)"; "Content-Type" = "application/json" }
+            Write-Verbose "Authorization = 'Basic $($encodedAuth)' ; 'Content-Type' = 'application/json' "
         }
         Headersv3_JSON { 
             $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json" }
-            Write-Verbose "Authorization = Bearer $($v3Token.access_token)"
+            Write-Verbose "Authorization = 'Bearer $($v3Token.access_token)' ; 'Content-Type' = 'application/json'"
+            Write-verbose ($v3Token | convertTo-json)
+        }
+        Headersv3_JSON-Patch { 
+            $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json-patch+json" }
+            Write-Verbose "Authorization = 'Bearer $($v3Token.access_token)'; 'Content-Type' = 'application/json-patch+json'"
             Write-verbose ($v3Token | convertTo-json)
         }
         default { 

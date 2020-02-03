@@ -1356,7 +1356,7 @@ Invoke-IdentityNowSourceReset -sourceID 12345 -skip Accounts
 
 ### ... and the ultimate flexible cmdlet Invoke-IdentityNowRequest ###
 The cmdlet that lets you do your thing, with a little help. 
-This cmdlet has options for v2 and v3 authentication and will provide the web request headers (with and without content-type = application/json set).
+This cmdlet has options for v2 and v3 authentication and will provide the web request headers (with and without content-type = application/json / application/json-patch+json set).
 You supply the URI for the request, the method (POST, GET, DELETE, PATCH) and the request will be sent, and the results sent back.
 
 Request Methods are;
@@ -1371,6 +1371,7 @@ Header options are;
 * HeadersV3 - Headersv3 is JWT oAuth with no Content-Type set 
 * Headersv2_JSON - Headersv2_JSON is Digest Auth with Content-Type set for application/json
 * Headersv3_JSON - Headersv3_JSON is JWT oAuth with Content-Type set for application/json
+* Headersv3_JSON-Patch - Headersv3_JSON is JWT oAuth with Content-Type set for application/json-patch+json
 
 Example 1
 Get the Schema of a Source

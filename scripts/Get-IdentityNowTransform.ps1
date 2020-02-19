@@ -48,12 +48,12 @@ http://darrenjrobinson.com/sailpoint-identitynow
     if ($v3Token.access_token) {
         try {
             if ($ID) {
-                $IDNTransform = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/transform/get/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                                                                                     
-                return $IDNTransform
+                $IDNTransform = Invoke-WebRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/transform/get/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } 
+                return $IDNTransform.content
             }
             else {
-                $IDNTransform = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/transform/list" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-                return $IDNTransform.items
+                $IDNTransform = Invoke-WebRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/transform/list" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+                return $IDNTransform.content
             }
         }
         catch {

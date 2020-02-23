@@ -23,7 +23,9 @@ http://darrenjrobinson.com/sailpoint-identitynow
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$ID
+        [string]$ID,
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [switch]$json
     )
 
     # IdentityNow Admin User
@@ -47,13 +49,24 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     if ($v3Token.access_token) {
         try {
-            if ($ID) {
-                $IDNTransform = Invoke-WebRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/transform/get/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } 
-                return $IDNTransform.content
-            }
-            else {
-                $IDNTransform = Invoke-WebRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/transform/list" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-                return $IDNTransform.content
+            if ($json) {
+                if ($ID) {
+                    $IDNTransform = Invoke-WebRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/transform/get/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } 
+                    return $IDNTransform.content
+                }
+                else {
+                    $IDNTransform = Invoke-WebRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/transform/list" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+                    return $IDNTransform.content
+                }
+            } else {
+                if ($ID) {
+                    $IDNTransform = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/transform/get/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } 
+                    return $IDNTransform.items
+                }
+                else {
+                    $IDNTransform = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/transform/list" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+                    return $IDNTransform.items
+                }
             }
         }
         catch {

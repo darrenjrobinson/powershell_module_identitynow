@@ -352,6 +352,13 @@ Example
 Search-IdentityNowEntitlements -query "File_Share_Sydney"
 ```
 
+Search for entitlements on a Source. Use Source externalId (rather than Source Name)
+
+Example
+```
+Search-IdentityNowEntitlements -query "source.id:2c918083670df373016835e063ff6b5b"
+```
+
 ### Search IdentityNow Identities (Beta - Elasticsearch) ###
 Search IdentityNow Identities using the new IdentityNow Search (Elasticsearch).
 Results defaults to 2500. If you want more or less use the -searchLimit option.

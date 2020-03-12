@@ -7,13 +7,16 @@ function Search-IdentityNowEntitlements {
     Gets Entitlements based on query
 
 .PARAMETER query
-    (required) Entitlements Search Query
+    (required) Entitlements Search Query. To query source entitlements use the source.internalID.
 
 .PARAMETER limit
     (optional) Search Page Result Size
-
+    
 .EXAMPLE
     Search-IdentityNowEntitlements -query "source.name:'Active Directory'" 
+
+.EXAMPLE
+    Search-IdentityNowEntitlements -query "source.id:2c918083670df373016835e063ff6b5b" 
 
 .EXAMPLE
     Search-IdentityNowEntitlements -query "@accounts.entitlementAttributes.'App_Group_*'"

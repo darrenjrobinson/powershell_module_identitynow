@@ -73,6 +73,7 @@
         'Start-IdentityNowCertCampaign',
         'Start-IdentityNowProfileUserRefresh',
         'Test-IdentityNowCredentials',
+        'Test-IdentityNowTransforms',
         'Test-IdentityNowSourceConnection',
         'Update-IdentityNowAccessProfile',
         'Update-IdentityNowApplication',

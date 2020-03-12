@@ -205,6 +205,7 @@ Set-IdentityNowTimeZone                     Set IdentityNow Time Zone.
 Start-IdentityNowCertCampaign               Start an IdentityNow Certification Campaign that is currently 'Staged'.
 Start-IdentityNowProfileUserRefresh         Triggers a user refresh for an IdentityNow Identity Profile(s).
 Test-IdentityNowCredentials                 Tests IdentityNow Live credentials.
+Test-IdentityNowTransforms                  Tests transforms on IdentityNow to detect common problems.
 Test-IdentityNowSourceConnection            Tests connection on an IdentityNow Source.
 Update-IdentityNowAccessProfile             Update an IdentityNow Access Profile(s).
 Update-IdentityNowApplication               Update an IdentityNow Application.
@@ -270,6 +271,14 @@ Validates the saved credentials (v2 and v3) against the configured Org.
 Example
 ```
 Test-IdentityNowCredentials
+```
+
+### Test IdentityNow Transforms ###
+Test IdentityNow transforms to detect common problems
+
+Example
+```
+Test-IdentityNowTransforms -verbose
 ```
 
 ### Get IdentityNow Queue ###

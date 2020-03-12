@@ -13,6 +13,9 @@ Update the configuration of an IdentityNow Source
 (required) Sources change(s) to update 
 e.g  name=SyntheticAttributes&description=Attributes for Provisioning Logic
 
+.PARAMETER accountProfile
+used to update the source account profile, pass the entire profile with updates
+
 .EXAMPLE
 Update-IdentityNowSource -id 12345 -update 'name=SyntheticAttributes&description=Attributes for Provisioning Logic'
 
@@ -26,7 +29,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$sourceID,
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$update
+        [string]$update,
+        [switch]$accountProfile
     )
 
     # IdentityNow Admin User
@@ -51,9 +55,16 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     if ($v3Token.access_token) {
         try {                         
-            Write-Verbose "update ===> $($update)"
-            $updateSource = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/source/update/$($sourceID)?$($update)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json"}            
-            return $updateSource           
+            if ($accountProfile) {
+                $body = $update | ConvertTo-Json -Depth 100
+                $updateSource = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/api/accountProfile/bulkUpdate/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" } -Body $body
+                return $updateSource
+            }
+            else {
+                Write-Verbose "update ===> $($update)"
+                $updateSource = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/source/update/$($sourceID)?$($update)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" }            
+                return $updateSource
+            }          
         }
         catch {
             Write-Error "Update failed. $($_)" 
@@ -64,4 +75,3 @@ http://darrenjrobinson.com/sailpoint-identitynow
         return $v3Token
     } 
 }
-

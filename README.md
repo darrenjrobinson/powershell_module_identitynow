@@ -727,6 +727,13 @@ Example
 Get-IdentityNowSource -sourceID 12345
 ```
 
+Get Account Profiles associated with a Source
+<b>Note:</b> If there are no Account Profiles associated with the source, nothing is returned.
+Example
+```
+Get-IdentityNowSource -sourceID 12345 -accountProfiles
+```
+
 Update an IdentityNow Source
 [Reference post](https://blog.darrenjrobinson.com/managing-sailpoint-identitynow-sources-via-the-api-with-powershell/)
 

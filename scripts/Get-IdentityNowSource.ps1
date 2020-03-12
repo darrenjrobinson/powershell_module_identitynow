@@ -9,6 +9,9 @@ function Get-IdentityNowSource {
 .PARAMETER sourceID
     (optional) The ID of an IdentityNow Source. eg. 45678
 
+.PARAMETER accountProfiles
+    (optional) get the account profiles such as create/update profile of an IdentityNow Source.
+
 .EXAMPLE
     Get-IdentityNowSource 
 
@@ -23,8 +26,11 @@ function Get-IdentityNowSource {
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$sourceID
+        [string]$sourceID,
+        [switch]$accountProfiles
     )
+
+    if ($accountProfiles -and $null -eq $sourceID) { Write-Warning "exporting the provisionng profiles requires a sourceID"; break }
 
     # IdentityNow Admin User
     $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
@@ -49,8 +55,12 @@ function Get-IdentityNowSource {
     if ($v3Token.access_token) {
         try {
             if ($sourceID) {
-                # Get an IdentityNow Source
-                $IDNSources = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/source/get/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+                if ($accountProfiles) {
+                    $IDNSources = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/accountProfile/list/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+                }
+                else {
+                    $IDNSources = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/source/get/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+                }                
                 return $IDNSources
             }
             else {

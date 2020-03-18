@@ -22,6 +22,30 @@ Update-IdentityNowSource -sourceID 12345 -update 'name=SyntheticAttributes&descr
 .EXAMPLE
 Update-IdentityNowSource -sourceid 123456 -update 'connector_oauth_request_parameters={"scope":"users:read,users:write"}'
 
+.EXAMPLE
+$json='[{
+  "description": null,
+  "fields": [
+    {
+      "attributes": {},
+      "isRequired": false,
+      "multi": false,
+      "name": "username",
+      "transform": {
+        "attributes": {
+          "name": "uid"
+        },
+        "type": "identityAttribute"
+      },
+      "type": "string"
+    }
+  ],
+  "name": "Account",
+  "usage": "Create",
+  "validPolicy": true
+}]'
+Update-IdentityNowSource -sourceID 120111 -accountProfile -update $json
+
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
 
@@ -59,8 +83,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
     if ($v3Token.access_token) {
         try {                         
             if ($accountProfile) {
-                $body = $update | ConvertTo-Json -Depth 100
-                $updateSource = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/api/accountProfile/bulkUpdate/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" } -Body $body
+                $body = $update
+                $updateSource = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/accountProfile/bulkUpdate/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" } -Body $body
                 return $updateSource
             }
             else {

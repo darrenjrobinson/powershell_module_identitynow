@@ -17,6 +17,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Get IdentityNow Queue
 * Get IdentityNow Active Jobs
 * Get IdentityNow Org Status
+* Get / Set IdentityNow TimeZone
 * Search IdentityNow Users
 * Search IdentityNow Users Profiles
 * Search IdentityNow Entitlements
@@ -162,6 +163,7 @@ Get-IdentityNowRule                         Get IdentityNow Rule(s).
 Get-IdentityNowSource                       Get IdentityNow Source(s).
 Get-IdentityNowSourceAccounts               Get IdentityNow Accounts on a Source.
 Get-IdentityNowTask                         Get an IdentityNow Task(s).
+Get-IdentityNowTimeZone                     Get IdentityNow Time Zone(s).
 Get-IdentityNowTransform                    Get IdentityNow Transform(s).
 Get-IdentityNowVACluster                    Get IdentityNow Virtual Appliance Cluster(s).
 Invoke-IdentityNowAggregateSource           Initiate Aggregation of an IdentityNow Source.
@@ -199,9 +201,11 @@ Search-IdentityNowUserProfile               Get an IdentityNow Users Identity Pr
 Search-IdentityNowUsers                     Get IdentityNow Users.
 Set-IdentityNowCredential                   Sets the default IdentityNow API credentials.
 Set-IdentityNowOrg                          Sets the default Organisation name for an IdentityNow Tenant.
+Set-IdentityNowTimeZone                     Set IdentityNow Time Zone.
 Start-IdentityNowCertCampaign               Start an IdentityNow Certification Campaign that is currently 'Staged'.
 Start-IdentityNowProfileUserRefresh         Triggers a user refresh for an IdentityNow Identity Profile(s).
 Test-IdentityNowCredentials                 Tests IdentityNow Live credentials.
+Test-IdentityNowTransforms                  Tests transforms on IdentityNow to detect common problems.
 Test-IdentityNowSourceConnection            Tests connection on an IdentityNow Source.
 Update-IdentityNowAccessProfile             Update an IdentityNow Access Profile(s).
 Update-IdentityNowApplication               Update an IdentityNow Application.
@@ -269,6 +273,14 @@ Example
 Test-IdentityNowCredentials
 ```
 
+### Test IdentityNow Transforms ###
+Test IdentityNow transforms to detect common problems
+
+Example
+```
+Test-IdentityNowTransforms -verbose
+```
+
 ### Get IdentityNow Queue ###
 Query the IdentityNow Org for currently queued events.
 Equivalent of the Portal Dashboard -> monitor, how busy in your tenant
@@ -294,6 +306,29 @@ Equivalent of the info you see on the Overview page. A count of Identities, VAs,
 Example
 ```
 Get-IdentityNowOrgStatus
+```
+
+### Get IdentityNow TimeZone(s) ###
+Get the configured Organisation Time Zone configuration
+
+Example
+```
+Get-IdentityNowTimeZone
+```
+
+Get a list of time zones that can be configured.
+
+Example 
+```
+Get-IdentityNowTimeZone -list
+```
+
+### Set IdentityNow Time Zone
+Set the time zone for an IdentityNow Organisation to a valid value (as retrieved using Get-IdentityNowTimeZone - list)
+
+Example
+```
+Set-IdentityNowTimeZone -tz 'Australia/Sydney'
 ```
 
 ### Search IdentityNow Users ###
@@ -324,6 +359,13 @@ Search for Entitlements associated with IdentityNow Sources
 Example
 ```
 Search-IdentityNowEntitlements -query "File_Share_Sydney"
+```
+
+Search for entitlements on a Source. Use Source externalId (rather than Source Name)
+
+Example
+```
+Search-IdentityNowEntitlements -query "source.id:2c918083670df373016835e063ff6b5b"
 ```
 
 ### Search IdentityNow Identities (Beta - Elasticsearch) ###
@@ -685,6 +727,13 @@ Example
 Get-IdentityNowSource -sourceID 12345
 ```
 
+Get Account Profiles associated with a Source
+<b>Note:</b> If there are no Account Profiles associated with the source, nothing is returned.
+Example
+```
+Get-IdentityNowSource -sourceID 12345 -accountProfiles
+```
+
 Update an IdentityNow Source
 [Reference post](https://blog.darrenjrobinson.com/managing-sailpoint-identitynow-sources-via-the-api-with-powershell/)
 
@@ -968,6 +1017,14 @@ Get an IdentityNow Transform
 Example
 ```
 Get-IdentityNowTransform -ID ToUpper
+```
+
+<b>OPTION:</b> Return transform(s) as JSON. Useful when you have transforms that don't convert to PowerShell objects due to PowerShell's inability to handle case sensitivity in JSON keys.
+
+Examples
+```
+Get-IdentityNowTransform -ID ToUpper -json
+Get-IdentityNowTransform -json
 ```
 
 Update an IdentityNow Transform
@@ -1330,7 +1387,7 @@ Invoke-IdentityNowSourceReset -sourceID 12345 -skip Accounts
 
 ### ... and the ultimate flexible cmdlet Invoke-IdentityNowRequest ###
 The cmdlet that lets you do your thing, with a little help. 
-This cmdlet has options for v2 and v3 authentication and will provide the web request headers (with and without content-type = application/json set).
+This cmdlet has options for v2 and v3 authentication and will provide the web request headers (with and without content-type = application/json / application/json-patch+json set).
 You supply the URI for the request, the method (POST, GET, DELETE, PATCH) and the request will be sent, and the results sent back.
 
 Request Methods are;
@@ -1345,6 +1402,7 @@ Header options are;
 * HeadersV3 - Headersv3 is JWT oAuth with no Content-Type set 
 * Headersv2_JSON - Headersv2_JSON is Digest Auth with Content-Type set for application/json
 * Headersv3_JSON - Headersv3_JSON is JWT oAuth with Content-Type set for application/json
+* Headersv3_JSON-Patch - Headersv3_JSON is JWT oAuth with Content-Type set for application/json-patch+json
 
 Example 1
 Get the Schema of a Source

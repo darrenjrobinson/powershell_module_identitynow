@@ -28,8 +28,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$sourceID,
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        $update,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]$update,
         [switch]$accountProfile
     )
 
@@ -55,15 +55,16 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     if ($v3Token.access_token) {
         try {                         
-            if ($accountProfile){
-                $body=$update | ConvertTo-Json -Depth 100
-                $updateSource = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/api/accountProfile/bulkUpdate/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json"} -Body $body
+            if ($accountProfile) {
+                $body = $update | ConvertTo-Json -Depth 100
+                $updateSource = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/api/accountProfile/bulkUpdate/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" } -Body $body
                 return $updateSource
-            }else{
+            }
+            else {
                 Write-Verbose "update ===> $($update)"
-                $updateSource = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/source/update/$($sourceID)?$($update)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json"}            
+                $updateSource = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/source/update/$($sourceID)?$($update)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" }            
                 return $updateSource
-            }           
+            }          
         }
         catch {
             Write-Error "Update failed. $($_)" 

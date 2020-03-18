@@ -1,9 +1,9 @@
 @{
     RootModule        = 'SailPointIdentityNow.psm1'
-    ModuleVersion     = '1.0.6'
+    ModuleVersion     = '1.0.7'
     GUID              = 'f82fe16a-7702-46f3-ab86-5de11b7305de'
     Author            = 'Darren J Robinson'
-    Copyright         = '(c) 2019 . All rights reserved.'
+    Copyright         = '(c) 2020 . All rights reserved.'
     Description       = "Orchestration of SailPoint IdentityNow"
     PowerShellVersion = '5.0'
     FunctionsToExport = @('Complete-IdentityNowTask',
@@ -31,6 +31,7 @@
         'Get-IdentityNowSource',
         'Get-IdentityNowSourceAccounts',
         'Get-IdentityNowTask',
+		'Get-IdentityNowTimeZone',
         'Get-IdentityNowTransform',
         'Get-IdentityNowVACluster',
         'Invoke-IdentityNowAggregateSource',
@@ -68,9 +69,11 @@
         'Search-IdentityNowUsers',
         'Set-IdentityNowCredential',
         'Set-IdentityNowOrg',
+		'Set-IdentityNowTimeZone',
         'Start-IdentityNowCertCampaign',
         'Start-IdentityNowProfileUserRefresh',
         'Test-IdentityNowCredentials',
+        'Test-IdentityNowTransforms',
         'Test-IdentityNowSourceConnection',
         'Test-IdentityNowTransforms',
         'Update-IdentityNowAccessProfile',
@@ -85,6 +88,7 @@
         'Update-IdentityNowUserSourceAccount',
         'Update-IdentityNowTransform'
     )
+    Tags = @('powershell','sailpoint','identitynow', 'sailpoint identitynow')
     PrivateData       = @{
         PSData = @{
             ProjectUri = 'https://github.com/darrenjrobinson/powershell_module_identitynow'

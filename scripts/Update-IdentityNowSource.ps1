@@ -17,7 +17,10 @@ e.g  name=SyntheticAttributes&description=Attributes for Provisioning Logic
 used to update the source account profile, pass the entire profile with updates
 
 .EXAMPLE
-Update-IdentityNowSource -id 12345 -update 'name=SyntheticAttributes&description=Attributes for Provisioning Logic'
+Update-IdentityNowSource -sourceID 12345 -update 'name=SyntheticAttributes&description=Attributes for Provisioning Logic'
+
+.EXAMPLE
+Update-IdentityNowSource -sourceid 123456 -update 'connector_oauth_request_parameters={"scope":"users:read,users:write"}'
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow

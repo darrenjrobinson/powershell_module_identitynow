@@ -1001,7 +1001,7 @@ Aggregate an IdentityNow Source without optimization
 
 Example
 ```
-Invoke-IdentityNowAggregateSource -sourceID 12345 -disableOptimization $true 
+Invoke-IdentityNowAggregateSource -sourceID 12345 -disableOptimization 
 ```
 
 ### Create / Get / Update / Remove IdentityNow Transforms ###

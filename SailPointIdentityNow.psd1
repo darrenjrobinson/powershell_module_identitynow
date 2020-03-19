@@ -75,6 +75,7 @@
         'Test-IdentityNowCredentials',
         'Test-IdentityNowTransforms',
         'Test-IdentityNowSourceConnection',
+        'Test-IdentityNowTransforms',
         'Update-IdentityNowAccessProfile',
         'Update-IdentityNowApplication',
         'Update-IdentityNowEmailTemplate',
@@ -87,7 +88,6 @@
         'Update-IdentityNowUserSourceAccount',
         'Update-IdentityNowTransform'
     )
-    Tags = @('powershell','sailpoint','identitynow', 'sailpoint identitynow')
     PrivateData       = @{
         PSData = @{
             ProjectUri = 'https://github.com/darrenjrobinson/powershell_module_identitynow'

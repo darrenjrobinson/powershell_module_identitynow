@@ -39,16 +39,16 @@ https://github.com/darrenjrobinson/powershell_module_identitynow
         )
 
         write-verbose "TF:$path\$($next.type)"
-        if ($null -ne $next.input) { check-recurse -next $next.input.attributes -transformname $transformname -path "$path\input" }
+        if ($null -ne $next.attributes.input) { check-recurse -next $next.attributes.input -transformname $transformname -path "$path\$($next.type)\input" }
         switch ($next.type) {
             
             'accountAttribute' {
                 $target = $sources.where{ $_.name -eq $next.attributes.sourceName }
-                if ($null -eq $target) {
-                    Write-Warning -Message "TF:$path\$($next.type) - references missing source name '$($next.attributes.sourcename)'" 
+                if (-not $target) {
+                    Write-host -Message "TF:$path\$($next.type) - references missing source name '$($next.attributes.sourcename)'"  -ForegroundColor yellow
                 }
-                elseif ($target.schema.name.where{ $_ -eq $next.attributes.attributeName } -eq $null) {
-                    Write-Warning -Message "TF:$path\$($next.type) - references missing source attribute '$($next.attributes.sourcename):$($next.attributes.attributeName)'"
+                elseif ($target.schema.name -notcontains $next.attributes.attributeName) {
+                    Write-host -Message "TF:$path\$($next.type) - references missing source attribute '$($next.attributes.sourcename):$($next.attributes.attributeName)'" -ForegroundColor yellow
                 }
                 else {
                     Write-Verbose -message "TF:$path\$($next.type) - references valid source attribute '$($next.attributes.sourcename):$($next.attributes.attributeName)'"
@@ -57,7 +57,7 @@ https://github.com/darrenjrobinson/powershell_module_identitynow
             
             'identityAttribute' {
                 if ($next.attributes.name -notin $identity.name) {
-                    write-warning -Message "TF:$path\$($next.type) - references missing identity attribute '$($next.attributes.name)'" 
+                    write-host -Message "TF:$path\$($next.type) - references missing identity attribute '$($next.attributes.name)'" -ForegroundColor yellow
                 }
                 else {
                     Write-Verbose -Message "TF:$path\$($next.type) - references valid identity attribute '$($next.attributes.name)'" 
@@ -65,10 +65,10 @@ https://github.com/darrenjrobinson/powershell_module_identitynow
             }
             
             'firstValid' { $next.attributes.values | ForEach-Object { check-recurse -next $_ -transformname $transformname -path "$path\$($next.type)" } }
-            
+            'lookup'{ (($next.attributes.table | Get-Member -MemberType NoteProperty)).name | ForEach-Object { check-recurse -next $next.attributes.table.$_ -transformname $transformname -path "$path\$($next.type)" } }
             'reference' {
                 if ($next.attributes.id -notin $transforms.id) {
-                    Write-Warning -Message "TF:$path\$($next.type) - references missing transform name '$($next.attributes.id)'"
+                    Write-host -Message "TF:$path\$($next.type) - references missing transform name '$($next.attributes.id)'" -ForegroundColor yellow
                 }
                 else {
                     Write-Verbose -Message "TF:$path\$($next.type) - references valid transform name '$($next.attributes.id)'"
@@ -77,7 +77,7 @@ https://github.com/darrenjrobinson/powershell_module_identitynow
             
             'rule' {
                 if ($next.attributes.name -notin $rule.name) {
-                    Write-Warning -Message "TF:$path\$($next.type) - references missing rule name '$($next.attributes.name)'"
+                    Write-host -Message "TF:$path\$($next.type) - references missing rule name '$($next.attributes.name)'" -ForegroundColor yellow
                 }
                 else {
                     Write-Verbose -Message "TF:$path\$($next.type) - references valid rule name '$($next.attributes.name)'"
@@ -93,7 +93,7 @@ https://github.com/darrenjrobinson/powershell_module_identitynow
     $i = 0
     foreach ($t in $transforms) {
         Write-Progress -Activity "checking $($t.id)" -PercentComplete ($i/$transforms.count*100)
-        check-recurse -next $t -transformname $t.id -path "\\$($t.id)"
+        check-recurse -next $t -transformname $t.id -path "\\$((Get-IdentityNowOrg).'Organisation Name')\$($t.id)"
         $i++
     }
 }

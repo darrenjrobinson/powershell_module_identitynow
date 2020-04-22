@@ -83,6 +83,7 @@
         'Update-IdentityNowGovernanceGroup',
         'Update-IdentityNowIdentityAttribute',
         'Update-IdentityNowOrgConfig',
+        'Update-IdentityNowProfileMapping',
         'Update-IdentityNowProfileOrder',
         'Update-IdentityNowRole',
         'Update-IdentityNowSource',

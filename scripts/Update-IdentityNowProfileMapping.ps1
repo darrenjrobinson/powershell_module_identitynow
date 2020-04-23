@@ -33,6 +33,11 @@ Update-IdentityNowProfileOrder -id 1285 -IdentityAttribute uid -sourceType Null
 .EXAMPLE
 Update-IdentityNowProfileOrder -id 1285 -IdentityAttribute managerDn -sourceType Complex -source 'Rule - IdentityAttribute - Get Manager'
 
+.EXAMPLE
+$idp=Get-IdentityNowProfile
+$source=@('AD','samAccountName','Transform-UID')
+$idp.id | foreach {Update-IdentityNowProfileMapping -ID $_ -IdentityAttribute uid -sourceType Standard -source $source; Start-IdentityNowProfileUserRefresh -id $_}
+
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
 

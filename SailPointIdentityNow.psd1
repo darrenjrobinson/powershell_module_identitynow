@@ -1,12 +1,13 @@
 @{
-    RootModule        = 'SailPointIdentityNow.psm1'
-    ModuleVersion     = '1.0.7'
-    GUID              = 'f82fe16a-7702-46f3-ab86-5de11b7305de'
-    Author            = 'Darren J Robinson'
-    Copyright         = '(c) 2020 . All rights reserved.'
-    Description       = "Orchestration of SailPoint IdentityNow"
-    PowerShellVersion = '5.0'
-    FunctionsToExport = @('Complete-IdentityNowTask',
+    RootModule           = 'SailPointIdentityNow.psm1'
+    ModuleVersion        = '1.0.8'
+    GUID                 = 'f82fe16a-7702-46f3-ab86-5de11b7305de'
+    Author               = 'Darren J Robinson'
+    Copyright            = '(c) 2020 . All rights reserved.'
+    Description          = "Orchestration of SailPoint IdentityNow"
+    PowerShellVersion    = '5.0'
+    CompatiblePSEditions = 'Core', 'Desktop'
+    FunctionsToExport    = @('Complete-IdentityNowTask',
         'Get-HashString',
         'Get-IdentityNowAccessProfile',
         'Get-IdentityNowAccountActivities',
@@ -31,7 +32,7 @@
         'Get-IdentityNowSource',
         'Get-IdentityNowSourceAccounts',
         'Get-IdentityNowTask',
-		'Get-IdentityNowTimeZone',
+        'Get-IdentityNowTimeZone',
         'Get-IdentityNowTransform',
         'Get-IdentityNowVACluster',
         'Invoke-IdentityNowAggregateSource',
@@ -69,7 +70,7 @@
         'Search-IdentityNowUsers',
         'Set-IdentityNowCredential',
         'Set-IdentityNowOrg',
-		'Set-IdentityNowTimeZone',
+        'Set-IdentityNowTimeZone',
         'Start-IdentityNowCertCampaign',
         'Start-IdentityNowProfileUserRefresh',
         'Test-IdentityNowCredentials',
@@ -88,7 +89,7 @@
         'Update-IdentityNowUserSourceAccount',
         'Update-IdentityNowTransform'
     )
-    PrivateData       = @{
+    PrivateData          = @{
         PSData = @{
             ProjectUri = 'https://github.com/darrenjrobinson/powershell_module_identitynow'
         } 

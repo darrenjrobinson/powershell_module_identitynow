@@ -23,6 +23,9 @@ Headersv3_JSON is JWT oAuth with Content-Type set for application/json
 .PARAMETER body
 (optional - JSON) Payload for a webrequest
 
+.PARAMETER json
+(optional) Return IdentityNow Request response as JSON.
+
 .EXAMPLE
 Invoke-IdentityNowRequest -method Get -headers Headersv2 -uri "https://YOURORG.api.identitynow.com/v2/accounts?sourceId=12345&limit=20&org=YOURORG"
 
@@ -45,7 +48,9 @@ http://darrenjrobinson.com/sailpoint-identitynow
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string][ValidateSet("HeadersV2", "HeadersV3", "Headersv2_JSON", "Headersv3_JSON", "Headersv3_JSON-Patch")]$headers,
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$body
+        [string]$body,
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [switch]$json
     )
 
     # IdentityNow Admin User
@@ -105,10 +110,20 @@ http://darrenjrobinson.com/sailpoint-identitynow
     if ($requestHeaders) {
         try {
             if ($body) {
-                $result = Invoke-RestMethod -Method $method -Uri $uri -Headers $requestHeaders -Body $body 
+                if ($json) {
+                    $result = (Invoke-WebRequest -Method $method -Uri $uri -Headers $requestHeaders -Body $body).content
+                }
+                else {
+                    $result = Invoke-RestMethod -Method $method -Uri $uri -Headers $requestHeaders -Body $body 
+                }
             }
-            else {            
-                $result = Invoke-RestMethod -Method $method -Uri $uri -Headers $requestHeaders        
+            else {   
+                if ($json) {
+                    $result = (Invoke-WebRequest -Method $method -Uri $uri -Headers $requestHeaders).content
+                }
+                else {      
+                    $result = Invoke-RestMethod -Method $method -Uri $uri -Headers $requestHeaders        
+                }
             }
             return $result
         }

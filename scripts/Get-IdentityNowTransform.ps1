@@ -9,11 +9,17 @@ Get IdentityNow Transform(s).
 .PARAMETER ID
 (optional) The ID of an IdentityNow Transform.
 
+.PARAMETER json
+(optional) Return IdentityNow Transform(s) as JSON.
+
 .EXAMPLE
 Get-IdentityNowTransform 
 
 .EXAMPLE
 Get-IdentityNowTransform -ID ToUpper 
+
+.EXAMPLE
+Get-IdentityNowTransform -ID ToUpper -json 
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow

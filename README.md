@@ -1404,6 +1404,8 @@ Header options are;
 * Headersv3_JSON - Headersv3_JSON is JWT oAuth with Content-Type set for application/json
 * Headersv3_JSON-Patch - Headersv3_JSON is JWT oAuth with Content-Type set for application/json-patch+json
 
+<b>OPTION:</b> -json switch to return request result as JSON. 
+
 Example 1
 Get the Schema of a Source
 [Reference post](https://blog.darrenjrobinson.com/creating-sailpoint-identitynow-source-configuration-backups-and-html-reports-with-powershell/)

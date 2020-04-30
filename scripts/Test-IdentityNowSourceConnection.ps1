@@ -42,7 +42,13 @@ written by Sean McGovern 11/20/2019 (twitter @410sean)
     # Get v3 oAuth Token
     # oAuth URI
     $oAuthURI = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/oauth/token"
-    $v3Token = Invoke-RestMethod -Method Post -Uri "$($oAuthURI)?grant_type=password&username=$($adminUSR)&password=$($adminPWD)" -Headers $Headersv3 
+    $oAuthTokenBody = @{
+        grant_type = "password"
+        username   = $adminUSR
+        password   = $adminPWD
+    }
+    $v3Token = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody -Headers $Headersv3 
+
     if ($v3Token.access_token) {
         try {
             $privateuribase = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com"

@@ -40,8 +40,6 @@ function Invoke-IdentityNowSourceReset {
     # Generate the account hash
     $hashUser = Get-HashString $adminUSR.ToLower() 
     $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
-
-    $tokenURI = "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/oauth/token?grant_type=password&username=$($adminUSR)&password=$($adminPWD)"
     
     # v2 Auth
     $clientSecretv2 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v2.Password))
@@ -49,7 +47,13 @@ function Invoke-IdentityNowSourceReset {
     $encodedAuth = [Convert]::ToBase64String($Bytes)     
 
     # Get Token
-    $token = Invoke-RestMethod -Method POST -Uri $tokenURI -Headers @{Authorization = "Basic $($encodedAuth)" } 
+    $oAuthURI = "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/oauth/token"
+    $oAuthTokenBody = @{
+        grant_type = "password"
+        username   = $adminUSR
+        password   = $adminPWD
+    }
+    $token = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody -Headers @{Authorization = "Basic $($encodedAuth)" } 
 
     if ($token) {
         try {

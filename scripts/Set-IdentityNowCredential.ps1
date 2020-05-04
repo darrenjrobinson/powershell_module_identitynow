@@ -34,13 +34,15 @@ function Set-IdentityNowCredential {
 
     [CmdletBinding()]
     param (
-        [PSCredential]$AdminCredential = $(Get-Credential -Message 'Enter IdentityNow Admin User Credentials.'),
-        [PSCredential]$v2APIKey = $(Get-Credential -Message 'Enter IdentityNow v1/v2 API ClientID and Secret generated from the IdentityNow Admin Portal.'),
-        [PSCredential]$v3APIKey = $(Get-Credential -Message 'Enter IdentityNow v3 API ClientID and Secret provided by SailPoint for your Org.')
+        [PSCredential]$AdminCredential,
+        [PSCredential]$v2APIKey,
+        [PSCredential]$v3APIKey,
+        [PSCredential]$PersonalAccessToken
     )
 
-    $IdentityNowConfiguration.AdminCredential = $AdminCredential
-    $IdentityNowConfiguration.v2 = $v2APIKey
-    $IdentityNowConfiguration.v3 = $v3APIKey
+    if ($AdminCredential){$IdentityNowConfiguration.AdminCredential = $AdminCredential}
+    if ($v2APIKey){$IdentityNowConfiguration.v2 = $v2APIKey}
+    if ($v3apikey){$IdentityNowConfiguration.v3 = $v3APIKey}
+    if ($PersonalAccessToken){$IdentityNowConfiguration.PAT = $PersonalAccessToken}
 }
 

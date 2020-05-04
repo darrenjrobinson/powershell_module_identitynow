@@ -1,11 +1,10 @@
 function Get-IdentityNowAuthorization {
     <#
 .SYNOPSIS
-Gets Identity Now JWT access token or basic auth header.
+Gets IdentityNow JWT access token or basic auth header.
 
 .DESCRIPTION
-will return api v2 or v3 auth.
-
+will return API v2 or v3 auth.
 
 .PARAMETER returnType
 (required) Headers for the request
@@ -16,7 +15,7 @@ Headersv3 is JWT oAuth
 Invoke-IdentityNowRequest -return V2Header
 
 .EXAMPLE
-Invoke-IdentityNowRequest -return v3jwt
+Invoke-IdentityNowRequest -return V3JWT
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -88,7 +87,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
     $Bytes = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v2.UserName):$($clientSecretv2)") 
     $encodedAuth = [Convert]::ToBase64String($Bytes)     
 
-    switch ($Return) {
+    switch ($return) {
         V2Header { 
             $requestHeaders = @{Authorization = "Basic $($encodedAuth)" }
             Write-Verbose "Authorization = Basic $($encodedAuth)"
@@ -103,7 +102,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
         }
         default { 
-            $requestHeaders = $headers 
+            $requestHeaders = $Headersv3 
         } 
     }
     

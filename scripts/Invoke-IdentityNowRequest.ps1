@@ -53,54 +53,29 @@ http://darrenjrobinson.com/sailpoint-identitynow
         [switch]$json
     )
 
-    # IdentityNow Admin User
-    $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
-    $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
-
-    # Generate the account hash
-    $hashUser = Get-HashString $adminUSR.ToLower() 
-    $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
-
-    $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
-    # Basic Auth
-    $Bytesv3 = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v3.UserName):$($clientSecretv3)")
-    $encodedAuthv3 = [Convert]::ToBase64String($Bytesv3)
-    $Headersv3 = @{Authorization = "Basic $($encodedAuthv3)" }
-
-    # Get v3 oAuth Token
-    # oAuth URI
-    $oAuthURI = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/oauth/token"
-    $oAuthTokenBody = @{
-        grant_type = "password"
-        username = $adminUSR
-        password = $adminPWD
-    }
-    $v3Token = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody -Headers $Headersv3 
-    
-    # v2 Auth
-    $clientSecretv2 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v2.Password))
-    $Bytes = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v2.UserName):$($clientSecretv2)") 
-    $encodedAuth = [Convert]::ToBase64String($Bytes)     
-
     switch ($headers) {
         HeadersV2 { 
-            $requestHeaders = @{Authorization = "Basic $($encodedAuth)" }
-            Write-Verbose "Authorization = Basic $($encodedAuth)"
+            $requestHeaders = Get-IdentityNowAuth -return V2Header
+            Write-Verbose "$requestheaders"
         }
         HeadersV3 { 
+            $v3Token=Get-IdentityNowAuth
             $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)" }
             Write-Verbose "Authorization = Bearer $($v3Token.access_token)"
         }
         Headersv2_JSON { 
-            $requestHeaders = @{Authorization = "Basic $($encodedAuth)"; "Content-Type" = "application/json" }
+            $requestHeaders = Get-IdentityNowAuth -return V2Header
+            $requestHeaders.'Content-Type' = "application/json" 
             Write-Verbose "Authorization = 'Basic $($encodedAuth)' ; 'Content-Type' = 'application/json' "
         }
         Headersv3_JSON { 
+            $v3Token=Get-IdentityNowAuth
             $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json" }
             Write-Verbose "Authorization = 'Bearer $($v3Token.access_token)' ; 'Content-Type' = 'application/json'"
             Write-verbose ($v3Token | convertTo-json)
         }
         Headersv3_JSON-Patch { 
+            $v3Token=Get-IdentityNowAuth
             $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json-patch+json" }
             Write-Verbose "Authorization = 'Bearer $($v3Token.access_token)'; 'Content-Type' = 'application/json-patch+json'"
             Write-verbose ($v3Token | convertTo-json)

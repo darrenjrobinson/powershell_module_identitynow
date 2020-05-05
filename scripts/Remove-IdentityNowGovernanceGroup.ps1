@@ -30,12 +30,8 @@ function Remove-IdentityNowGovernanceGroup {
         [string]$groupID
     )
 
-    # v2 Auth
-    $clientSecretv2 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v2.Password))
-    $Bytes = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v2.UserName):$($clientSecretv2)") 
-    $encodedAuth = [Convert]::ToBase64String($Bytes) 
-
-    $Headersv2 = @{Authorization = "Basic $($encodedAuth)"; "Content-Type" = "application/json" }
+    $Headersv2 = Get-IdentityNowAuth -return V2Header
+    $Headersv2."Content-Type" = "application/json"
 
     try {        
         $grpID = @($groupID)

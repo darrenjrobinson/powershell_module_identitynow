@@ -23,6 +23,8 @@ function Save-IdentityNowConfiguration {
         orgName         = $IdentityNowConfiguration.orgName 
         v2              = $IdentityNowConfiguration.v2
         v3              = $IdentityNowConfiguration.v3
+        PAT             = $IdentityNowConfiguration.PAT
+        JWT             = $IdentityNowConfiguration.JWT
         AdminCredential = $IdentityNowConfiguration.AdminCredential
     }
     Export-Clixml -Path $IdentityNowConfigurationFile -InputObject $IdentityNowConfiguration

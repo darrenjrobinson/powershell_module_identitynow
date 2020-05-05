@@ -3,6 +3,8 @@ $IdentityNowConfiguration = @{
     v2  = $null
     v3  = $null
     AdminCredential = $null
+    PAT = $null
+    JWT = $null
     DefaultOrg = $null
 }
 

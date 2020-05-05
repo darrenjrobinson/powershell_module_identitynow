@@ -54,16 +54,31 @@ function Get-IdentityNowSourceAccounts {
                     }
                 }
             } until ($results.Count -lt $searchLimit)
+
             if ($attributes) {
                 $temp = $sourceObjects
                 $sourceObjects = @()
                 $i = 0
+                $currenterroraction = $ErrorActionPreference
+                $ErrorActionPreference = 'continue'
+                
                 foreach ($object in $temp) {
                     $i++
                     Write-Progress -Activity "fetching account attributes $($i) of $($temp.count)" -PercentComplete ($i / $temp.count * 100)
-                    $result = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts/$($object.id)" -Headers $Headersv2
+                    do {
+                        $result = $null
+                        try {
+                            $result = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts/$($object.id)" -Headers $Headersv2
+                        }
+                        catch {
+                            write-host "Sleeping 2 seconds:$($_)"
+                            Start-Sleep -Seconds 2
+                        }
+                    }until($null -ne $result)
+                    
                     $sourceObjects += $result
                 }
+                $ErrorActionPreference = $currenterroraction
             }
             return $sourceObjects
         }

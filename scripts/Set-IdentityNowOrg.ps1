@@ -27,8 +27,10 @@ function Set-IdentityNowOrg {
 
     process {
         $IdentityNowConfiguration.OrgName = $orgName
-        if ($null -ne $IdentityNowConfiguration.($orgName).AdminCredential) { $IdentityNowConfiguration.AdminCredential = $IdentityNowConfiguration.($orgName).AdminCredential }
-        if ($null -ne $IdentityNowConfiguration.($orgName).v2) { $IdentityNowConfiguration.v2 = $IdentityNowConfiguration.($orgName).v2 }
-        if ($null -ne $IdentityNowConfiguration.($orgName).v3) { $IdentityNowConfiguration.v3 = $IdentityNowConfiguration.($orgName).v3 }
+        if ($IdentityNowConfiguration.($orgName).AdminCredential) { $IdentityNowConfiguration.AdminCredential = $IdentityNowConfiguration.($orgName).AdminCredential }
+        if ($IdentityNowConfiguration.($orgName).v2) { $IdentityNowConfiguration.v2 = $IdentityNowConfiguration.($orgName).v2 }
+        if ($IdentityNowConfiguration.($orgName).v3) { $IdentityNowConfiguration.v3 = $IdentityNowConfiguration.($orgName).v3 }
+        $IdentityNowConfiguration.PAT= $IdentityNowConfiguration.($orgName).PAT
+        $IdentityNowConfiguration.JWT= $IdentityNowConfiguration.($orgname).JWT
     }
 }

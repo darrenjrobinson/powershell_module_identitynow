@@ -4,7 +4,7 @@ function Update-IdentityNowProfileMapping {
 Update IdentityNow Profile Attribute Mapping.
 
 .DESCRIPTION
-Update IdentityNow Profile mapping.
+Update IdentityNow Profile Attribute Mapping.
 
 .PARAMETER ID
 (required) ID of the Identity Profile to update
@@ -62,7 +62,6 @@ http://darrenjrobinson.com/sailpoint-identitynow
     # Generate the account hash
     $hashUser = Get-HashString $adminUSR.ToLower() 
     $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
-
     $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
 
     # Basic Auth
@@ -71,9 +70,14 @@ http://darrenjrobinson.com/sailpoint-identitynow
     $Headersv3 = @{Authorization = "Basic $($encodedAuthv3)" }
 
     # Get v3 oAuth Token
-    # oAuth URI
+    # oAuth URI    
     $oAuthURI = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/oauth/token"
-    $v3Token = Invoke-RestMethod -Method Post -Uri "$($oAuthURI)?grant_type=password&username=$($adminUSR)&password=$($adminPWD)" -Headers $Headersv3 
+    $oAuthTokenBody = @{
+        grant_type = "password"
+        username = $adminUSR
+        password = $adminPWD
+    }
+    $v3Token = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody -Headers $Headersv3 
 
     if ($v3Token.access_token) {
         try {
@@ -109,8 +113,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
                             }
                         }
                         default{
-                            write-error 'unable to get two or three items from source parameter'
-                            exit
+                            write-error "unable to get two or three items from source parameter $($_)"
+                            quit
                         }
                     }
 

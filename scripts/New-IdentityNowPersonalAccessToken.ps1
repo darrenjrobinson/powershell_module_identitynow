@@ -1,22 +1,16 @@
 function New-IdentityNowPersonalAccessToken {
     <#
 .SYNOPSIS
-Create an IdentityNow v3 oAuth API Client.
+Create an IdentityNow v3 oAuth Personal Access Token.
 
 .DESCRIPTION
-Create an IdentityNow v3 oAuth API Client.
+Create an IdentityNow v3 oAuth Personal Access Token.
 
 .PARAMETER name
-(required) Grant Type options "AUTHORIZATION_CODE,CLIENT_CREDENTIALS,REFRESH_TOKEN,PASSWORD"
-
-.PARAMETER description
-(required) Description 
-
-.PARAMETER redirectUris
-(required) redirectUris e.g "https://localhost,https://myapp.com.au"
+(required) e.g MyApps
 
 .EXAMPLE
-New-IdentityNowOAuthAPIClient -description "oAuth Client via API" -grantTypes 'AUTHORIZATION_CODE,CLIENT_CREDENTIALS,REFRESH_TOKEN,PASSWORD' -redirectUris 'https://localhost'
+New-IdentityNowPersonalAccessToken -name "MyApp" 
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow

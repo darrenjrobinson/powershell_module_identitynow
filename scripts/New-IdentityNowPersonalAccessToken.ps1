@@ -1,35 +1,46 @@
 function New-IdentityNowPersonalAccessToken {
     <#
 .SYNOPSIS
-Create an IdentityNow v3 oAuth API Client.
+Create an IdentityNow Personal Access Token.
 
 .DESCRIPTION
-Create an IdentityNow v3 oAuth API Client.
+Create an IdentityNow Personal Access Token. this is a supported way of authenticating to 
+IdentityNow API without browser prompt.
 
 .PARAMETER name
-(required) Grant Type options "AUTHORIZATION_CODE,CLIENT_CREDENTIALS,REFRESH_TOKEN,PASSWORD"
+(required) identifiable name for a new Personal access token like postman, powershell, or 'sailpointidentitynow module'
 
-.PARAMETER description
-(required) Description 
-
-.PARAMETER redirectUris
-(required) redirectUris e.g "https://localhost,https://myapp.com.au"
+.PARAMETER accessToken
+if a personal access token needs to be made for an account not saved in this module 
+we can pull the access token from https://{org}.identitynow.com/ui/session?refresh=true
+after pulling up the admin section
 
 .EXAMPLE
-New-IdentityNowOAuthAPIClient -description "oAuth Client via API" -grantTypes 'AUTHORIZATION_CODE,CLIENT_CREDENTIALS,REFRESH_TOKEN,PASSWORD' -redirectUris 'https://localhost'
+New-IdentityNowPersonalAccessToken -name "Sean's SailpointIdentitynow module"
+
+.EXAMPLE
+New-IdentityNowPersonalAccessToken -name "Sean's SailpointIdentitynow module" -accessToken $at
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
+
+.LINK
+https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-REST-API-Create-Personal-Access-Token/ta-p/150462
+
 
 #>
 
     [cmdletbinding()]
     param( 
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]    
-        [string]$name    
+        [string]$name,
+        [string]$accessToken
     )
-
-    $v3Token = Get-IdentityNowAuth
+    if ($accessToken){
+        $v3Token=$accessToken
+    }else{
+        $v3Token = Get-IdentityNowAuth
+    }
 
     if ($v3Token.access_token) {
         try {    

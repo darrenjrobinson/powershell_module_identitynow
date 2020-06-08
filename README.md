@@ -155,6 +155,7 @@ Get-IdentityNowOAuthAPIClient               Get IdentityNow oAuth API Client(s).
 Get-IdentityNowOrg                          Displays the default Uri value for all or a particular Organisation based on configured OrgName.
 Get-IdentityNowOrgConfig                    Get IdentityNow Org Global Reminders and Escalation Policies Configuration.
 Get-IdentityNowOrgStatus                    Get an IdentityNow Org Status.
+Get-IdentityNowPersonalAccessToken          List IdentityNow Personal Access Tokens.
 Get-IdentityNowProfile                      Get IdentityNow Profile(s).
 Get-IdentityNowProfileOrder                 Get IdentityNow Profiles Order.
 Get-IdentityNowQueue                        Get IdentityNow Queues.
@@ -1092,6 +1093,21 @@ $templateChanges.add("id","2c91601362431b32016275b4241b08f0")
 $templateChanges.add("subject",'Access Request requires completion of Work Item ID : $workItemName')
 
 Update-IdentityNowEmailTemplate -template ($templateChanges | ConvertTo-Json)
+```
+
+### Get IdentityNow Personal Access Token(s) ###
+List IdentityNow Personal Access Token(s).
+
+Example
+```
+Get-IdentityNowPersonalAccessToken
+```
+
+Limit number of Personal Access Tokens to return
+
+Example
+```
+Get-IdentityNowPersonalAccessToken -limit 10
 ```
 
 ### Get IdentityNow Identity Profiles ###

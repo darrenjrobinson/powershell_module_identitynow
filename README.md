@@ -146,6 +146,7 @@ Get-IdentityNowAccountActivity              Get IdentityNow Activity for an acco
 Get-IdentityNowActiveJobs                   Get IdentityNow Active Jobs.
 Get-IdentityNowAPIClient                    Get IdentityNow API Client(s).
 Get-IdentityNowApplication                  Get IdentityNow Application(s).
+Get-IdentityNowAuth                         Gets IdentityNow JWT access token or basic auth header.
 Get-IdentityNowCertCampaign                 Get IdentityNow Certification Campaign(s).
 Get-IdentityNowCertCampaignReport           Get IdentityNow Certification Campaign Report(s).
 Get-IdentityNowEmailTemplate                Get IdentityNow Email Template(s).
@@ -987,6 +988,32 @@ $appBody = @{
     "appCenterEnabled"        = $false
 } 
 Update-IdentityNowApplication -appID 24188 -update ($appBody | ConvertTo-Json) 
+```
+
+### Get IdentityNow Authentication Headers / Token ####
+Get IdentityNow API Authentication Headers or v3 JWT. 
+
+Parameters: authentication header/token to return (defaults to V3JWT)
+- V2Header Digest Auth
+- V3Header oAuth Access Token Bearer Header
+- V3JWT is oAuth JWT Token
+
+Return default JWT 
+Example
+```
+Get-IdentityNowAuth
+```
+
+Return v2 Digest Auth Header
+Example
+```
+Get-IdentityNowAuth -return V2Header
+```
+
+Return v3 oAuth Access Token Bearer Header
+Example
+```
+Get-IdentityNowAuth -return V3Header
 ```
 
 ### Initiate Aggregation of an IdentityNow Source ###

@@ -1110,6 +1110,22 @@ Example
 Get-IdentityNowPersonalAccessToken -limit 10
 ```
 
+### Create an IdentityNow Personal Access Token(s) ###
+Create an IdentityNow Personal Access Token.
+
+Example
+```
+New-IdentityNowPersonalAccessToken -name "Sean's Sailpoint IdentityNow module"
+```
+
+*Optional:* If a personal access token needs to be made for an account not saved in this module you can pull the access token from https://{org}.identitynow.com/ui/session?refresh=true after pulling up the admin section 
+[See Compass article:]( https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-REST-API-Create-Personal-Access-Token/ta-p/150462 )
+
+Example
+```
+New-IdentityNowPersonalAccessToken -name "Sean's Sailpoint IdentityNow module" -accessToken baa2c01cb5674636b8c0f063f3f13db3
+```
+
 ### Get IdentityNow Identity Profiles ###
 Get IdentityNow Identity Profiles
 

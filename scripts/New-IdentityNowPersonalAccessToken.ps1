@@ -4,22 +4,22 @@ function New-IdentityNowPersonalAccessToken {
 Create an IdentityNow Personal Access Token.
 
 .DESCRIPTION
-Create an IdentityNow Personal Access Token. this is a supported way of authenticating to 
+Create an IdentityNow Personal Access Token. This is a supported way of authenticating to 
 IdentityNow API without browser prompt.
 
 .PARAMETER name
-(required) identifiable name for a new Personal access token like postman, powershell, or 'sailpointidentitynow module'
+(required) Identifiable name for a new Personal access token like postman, powershell, or 'sailpointidentitynow module'
 
 .PARAMETER accessToken
-if a personal access token needs to be made for an account not saved in this module 
+(optional) if a personal access token needs to be made for an account not saved in this module 
 we can pull the access token from https://{org}.identitynow.com/ui/session?refresh=true
 after pulling up the admin section
 
 .EXAMPLE
-New-IdentityNowPersonalAccessToken -name "Sean's SailpointIdentitynow module"
+New-IdentityNowPersonalAccessToken -name "Sean's Sailpoint IdentityNow module"
 
 .EXAMPLE
-New-IdentityNowPersonalAccessToken -name "Sean's SailpointIdentitynow module" -accessToken $at
+New-IdentityNowPersonalAccessToken -name "Sean's Sailpoint IdentityNow module" -accessToken baa2c01cb5674636b8c0f063f3f13db3
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -29,16 +29,17 @@ https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-REST-API-Create-
 
 
 #>
-
     [cmdletbinding()]
     param( 
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]    
         [string]$name,
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]   
         [string]$accessToken
     )
-    if ($accessToken){
-        $v3Token=$accessToken
-    }else{
+    if ($accessToken) {
+        $v3Token = $accessToken
+    }
+    else {
         $v3Token = Get-IdentityNowAuth
     }
 

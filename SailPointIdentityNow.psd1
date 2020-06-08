@@ -59,6 +59,7 @@
         'Remove-IdentityNowAPIClient',
         'Remove-IdentityNowGovernanceGroup',
         'Remove-IdentityNowOAuthAPIClient',
+        'Remove-IdentityNowPersonalAccessToken',
         'Remove-IdentityNowProfile',
         'Remove-IdentityNowRole',
         'Remove-IdentityNowSource'

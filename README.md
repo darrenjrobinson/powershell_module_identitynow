@@ -188,6 +188,7 @@ Remove-IdentityNowAccessProfile             Delete an IdentityNow Access Profile
 Remove-IdentityNowAPIClient                 Delete an IdentityNow API Client.
 Remove-IdentityNowGovernanceGroup           Delete an IdentityNow Governance Group.
 Remove-IdentityNowOAuthAPIClient            Delete an IdentityNow oAuth API Client.
+Remove-IdentityNowPersonalAccessToken       Delete a personal access token in IdentityNow. 
 Remove-IdentityNowProfile                   Delete an IdentityNow Identity Profile.
 Remove-IdentityNowRole                      Delete an IdentityNow Role.
 Remove-IdentityNowSource                    Deletes an IdentityNow Source.
@@ -1124,6 +1125,14 @@ New-IdentityNowPersonalAccessToken -name "Sean's Sailpoint IdentityNow module"
 Example
 ```
 New-IdentityNowPersonalAccessToken -name "Sean's Sailpoint IdentityNow module" -accessToken baa2c01cb5674636b8c0f063f3f13db3
+```
+
+### Remove an IdentityNow Personal Access Token ###
+Delete an IdentityNow Personal Access Token
+
+Example
+```
+Remove-IdentityNowPersonalAccessToken -id 36480043060f4562af28123456
 ```
 
 ### Get IdentityNow Identity Profiles ###

@@ -175,7 +175,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
     if ($IdentityNowConfiguration.JWT.refresh_token) {
         $oAuthTokenBody = @{
             grant_type    = "refresh_token"
-            client_id     = (get-jwtdetails $IdentityNowConfiguration.jwt.access_token).client_id
+            client_id     = (get-jwtdetails $IdentityNowConfiguration.JWT.access_token).client_id
             client_secret = $null
             refresh_token = $IdentityNowConfiguration.JWT.refresh_token
         }
@@ -200,16 +200,15 @@ http://darrenjrobinson.com/sailpoint-identitynow
             password   = $adminPWD
         }        
     }
-    if (-not $IdentityNowConfiguration.jwt) { $forcerefresh = $true }
-    if ($ForceRefresh -or ((get-jwtdetails $IdentityNowConfiguration.jwt.access_token).expiryDateTime -lt (get-date).addminutes(1) -and (get-jwtdetails $IdentityNowConfiguration.jwt.access_token).org -eq $IdentityNowConfiguration.org)) {
+    if (-not $IdentityNowConfiguration.JWT) { $forcerefresh = $true }
+    if ($ForceRefresh -or ((get-jwtdetails $IdentityNowConfiguration.JWT.access_token).expiryDateTime -lt (get-date).addminutes(1) -and (get-jwtdetails $IdentityNowConfiguration.JWT.access_token).org -eq $IdentityNowConfiguration.orgName)) {
         Write-Verbose ($oAuthTokenBody | convertto-json)
         if ($oAuthTokenBody.grant_type -ne 'password') { $Headersv3 = $null }
         $v3Token = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody -Headers $Headersv3
-        $IdentityNowConfiguration.jwt = $v3Token
-        
+        $IdentityNowConfiguration.JWT = $v3Token
     }
     else {
-        $v3Token = $IdentityNowConfiguration.jwt
+        $v3Token = $IdentityNowConfiguration.JWT
     }
 
     # v2 Auth
@@ -229,7 +228,6 @@ http://darrenjrobinson.com/sailpoint-identitynow
         V3JWT { 
             $requestHeaders = $v3Token
             Write-Verbose $v3Token
-
         }
         default { 
             $requestHeaders = $Headersv3 

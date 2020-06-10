@@ -861,12 +861,12 @@ Example
 Get-IdentityNowSourceAccounts -sourceID 40113
 ```
 
-Get Source Accounts with all their attributes. Defaults to False. Set to True. 
+Get Source Accounts with all their attributes. Defaults to False. Using the switch -attributes sets return all attributes to True. 
 <b>Note:</b> Each account is a sepearte API call. Large sources will take time to return all accounts with attributes.
 
 Example
 ```
-Get-IdentityNowSourceAccounts -sourceID 40113 -attributes $true
+Get-IdentityNowSourceAccounts -sourceID 40113 -attributes 
 ```
 
 ### Create / Update / Remove IdentityNow Source Account (Flat File / Delimited Sources)  ###

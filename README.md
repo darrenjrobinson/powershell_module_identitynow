@@ -13,7 +13,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 ## Features ##
 * Easy command-line use, after setting default configuration options and securely saving them to the current user's profile.
 * Get an IdentityNow Organisation and Get / Update an Organisation Configuration
-* Test IdentitNow Credentials
+* Test IdentityNow Credentials
 * Get IdentityNow Queue
 * Get IdentityNow Active Jobs
 * Get IdentityNow Org Status
@@ -267,7 +267,7 @@ Update-IdentityNowOrgConfig -update ($approvalConfigBody | convertto-json)
 
 ```
 
-### Test IdentitNow Credentials ###
+### Test IdentityNow Credentials ###
 Test saved IdentityNow PowerShell Module credentials.
 Validates the saved credentials (v2 and v3) against the configured Org. 
 
@@ -715,7 +715,7 @@ Example
 Remove-IdentityNowRole -roleID 2c9180886cd58059016d1a5a23f609a8
 ```
 
-### Get / Update / Test IdentityNow Sources ###
+### Get / Update / Test / Create / Remove IdentityNow Sources ###
 Get all IdentityNow Sources
 [Reference post](https://blog.darrenjrobinson.com/managing-sailpoint-identitynow-sources-via-the-api-with-powershell/)
 
@@ -1317,6 +1317,7 @@ Remove-IdentityNowOAuthAPIClient -ID '9e23deaf-48aa-dead-beef-ab6821a12ab2'
 ```
 
 ### Search Audit Events (v2) ###
+**NOTE: Deprecated** [The v2 API for Audit Events has been decprecated as of end of May 2020.](https://community.sailpoint.com/t5/Updates/IdentityNow-s-Latest-Changes-for-May-4-11/ba-p/165983) </br>
 Search IdentityNow Audit Events using the v2 API 
 Search options (except Filter) as per the [v2/Audit documentation](https://community.sailpoint.com/t5/Admin-Help/Rest-API-to-View-Audit-Entries/ta-p/73965)
 For Filter (JSON) Audit Event queries use the Search-IdentityNowEvents cmdlet

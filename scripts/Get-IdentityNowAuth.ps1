@@ -212,9 +212,12 @@ http://darrenjrobinson.com/sailpoint-identitynow
     }
 
     # v2 Auth
-    $clientSecretv2 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v2.Password))
-    $Bytes = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v2.UserName):$($clientSecretv2)") 
-    $encodedAuth = [Convert]::ToBase64String($Bytes)     
+    # Check to see if v2 API Client exists before generating v2 Headers
+    if ($IdentityNowConfiguration.v2) {
+        $clientSecretv2 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v2.Password))
+        $Bytes = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v2.UserName):$($clientSecretv2)") 
+        $encodedAuth = [Convert]::ToBase64String($Bytes)     
+    }
 
     switch ($return) {
         V2Header { 

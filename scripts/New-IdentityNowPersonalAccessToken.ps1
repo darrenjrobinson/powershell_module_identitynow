@@ -51,7 +51,13 @@ https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-REST-API-Create-
             return $IDNNewPAT
         }
         catch {
-            Write-Error "Create Personal Access Token failed. $($_)" 
+            if ($_ -like '*"methodName":"create","fileName":"PersonalAccessTokenRepository.java"*') {
+                Write-Error "A Personal Access Token with that name already exists. New Personal Access Token not created."
+                Write-Error $_
+            }
+            else {
+                Write-Error "Create Personal Access Token failed. $($_)" 
+            }
         }
     }
     else {

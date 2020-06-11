@@ -33,7 +33,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
     if ($v3Token.access_token) {
         try {   
             $profID = "profileIds=$($profileIds -join ',')"
-            $IDNDeleteIDP = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/profile/bulkDelete" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" ; "Content-Type" = "application/json" } -Body $profID
+            Write-Verbose $profID
+            $IDNDeleteIDP = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/profile/bulkDelete" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" ; "Content-Type" = "application/x-www-form-urlencoded; charset=UTF-8"} -Body $profID
             return $IDNDeleteIDP
         }
         catch {

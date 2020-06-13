@@ -145,8 +145,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
         $orig = (Get-Date -Year 1970 -Month 1 -Day 1 -hour 0 -Minute 0 -Second 0 -Millisecond 0)
         $timeZone = Get-TimeZone
         $utcTime = $orig.AddSeconds($decodedToken.exp)
-        $hoursOffset = $timeZone.GetUtcOffset($(Get-Date)).hours #Daylight saving needs to be calculated
-        $localTime = $utcTime.AddHours($hoursOffset)     # Return local time,
+        $offset = $timeZone.GetUtcOffset($(Get-Date)).TotalMinutes #Daylight saving needs to be calculated
+		$localTime = $utcTime.AddMinutes($offset)     # Return local time,
         $decodedToken | Add-Member -Type NoteProperty -Name "expiryDateTime" -Value $localTime
         
         # Time to Expiry
@@ -173,17 +173,30 @@ http://darrenjrobinson.com/sailpoint-identitynow
     # oAuth URI
     $oAuthURI = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/oauth/token"
     if ($IdentityNowConfiguration.JWT.refresh_token) {
-        $oAuthTokenBody = @{
-            grant_type    = "refresh_token"
-            client_id     = (get-jwtdetails $IdentityNowConfiguration.JWT.access_token).client_id
-            client_secret = $null
-            refresh_token = $IdentityNowConfiguration.JWT.refresh_token
-        }
-        if ($oAuthTokenBody.client_id -eq $IdentityNowConfiguration.v3.UserName) {
-            $oAuthTokenBody.client_secret = $clientSecretv3
-        }
-        elseif ($oAuthTokenBody.client_id -eq $IdentityNowConfiguration.PAT.UserName) {
-            $oAuthTokenBody.client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
+
+        if ((Convert-UnixTime (Get-JWTDetails $IdentityNowConfiguration.JWT.refresh_token).exp) -lt (get-date) ){
+            $refreshTokenExpiry = (Get-JWTDetails $IdentityNowConfiguration.JWT.refresh_token).exp
+            Write-Verbose "Refresh Token expired: $($refreshTokenExpiry)" 
+            
+            # Can't use Refresh Token to get a new Access Token
+            $oAuthTokenBody = @{
+                grant_type = "password"
+                username   = $adminUSR
+                password   = $adminPWD
+            } 
+        } else {
+            $oAuthTokenBody = @{
+                grant_type    = "refresh_token"
+                client_id     = (Get-JWTDetails $IdentityNowConfiguration.JWT.access_token).client_id
+                client_secret = $null
+                refresh_token = $IdentityNowConfiguration.JWT.refresh_token
+            }
+            if ($oAuthTokenBody.client_id -eq $IdentityNowConfiguration.v3.UserName) {
+                $oAuthTokenBody.client_secret = $clientSecretv3
+            }
+            elseif ($oAuthTokenBody.client_id -eq $IdentityNowConfiguration.PAT.UserName) {
+                $oAuthTokenBody.client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
+            }
         }
     }
     elseif ($IdentityNowConfiguration.PAT) {
@@ -201,7 +214,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         }        
     }
     if (-not $IdentityNowConfiguration.JWT) { $forcerefresh = $true }
-    if ($ForceRefresh -or ((get-jwtdetails $IdentityNowConfiguration.JWT.access_token).expiryDateTime -lt (get-date).addminutes(1) -and (get-jwtdetails $IdentityNowConfiguration.JWT.access_token).org -eq $IdentityNowConfiguration.orgName)) {
+    if ($ForceRefresh -or ((Get-JWTDetails $IdentityNowConfiguration.JWT.access_token).expiryDateTime -lt (get-date).addminutes(1) -and (Get-JWTDetails $IdentityNowConfiguration.JWT.access_token).org -eq $IdentityNowConfiguration.orgName)) {
         Write-Verbose ($oAuthTokenBody | convertto-json)
         if ($oAuthTokenBody.grant_type -ne 'password') { $Headersv3 = $null }
         $v3Token = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody -Headers $Headersv3

@@ -1,6 +1,8 @@
 # SailPoint IdentityNow PowerShell Module #
 <b>NOTE: This is not an official SailPoint Module.</b>
 
+[![PSGallery Version](https://img.shields.io/powershellgallery/v/SailPointIdentityNow.svg?style=flat&logo=powershell&label=PSGallery%20Version)](https://www.powershellgallery.com/packages/SailPointIdentityNow) [![PSGallery Downloads](https://img.shields.io/powershellgallery/dt/SailPointIdentityNow.svg?style=flat&logo=powershell&label=PSGallery%20Downloads)](https://www.powershellgallery.com/packages/SailPointIdentityNow)
+
 ## Description ##
 A PowerShell Module enabling simple methods for accessing the SailPoint IdentityNow REST API's.
 
@@ -13,7 +15,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 ## Features ##
 * Easy command-line use, after setting default configuration options and securely saving them to the current user's profile.
 * Get an IdentityNow Organisation and Get / Update an Organisation Configuration
-* Test IdentitNow Credentials
+* Test IdentityNow Credentials
 * Get IdentityNow Queue
 * Get IdentityNow Active Jobs
 * Get IdentityNow Org Status
@@ -46,8 +48,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Get / Update Identity Attributes
 * Create / Get / Remove API Management Clients (Legacy v2)
 * Create / Get / Remove oAuth API Clients (v3)
-* Search Audit Events (v2)
-* Search Events (Beta) - Elasticsearch
+* Search Events - Elasticsearch
 * List Account Activities
 * Get Account Activity 
 * Reset an IdentityNow Source
@@ -146,6 +147,7 @@ Get-IdentityNowAccountActivity              Get IdentityNow Activity for an acco
 Get-IdentityNowActiveJobs                   Get IdentityNow Active Jobs.
 Get-IdentityNowAPIClient                    Get IdentityNow API Client(s).
 Get-IdentityNowApplication                  Get IdentityNow Application(s).
+Get-IdentityNowAuth                         Gets IdentityNow JWT access token or basic auth header.
 Get-IdentityNowCertCampaign                 Get IdentityNow Certification Campaign(s).
 Get-IdentityNowCertCampaignReport           Get IdentityNow Certification Campaign Report(s).
 Get-IdentityNowEmailTemplate                Get IdentityNow Email Template(s).
@@ -155,6 +157,7 @@ Get-IdentityNowOAuthAPIClient               Get IdentityNow oAuth API Client(s).
 Get-IdentityNowOrg                          Displays the default Uri value for all or a particular Organisation based on configured OrgName.
 Get-IdentityNowOrgConfig                    Get IdentityNow Org Global Reminders and Escalation Policies Configuration.
 Get-IdentityNowOrgStatus                    Get an IdentityNow Org Status.
+Get-IdentityNowPersonalAccessToken          List IdentityNow Personal Access Tokens.
 Get-IdentityNowProfile                      Get IdentityNow Profile(s).
 Get-IdentityNowProfileOrder                 Get IdentityNow Profiles Order.
 Get-IdentityNowQueue                        Get IdentityNow Queues.
@@ -187,13 +190,13 @@ Remove-IdentityNowAccessProfile             Delete an IdentityNow Access Profile
 Remove-IdentityNowAPIClient                 Delete an IdentityNow API Client.
 Remove-IdentityNowGovernanceGroup           Delete an IdentityNow Governance Group.
 Remove-IdentityNowOAuthAPIClient            Delete an IdentityNow oAuth API Client.
+Remove-IdentityNowPersonalAccessToken       Delete a personal access token in IdentityNow. 
 Remove-IdentityNowProfile                   Delete an IdentityNow Identity Profile.
 Remove-IdentityNowRole                      Delete an IdentityNow Role.
 Remove-IdentityNowSource                    Deletes an IdentityNow Source.
 Remove-IdentityNowTransform                 Delete an IdentityNow Transform.
 Remove-IdentityNowUserSourceAccount         Delete an IdentityNow User Account on a Flat File Source.
 Save-IdentityNowConfiguration               Saves default IdentityNow configuration to a file in the current users Profile.
-Search-IdentityNowAuditEvents               Search IdentityNow Audit Event(s) using the v2 API.
 Search-IdentityNowEntitlements              Get IdentityNow Entitlements.
 Search-IdentityNowEvents                    Search IdentityNow Event(s) using Elasticsearch queries.
 Search-IdentityNowIdentities                Search IdentityNow Identitie(s) using Elasticsearch queries.
@@ -264,7 +267,7 @@ Update-IdentityNowOrgConfig -update ($approvalConfigBody | convertto-json)
 
 ```
 
-### Test IdentitNow Credentials ###
+### Test IdentityNow Credentials ###
 Test saved IdentityNow PowerShell Module credentials.
 Validates the saved credentials (v2 and v3) against the configured Org. 
 
@@ -610,7 +613,7 @@ Get-IdentityNowGovernanceGroup
 Get a specific IdentityNow Governance Group
 Example
 ```
-Get-IdentityNowGovernanceGroup -groupID 4fc249bd-46ff-405a-93b9-21372f97c352
+Get-IdentityNowGovernanceGroup -group 4fc249bd-46ff-405a-93b9-21372f97c352
 ```
 
 Update an IdentityNow Governance Group to remove one member and add two members
@@ -712,7 +715,7 @@ Example
 Remove-IdentityNowRole -roleID 2c9180886cd58059016d1a5a23f609a8
 ```
 
-### Get / Update / Test IdentityNow Sources ###
+### Get / Update / Test / Create / Remove IdentityNow Sources ###
 Get all IdentityNow Sources
 [Reference post](https://blog.darrenjrobinson.com/managing-sailpoint-identitynow-sources-via-the-api-with-powershell/)
 
@@ -858,12 +861,12 @@ Example
 Get-IdentityNowSourceAccounts -sourceID 40113
 ```
 
-Get Source Accounts with all their attributes. Defaults to False. Set to True. 
+Get Source Accounts with all their attributes. Defaults to False. Using the switch -attributes sets return all attributes to True. 
 <b>Note:</b> Each account is a sepearte API call. Large sources will take time to return all accounts with attributes.
 
 Example
 ```
-Get-IdentityNowSourceAccounts -sourceID 40113 -attributes $true
+Get-IdentityNowSourceAccounts -sourceID 40113 -attributes 
 ```
 
 ### Create / Update / Remove IdentityNow Source Account (Flat File / Delimited Sources)  ###
@@ -970,7 +973,7 @@ Example
 Get-IdentityNowApplication -org $true
 ```
 
-Get a specific IdentityNow Applications
+Get a specific IdentityNow Application
 Example
 ```
 Get-IdentityNowApplication -appID 32128
@@ -987,6 +990,32 @@ $appBody = @{
 Update-IdentityNowApplication -appID 24188 -update ($appBody | ConvertTo-Json) 
 ```
 
+### Get IdentityNow Authentication Headers / Token ####
+Get IdentityNow API Authentication Headers or v3 JWT. 
+
+Parameters: authentication header/token to return (defaults to V3JWT)
+- V2Header Digest Auth
+- V3Header oAuth Access Token Bearer Header
+- V3JWT is oAuth JWT Token
+
+Return default JWT 
+Example
+```
+Get-IdentityNowAuth
+```
+
+Return v2 Digest Auth Header
+Example
+```
+Get-IdentityNowAuth -return V2Header
+```
+
+Return v3 oAuth Access Token Bearer Header
+Example
+```
+Get-IdentityNowAuth -return V3Header
+```
+
 ### Initiate Aggregation of an IdentityNow Source ###
 Aggregate an IdentityNow Source
 [Reference post](https://blog.darrenjrobinson.com/aggregating-sailpoint-identitynow-sources-via-api-with-powershell/)
@@ -1001,7 +1030,7 @@ Aggregate an IdentityNow Source without optimization
 
 Example
 ```
-Invoke-IdentityNowAggregateSource -sourceID 12345 -disableOptimization $true 
+Invoke-IdentityNowAggregateSource -sourceID 12345 -disableOptimization 
 ```
 
 ### Create / Get / Update / Remove IdentityNow Transforms ###
@@ -1094,6 +1123,45 @@ $templateChanges.add("subject",'Access Request requires completion of Work Item 
 Update-IdentityNowEmailTemplate -template ($templateChanges | ConvertTo-Json)
 ```
 
+### Get IdentityNow Personal Access Token(s) ###
+List IdentityNow Personal Access Token(s).
+
+Example
+```
+Get-IdentityNowPersonalAccessToken
+```
+
+Limit number of Personal Access Tokens to return
+
+Example
+```
+Get-IdentityNowPersonalAccessToken -limit 10
+```
+
+### Create an IdentityNow Personal Access Token(s) ###
+Create an IdentityNow Personal Access Token.
+
+Example
+```
+New-IdentityNowPersonalAccessToken -name "Sean's Sailpoint IdentityNow module"
+```
+
+*Optional:* If a personal access token needs to be made for an account not saved in this module you can pull the access token from https://{org}.identitynow.com/ui/session?refresh=true after pulling up the admin section 
+[See Compass article:]( https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-REST-API-Create-Personal-Access-Token/ta-p/150462 )
+
+Example
+```
+New-IdentityNowPersonalAccessToken -name "Sean's Sailpoint IdentityNow module" -accessToken baa2c01cb5674636b8c0f063f3f13db3
+```
+
+### Remove an IdentityNow Personal Access Token ###
+Delete an IdentityNow Personal Access Token
+
+Example
+```
+Remove-IdentityNowPersonalAccessToken -id 36480043060f4562af28123456
+```
+
 ### Get IdentityNow Identity Profiles ###
 Get IdentityNow Identity Profiles
 
@@ -1138,8 +1206,8 @@ Example - Remove multiple IdentityNow Profiles
 Remove-IdentityNowProfile -profileIDs 1234,1235,1236
 ```
 
-### Get / Update IdentityNow Profiles Order ###
-Get IdentityNow Profiles Order
+### Get / Update IdentityNow Identity Profiles Order ###
+Get IdentityNow Identity Profiles Order
 
 Example
 ```
@@ -1155,7 +1223,7 @@ Non Employee Identities     70 1380
 Employee Identities         80 1387
 ```
 
-Update IdentityNow Profile Order
+Update IdentityNow Identity Profile Order
 
 Example
 ```
@@ -1248,63 +1316,7 @@ Example
 Remove-IdentityNowOAuthAPIClient -ID '9e23deaf-48aa-dead-beef-ab6821a12ab2'
 ```
 
-### Search Audit Events (v2) ###
-Search IdentityNow Audit Events using the v2 API 
-Search options (except Filter) as per the [v2/Audit documentation](https://community.sailpoint.com/t5/Admin-Help/Rest-API-to-View-Audit-Entries/ta-p/73965)
-For Filter (JSON) Audit Event queries use the Search-IdentityNowEvents cmdlet
-
-* actn (Exact match of the “action” property.  Eg: -actn USER_STEP_UP_AUTH)
-* application (Case insensitive name of the source you're querying for  Eg: -application "Corporate AD")
-* type (the audit category. Valid values are “AUTH”, “SSO”, “PROVISIONING”, “PASSWORD_CHANGE” or “SOURCE” Eg: -type AUTH)
-* user (Case insensitive exact match of the UID of an identity contained in either “source” or “target” properties in the logs where source indicates the person who took the action and target indicates the person who was affected by the action. Eg: -user darren.robinson)
-* days (Only return results whose timestamp is within this previous number of days; defaults to 7.  Eg: -days 3)
-* searchLimit (Maximum number of items to return, used for paging; defaults to 200. Maximum value of 2500. Eg. -searchlimit 50)
-* since (Returns only results from days since the entered date, or date and time combination, in ISO-8601 format.) Eg. -since '2019-09-30T12:30:50.450Z'
-
-Example
-```
-Search-IdentityNowAuditEvents 
-Search-IdentityNowAuditEvents -action USER_STEP_UP_AUTH
-
-Search-IdentityNowAuditEvents -since '2019-09-30T12:30:50.450Z'
-Search-IdentityNowAuditEvents -since '2019-09-30T12:30:50.450Z' -searchLimit 10  
-Search-IdentityNowAuditEvents -since '2019-09-30T12:30:50.450Z' -searchLimit 2501 
-
-Search-IdentityNowAuditEvents -days 1 
-Search-IdentityNowAuditEvents -days 1 -searchLimit 5000 
-Search-IdentityNowAuditEvents -days 1 -action 'AUTHENTICATION-103'
-
-Search-IdentityNowAuditEvents -type AUTH
-Search-IdentityNowAuditEvents -type AUTH -days 1 
-Search-IdentityNowAuditEvents -type AUTH -days 1 -searchLimit 5000
-Search-IdentityNowAuditEvents -type AUTH -days 1 -action 'AUTHENTICATION-103'
-
-Search-IdentityNowAuditEvents -user 'customer_admin'
-Search-IdentityNowAuditEvents -user 'customer_admin' -searchLimit 10
-Search-IdentityNowAuditEvents -user 'customer_admin' -since '2019-10-30T12:30:50.450Z'
-Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 
-Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -searchLimit 2510
-Search-IdentityNowAuditEvents -user 'customer_admin' -action 'AUTHENTICATION-103'
-Search-IdentityNowAuditEvents -user 'customer_admin' -type 'AUTH'
-Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -action 'AUTHENTICATION-103'
-Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -type 'AUTH'
-Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -type 'AUTH' -action 'AUTHENTICATION-103' 
-Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -type 'AUTH' -action 'AUTHENTICATION-103' -searchLimit 50
-Search-IdentityNowAuditEvents -user 'customer_admin' -since '2019-10-30T12:30:50.450Z' -action 'AUTHENTICATION-103'
-Search-IdentityNowAuditEvents -user 'customer_admin' -since '2019-10-30T12:30:50.450Z'  -type 'AUTH' -action 'AUTHENTICATION-103' 
-
-Search-IdentityNowAuditEvents -application 'Workday (Dev)'
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -days 2
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -action 'SOURCE_ACCOUNT_AGGREGATION'
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -action 'SOURCE_ACCOUNT_AGGREGATION' -days 2
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -type 'PROVISIONING'
-
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -since '2019-10-30T12:30:50.450Z'
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -since '2019-10-30T12:30:50.450Z' -action 'SOURCE_ACCOUNT_AGGREGATION'
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -since '2019-10-30T12:30:50.450Z' -action 'SOURCE_ACCOUNT_AGGREGATION' -type 'PROVISIONING'
-```
-
-### Search Events (Beta) - Elasticsearch ###
+### Search Events - Elasticsearch ###
 Search IdentityNow Events using the new IdentityNow Search (Elasticsearch)
 Results defaults to 2500. If you want more or less use the -searchLimit option
 [Search Event Names](https://community.sailpoint.com/t5/IdentityNow-Forum/Audit-Events-and-Search-Equivalents/m-p/148204#feedback-success)
@@ -1403,6 +1415,8 @@ Header options are;
 * Headersv2_JSON - Headersv2_JSON is Digest Auth with Content-Type set for application/json
 * Headersv3_JSON - Headersv3_JSON is JWT oAuth with Content-Type set for application/json
 * Headersv3_JSON-Patch - Headersv3_JSON is JWT oAuth with Content-Type set for application/json-patch+json
+
+<b>OPTION:</b> -json switch to return request result as JSON. 
 
 Example 1
 Get the Schema of a Source

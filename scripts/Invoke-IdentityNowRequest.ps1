@@ -7,7 +7,18 @@ Submit an IdentityNow API Request.
 Submit an IdentityNow API Request.
 
 .PARAMETER uri
-(required) API URI
+(required for Full URI parameter set) API URI
+
+.PARAMETER path
+(Required for path parameter set) specify the rest of the api query after the base api url as determined when picking the API variable 
+
+.PARAMETER API
+(required for path parameter set) will determine the base url
+Private will use the base url HTTPS://{your org}.api.identitynow.com/cc/api/
+V1  will use the base url HTTPS://{your org}.identitynow.com/api/
+V2  will use the base url https://{your org}.api.identitynow.com/v2/
+V3  will use the base url https://{your org}.api.identitynow.com/v3/
+Beta  will use the base url https://{your org}.api.identitynow.com/beta/
 
 .PARAMETER method
 (required) API Method
@@ -19,6 +30,7 @@ Headersv2 Digest Auth with no Content-Type set
 Headersv2_JSON is Digest Auth with Content-Type set for application/json
 Headersv3 is JWT oAuth with no Content-Type set 
 Headersv3_JSON is JWT oAuth with Content-Type set for application/json
+Headersv3_JSON-Patch is JWT oAuth with Content-Type set for application/json-patch+json
 
 .PARAMETER body
 (optional - JSON) Payload for a webrequest
@@ -31,6 +43,13 @@ Invoke-IdentityNowRequest -method Get -headers Headersv2 -uri "https://YOURORG.a
 
 .EXAMPLE
 Invoke-IdentityNowRequest -method Get -headers Headersv3 -uri "https://YOURORG.api.identitynow.com/cc/api/integration/listSimIntegrations"
+
+.EXAMPLE
+Invoke-IdentityNowRequest -API Beta -path 'sources' -method get -headers Headersv3
+Invoke-IdentityNowRequest -API Private -path 'source/list' -method get -headers Headersv3
+
+.EXAMPLE
+Invoke-IdentityNowRequest -API Beta -path 'sources/2c9140847578a74611727de965d91c5c' -method patch -headers Headersv3_JSON-Patch -body '[{"op":"remove","path":"/connectorAttributes/timeoutinseconds"}]'
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow

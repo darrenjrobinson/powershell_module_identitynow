@@ -39,8 +39,12 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     [cmdletbinding()]
     param(
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName='Full URL')]
         [string]$uri,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName='Path')]
+        [string]$path,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName='Path')]
+        [string][ValidateSet("V1", "V2", "V3","Private", "Beta")]$API,
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [ValidateNotNullOrEmpty()]
         [string][ValidateSet("Get", "Put", "Patch", "Delete", "Post")]$method,
@@ -53,6 +57,13 @@ http://darrenjrobinson.com/sailpoint-identitynow
         [switch]$json
     )
 
+    switch ($API){
+        "Private"{$uri="$((Get-IdentityNowOrg).'v3 / Private Base API URI')/$path"}
+        "V1"{$uri="$((Get-IdentityNowOrg).'v1 Base API URI')/$path"}
+        "V2"{$uri="$((Get-IdentityNowOrg).'v2 Base API URI')/$path"}
+        "V3"{$uri="https://$((Get-IdentityNowOrg).'Organisation Name').api.identitynow.com/v3/$path"}
+        "Beta"{$uri="https://$((Get-IdentityNowOrg).'Organisation Name').api.identitynow.com/beta/$path"}
+    }
     switch ($headers) {
         HeadersV2 { 
             $requestHeaders = Get-IdentityNowAuth -return V2Header

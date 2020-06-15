@@ -1,6 +1,8 @@
 # SailPoint IdentityNow PowerShell Module #
 <b>NOTE: This is not an official SailPoint Module.</b>
 
+[![PSGallery Version](https://img.shields.io/powershellgallery/v/SailPointIdentityNow.svg?style=flat&logo=powershell&label=PSGallery%20Version)](https://www.powershellgallery.com/packages/SailPointIdentityNow) [![PSGallery Downloads](https://img.shields.io/powershellgallery/dt/SailPointIdentityNow.svg?style=flat&logo=powershell&label=PSGallery%20Downloads)](https://www.powershellgallery.com/packages/SailPointIdentityNow)
+
 ## Description ##
 A PowerShell Module enabling simple methods for accessing the SailPoint IdentityNow REST API's.
 
@@ -46,8 +48,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Get / Update Identity Attributes
 * Create / Get / Remove API Management Clients (Legacy v2)
 * Create / Get / Remove oAuth API Clients (v3)
-* Search Audit Events (v2)
-* Search Events (Beta) - Elasticsearch
+* Search Events - Elasticsearch
 * List Account Activities
 * Get Account Activity 
 * Reset an IdentityNow Source
@@ -196,7 +197,6 @@ Remove-IdentityNowSource                    Deletes an IdentityNow Source.
 Remove-IdentityNowTransform                 Delete an IdentityNow Transform.
 Remove-IdentityNowUserSourceAccount         Delete an IdentityNow User Account on a Flat File Source.
 Save-IdentityNowConfiguration               Saves default IdentityNow configuration to a file in the current users Profile.
-Search-IdentityNowAuditEvents               Search IdentityNow Audit Event(s) using the v2 API.
 Search-IdentityNowEntitlements              Get IdentityNow Entitlements.
 Search-IdentityNowEvents                    Search IdentityNow Event(s) using Elasticsearch queries.
 Search-IdentityNowIdentities                Search IdentityNow Identitie(s) using Elasticsearch queries.
@@ -973,7 +973,7 @@ Example
 Get-IdentityNowApplication -org $true
 ```
 
-Get a specific IdentityNow Applications
+Get a specific IdentityNow Application
 Example
 ```
 Get-IdentityNowApplication -appID 32128
@@ -1206,8 +1206,8 @@ Example - Remove multiple IdentityNow Profiles
 Remove-IdentityNowProfile -profileIDs 1234,1235,1236
 ```
 
-### Get / Update IdentityNow Profiles Order ###
-Get IdentityNow Profiles Order
+### Get / Update IdentityNow Identity Profiles Order ###
+Get IdentityNow Identity Profiles Order
 
 Example
 ```
@@ -1223,7 +1223,7 @@ Non Employee Identities     70 1380
 Employee Identities         80 1387
 ```
 
-Update IdentityNow Profile Order
+Update IdentityNow Identity Profile Order
 
 Example
 ```
@@ -1316,64 +1316,7 @@ Example
 Remove-IdentityNowOAuthAPIClient -ID '9e23deaf-48aa-dead-beef-ab6821a12ab2'
 ```
 
-### Search Audit Events (v2) ###
-**NOTE: Deprecated** [The v2 API for Audit Events has been decprecated as of end of May 2020.](https://community.sailpoint.com/t5/Updates/IdentityNow-s-Latest-Changes-for-May-4-11/ba-p/165983) </br>
-Search IdentityNow Audit Events using the v2 API 
-Search options (except Filter) as per the [v2/Audit documentation](https://community.sailpoint.com/t5/Admin-Help/Rest-API-to-View-Audit-Entries/ta-p/73965)
-For Filter (JSON) Audit Event queries use the Search-IdentityNowEvents cmdlet
-
-* actn (Exact match of the “action” property.  Eg: -actn USER_STEP_UP_AUTH)
-* application (Case insensitive name of the source you're querying for  Eg: -application "Corporate AD")
-* type (the audit category. Valid values are “AUTH”, “SSO”, “PROVISIONING”, “PASSWORD_CHANGE” or “SOURCE” Eg: -type AUTH)
-* user (Case insensitive exact match of the UID of an identity contained in either “source” or “target” properties in the logs where source indicates the person who took the action and target indicates the person who was affected by the action. Eg: -user darren.robinson)
-* days (Only return results whose timestamp is within this previous number of days; defaults to 7.  Eg: -days 3)
-* searchLimit (Maximum number of items to return, used for paging; defaults to 200. Maximum value of 2500. Eg. -searchlimit 50)
-* since (Returns only results from days since the entered date, or date and time combination, in ISO-8601 format.) Eg. -since '2019-09-30T12:30:50.450Z'
-
-Example
-```
-Search-IdentityNowAuditEvents 
-Search-IdentityNowAuditEvents -action USER_STEP_UP_AUTH
-
-Search-IdentityNowAuditEvents -since '2019-09-30T12:30:50.450Z'
-Search-IdentityNowAuditEvents -since '2019-09-30T12:30:50.450Z' -searchLimit 10  
-Search-IdentityNowAuditEvents -since '2019-09-30T12:30:50.450Z' -searchLimit 2501 
-
-Search-IdentityNowAuditEvents -days 1 
-Search-IdentityNowAuditEvents -days 1 -searchLimit 5000 
-Search-IdentityNowAuditEvents -days 1 -action 'AUTHENTICATION-103'
-
-Search-IdentityNowAuditEvents -type AUTH
-Search-IdentityNowAuditEvents -type AUTH -days 1 
-Search-IdentityNowAuditEvents -type AUTH -days 1 -searchLimit 5000
-Search-IdentityNowAuditEvents -type AUTH -days 1 -action 'AUTHENTICATION-103'
-
-Search-IdentityNowAuditEvents -user 'customer_admin'
-Search-IdentityNowAuditEvents -user 'customer_admin' -searchLimit 10
-Search-IdentityNowAuditEvents -user 'customer_admin' -since '2019-10-30T12:30:50.450Z'
-Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 
-Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -searchLimit 2510
-Search-IdentityNowAuditEvents -user 'customer_admin' -action 'AUTHENTICATION-103'
-Search-IdentityNowAuditEvents -user 'customer_admin' -type 'AUTH'
-Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -action 'AUTHENTICATION-103'
-Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -type 'AUTH'
-Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -type 'AUTH' -action 'AUTHENTICATION-103' 
-Search-IdentityNowAuditEvents -user 'customer_admin' -days 1 -type 'AUTH' -action 'AUTHENTICATION-103' -searchLimit 50
-Search-IdentityNowAuditEvents -user 'customer_admin' -since '2019-10-30T12:30:50.450Z' -action 'AUTHENTICATION-103'
-Search-IdentityNowAuditEvents -user 'customer_admin' -since '2019-10-30T12:30:50.450Z'  -type 'AUTH' -action 'AUTHENTICATION-103' 
-
-Search-IdentityNowAuditEvents -application 'Workday (Dev)'
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -days 2
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -action 'SOURCE_ACCOUNT_AGGREGATION'
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -action 'SOURCE_ACCOUNT_AGGREGATION' -days 2
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -type 'PROVISIONING'
-
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -since '2019-10-30T12:30:50.450Z'
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -since '2019-10-30T12:30:50.450Z' -action 'SOURCE_ACCOUNT_AGGREGATION'
-Search-IdentityNowAuditEvents -application 'Workday (Dev)' -since '2019-10-30T12:30:50.450Z' -action 'SOURCE_ACCOUNT_AGGREGATION' -type 'PROVISIONING'
-```
-
-### Search Events (Beta) - Elasticsearch ###
+### Search Events - Elasticsearch ###
 Search IdentityNow Events using the new IdentityNow Search (Elasticsearch)
 Results defaults to 2500. If you want more or less use the -searchLimit option
 [Search Event Names](https://community.sailpoint.com/t5/IdentityNow-Forum/Audit-Events-and-Search-Equivalents/m-p/148204#feedback-success)

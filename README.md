@@ -1,6 +1,8 @@
 # SailPoint IdentityNow PowerShell Module #
 <b>NOTE: This is not an official SailPoint Module.</b>
 
+[![PSGallery Version](https://img.shields.io/powershellgallery/v/SailPointIdentityNow.svg?style=flat&logo=powershell&label=PSGallery%20Version)](https://www.powershellgallery.com/packages/SailPointIdentityNow) [![PSGallery Downloads](https://img.shields.io/powershellgallery/dt/SailPointIdentityNow.svg?style=flat&logo=powershell&label=PSGallery%20Downloads)](https://www.powershellgallery.com/packages/SailPointIdentityNow)
+
 ## Description ##
 A PowerShell Module enabling simple methods for accessing the SailPoint IdentityNow REST API's.
 
@@ -971,7 +973,7 @@ Example
 Get-IdentityNowApplication -org $true
 ```
 
-Get a specific IdentityNow Applications
+Get a specific IdentityNow Application
 Example
 ```
 Get-IdentityNowApplication -appID 32128
@@ -1204,8 +1206,8 @@ Example - Remove multiple IdentityNow Profiles
 Remove-IdentityNowProfile -profileIDs 1234,1235,1236
 ```
 
-### Get / Update IdentityNow Profiles Order ###
-Get IdentityNow Profiles Order
+### Get / Update IdentityNow Identity Profiles Order ###
+Get IdentityNow Identity Profiles Order
 
 Example
 ```
@@ -1221,7 +1223,7 @@ Non Employee Identities     70 1380
 Employee Identities         80 1387
 ```
 
-Update IdentityNow Profile Order
+Update IdentityNow Identity Profile Order
 
 Example
 ```

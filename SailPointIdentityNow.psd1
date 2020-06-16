@@ -34,6 +34,7 @@
         'Get-IdentityNowRule',
         'Get-IdentityNowSource',
         'Get-IdentityNowSourceAccounts',
+        'Get-IdentityNowSourceSchema',
         'Get-IdentityNowTask',
         'Get-IdentityNowTimeZone',
         'Get-IdentityNowTransform',

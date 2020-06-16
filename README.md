@@ -76,6 +76,11 @@ install-module -name SailPointIdentityNow
 ```
 
 ## Examples ##
+
+These examples are also available as an interactive PowerShell Jupyter Notebook. You can download the examples [PowerShell Jupyter Notebook from here](https://gist.github.com/darrenjrobinson/dfbf7470212fb295fc13c6608d91c0f1).
+
+To get started with Local PowerShell Jupyter Notebook [see this post](https://blog.darrenjrobinson.com/getting-started-with-local-powershell-jupyter-notebook/).
+
 ### Setting up Credentials and Organisation Configuration ###
 
 [Reference Post](https://blog.darrenjrobinson.com/generate-sailpoint-identitynow-v2-v3-api-credentials/)

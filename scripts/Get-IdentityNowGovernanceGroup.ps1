@@ -6,14 +6,14 @@ function Get-IdentityNowGovernanceGroup {
 .DESCRIPTION
     Get an IdentityNow Governance Group.
 
-.PARAMETER group
-    (optional) The Name of an IdentityNow Governance Group.
+.PARAMETER groupID
+    (optional) The ID of an IdentityNow Governance Group.
 
 .EXAMPLE
     Get-IdentityNowGovernanceGroup 
 
 .EXAMPLE
-    Get-IdentityNowGovernanceGroup -group 6289788a-c73c-426b-9170-12340aaa6789
+    Get-IdentityNowGovernanceGroup -groupID 6289788a-c73c-426b-9170-12340aaa6789
 
 .LINK
     http://darrenjrobinson.com/sailpoint-identitynow
@@ -23,15 +23,15 @@ function Get-IdentityNowGovernanceGroup {
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$group
+        [string]$groupID
     )
 
     $v3Token = Get-IdentityNowAuth
     
     if ($v3Token.access_token) {
         try {
-            if ($group) {
-                $IDNGroups = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/workgroups/$($group)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+            if ($groupID) {
+                $IDNGroups = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/workgroups/$($groupID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
                 return $IDNGroups
             }
             else {
@@ -53,8 +53,8 @@ function Get-IdentityNowGovernanceGroup {
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUfW/R8Qc6VJEhhv+xsN62uGsh
-# 06GgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUcnXf3r7PmRTYI3UJSz7HIpc9
+# JX+gghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -161,22 +161,22 @@ function Get-IdentityNowGovernanceGroup {
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUQ/erLl+pgm95i8CTP0Ig
-# e9yRq1cwDQYJKoZIhvcNAQEBBQAEggEAghnl/lWfyWMuNP51aP3N3J8ohQhln6Lj
-# nnrKo+1/sLJcIiMW+oB+9n1cv2zCkP3NnwlUroeG7oEB3KpM+xfUnVA87DUiZQ/b
-# catWAgsx6TIIP+ANMnbG2wVrn902dQW2Pn0IbkpUgeQNyFCFVjFNmMEUV+6R8Qy0
-# TuEkZWaXB3AWpZukCdx+dxfXTw1f5DcBj2KWuYVgW5VxPhnla8tZj8C0WuR/DIiL
-# OmhFUIraISzvnkDjCLu3Eg62mdDt94bGivakQESSGgPBUyOxm8jYBVBdpRYhSmhG
-# 5ZvnCSwd6Mn7TqFHnBgI9zozwd9WwYnmNZ6UN4nP07f/+7ITJzA7EqGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUYZoVEmYWHz6wYUhy95Ni
+# h114S7YwDQYJKoZIhvcNAQEBBQAEggEAr2EjO75MpkRx9YVL7ItYsBmsKl1URNY+
+# 8s8wnApzFDaUiv+SbrpHMqBUb7bwe1f8ntz/CEFzNGyoJsYrUdP2RLSI2eAZYizD
+# 7xAnVfJ9kdrfHiUI0ZQ9m+nP08h1Ql3fD6etrk7cGCi48eRTnr9x5JAWJIrAZvgL
+# tem5oOFecQIzSDcunfUQprte47XKXOPDTMK7u5p1jS74CtYSodk4FyyqK+1y3qel
+# JENuAcGeupaXBIz2fuXIpnaLqx2EpAuMD7qDIe+bLfwjET2oXAX919FnZuN6ru/d
+# xgqdqP+DmZPT0kII9RiRSVtAPx3c/P3Y/Vl7cc1xno7vJrILszToKqGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjAyMzRaMCMGCSqGSIb3DQEJBDEWBBSmOuqB3nM9LaHM1XLgPvy+
-# zywtBTANBgkqhkiG9w0BAQEFAASCAQByqi9sznVRWqLc3SvwkoCB1roBe3uaYmPa
-# w5yqE7YA4Mi4NJfxCuTM2b3kmMikckGxnaf54W8/lQf5sjZ285BF59qUizKVwZ/S
-# QcG1TO1dLOBaezHZSaZoo5VtpohvZhNstrjMsFNjxj4pzZxZQHuLe3WhkAOJ/Jqy
-# Z6MuMmEcUhWwETcgv387uD2+8JKe4JT6tQR1J4h6xzLdtTTukXsKUEWJJ7SGaqYD
-# Xnxe16po0DQqNDCeutKh4JUmfcujPQT07MLLxEBxA6v0UpZb7tfgn4VlpMI71M47
-# xm7jriruQWNIk+DAWcNKOwGoAkC2ueRQO28tFzeSaBtEX57RUalC
+# Fw0yMDA2MTYwMDM4MzFaMCMGCSqGSIb3DQEJBDEWBBQjoXkf8/LR1qe5iNlTcrfS
+# dl7ClDANBgkqhkiG9w0BAQEFAASCAQBSNDtEQhfrrOg2iNkMDb11PvM29k8besgh
+# yl8chKWkmPW5OoLSsdKNSUFBG6ojFVk6iQMpevWqoNgmeEPADmB7JqJKaMWCcDDz
+# GnRXFUauCAo28xRTtkSS85LGpq4xUFv5eJRNcJ0q2V4GSgc94nZUtfbU8aEpTnFz
+# ftHIm+zAQSSQFjNGywEtXHoGE0W1/AOnLtSJkAs2YmsnQGPBBKL/aPGG721bTpYx
+# i8ag7myzDkuSzCxAfufeGIplhMZrOimhvt4EtLFdZl2lIVEd33CBhTFjwh1Aai6D
+# 4aVLdgVn2PFAzgZwM14C7ltl2we5HHN9ZkbQzD/XdpVCufpI7eNr
 # SIG # End signature block

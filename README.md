@@ -615,7 +615,7 @@ Get-IdentityNowGovernanceGroup
 Get a specific IdentityNow Governance Group
 Example
 ```
-Get-IdentityNowGovernanceGroup -group 4fc249bd-46ff-405a-93b9-21372f97c352
+Get-IdentityNowGovernanceGroup -groupID 4fc249bd-46ff-405a-93b9-21372f97c352
 ```
 
 Update an IdentityNow Governance Group to remove one member and add two members

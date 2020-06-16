@@ -1,44 +1,77 @@
-function New-IdentityNowGovernanceGroup {
+function New-IdentityNowPersonalAccessToken {
     <#
 .SYNOPSIS
-    Create a new IdentityNow Governance Group.
+Create an IdentityNow Personal Access Token.
 
 .DESCRIPTION
-    Create a new IdentityNow Governance Group.
+Create an IdentityNow Personal Access Token. This is a supported way of authenticating to 
+IdentityNow API without browser prompt.
 
-.PARAMETER group
-    The Governance Group details.
+.PARAMETER name
+(required) Identifiable name for a new Personal access token like postman, powershell, or 'sailpointidentitynow module'
+
+.PARAMETER accessToken
+(optional) if a personal access token needs to be made for an account not saved in this module 
+we can pull the access token from https://{org}.identitynow.com/ui/session?refresh=true
+after pulling up the admin section
 
 .EXAMPLE
-    New-IdentityNowGovernanceGroup 
+New-IdentityNowPersonalAccessToken -name "Sean's Sailpoint IdentityNow module"
+
+.EXAMPLE
+New-IdentityNowPersonalAccessToken -name "Sean's Sailpoint IdentityNow module" -accessToken baa2c01cb5674636b8c0f063f3f13db3
 
 .LINK
-    http://darrenjrobinson.com/sailpoint-identitynow
+http://darrenjrobinson.com/sailpoint-identitynow
+
+.LINK
+https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-REST-API-Create-Personal-Access-Token/ta-p/150462
+
 
 #>
-
     [cmdletbinding()]
-    param(
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$group
+    param( 
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]    
+        [string]$name,
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]   
+        [string]$accessToken
     )
-    $Headersv2 = Get-IdentityNowAuth -return V2Header
-    $Headersv2."Content-Type" = "application/json" 
+    if ($accessToken) {
+        $v3Token = $accessToken
+    }
+    else {
+        $v3Token = Get-IdentityNowAuth
+    }
 
-    try {          
-        $IDNNewGroup = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/workgroups?&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2 -Body $group
-        return $IDNNewGroup              
+    if ($v3Token.access_token) {
+        try {    
+            $PATBody = @{ }
+            $PATBody.add("name", $name)
+            $IDNNewPAT = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/personal-access-tokens" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" } -Body ($PATBody | convertTo-json)
+            return $IDNNewPAT
+        }
+        catch {
+            if ($_ -like '*"methodName":"create","fileName":"PersonalAccessTokenRepository.java"*') {
+                Write-Error "A Personal Access Token with that name already exists. New Personal Access Token not created."
+                Write-Error $_
+            }
+            else {
+                Write-Error "Create Personal Access Token failed. $($_)" 
+            }
+        }
     }
-    catch {
-        Write-Error "Failed to create group. Check group details. $($_)" 
-    }
+    else {
+        Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
+        return $v3Token
+    } 
 }
+
 
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUIYdWQ4pnTnqMXBMCp0UTXPOU
-# jCGgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUWRh5vQTlG33vjxTUChGYQBmI
+# 8rmgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -145,22 +178,22 @@ function New-IdentityNowGovernanceGroup {
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUGiNxXtaKh4nSjy0T7FO/
-# 1J3j8vMwDQYJKoZIhvcNAQEBBQAEggEARisEMhsS3ptLVylDtnBh6QozxSunW5aH
-# WE9B4W+zEDmVbP6G3bieXq68n2QHrSiPchhfUgkBj7+RnYUnG34Rzr/T5m1F5wlV
-# ohQhNIzMchPI8fksc9Bfyh/IcCJo6WxIJQkkVl+fgKHjTx0X9WQssw30nyT17d/f
-# JT1+O9AGuC2gDIS9TW7sKj6ZczT8rHymKgEXrzyZthKIZBCwf65fkvk+I/cIfTsa
-# vI4OUhq/4SQ21BYPBhuI5dzbA/jQBATfU5oD16iPIQCwMZfYTRUgm180fxY2XDpy
-# xoh2t7gt88vasD4TZffiDsMP1GDhpDKwI6LHyW/hcbPT2lDl+Fk8xaGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUi3NaX9jNOhXXDengBe2B
+# t2SGoQ8wDQYJKoZIhvcNAQEBBQAEggEAE2SKuXzSg3Xo/auGRsJRdjk7WBPvX6vP
+# tff4U3Kn9IoYlUerFq0qCqYv/cmzo9bpbY7WMZXM/eGUQXGaO7RqmRN5LvrZS8eo
+# TA9emafI6/G/mLPsiXbB/xjiB0xC0bl4B/knrmq4ZwXCoMwRkdL6VSh0QzUqQAZs
+# dwX6HQclJFp9SCSU0eF4tSoYreSmqSOxNLp0lhyC74L+1dk4zv+1K/WWBmZ1lb9f
+# UH8BA83o2ohA83p9uz9s7TIDF8wjByePi9881NiT/qddJVz1VX11PKWi+Vlel0jh
+# 8ugJ9Uv3AJvl84EK2ygQfweiAHe9HppUZhtzzG1DY5B7c8Y9zEynxKGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjAyNDFaMCMGCSqGSIb3DQEJBDEWBBTEBUUPZjJoMedGokY0T5uf
-# iyLMVzANBgkqhkiG9w0BAQEFAASCAQAJor30NSH8CesChY/M5tsrBc79DbWjpPaY
-# /vgfdpc5XJLgbHtfikKJeoMpIyg9pIsbbRHgi401rFA0VEW0OoMMFw4CPRrSYV2v
-# uxB7Gu2vAVeyAr1Ty6ChFsRljfc7jJgUkGJqrxxkxf5o25LBXygCGPEg63G7LO5H
-# 7b9awACb+CqR14daPuQ320Cj1U93oHXNSCH+BsHxnQPV4Je0GrSGXJRYMeWhxaQd
-# IMhRedryuiMfIT++QE+x5fB8qVpLKVv9sv/HLAg/u47ajJ1Pxm/wn4o1TCkOjJS4
-# KGF2qCcmbAhhp05mupjeRReyU1429C1kdIfV97UPois0s5i9RieH
+# Fw0yMDA2MTUwMjAyNDJaMCMGCSqGSIb3DQEJBDEWBBQNy5MGCPsHpCKwy6Iubwoc
+# Vr4c3DANBgkqhkiG9w0BAQEFAASCAQBuN6LL7cbfZk7adfZBQJzqaeIUsLXZt6oC
+# cuEZo2wpU+tmj7aUxLKahPcj6Y7+7gTcAc8gPpSr/OX49RgjMOg/bzTXCYddcBCd
+# +F8nMwxSsPdKmjRIQqsvhbAU/O8De2C1SxXq3O0qU4oUtFqSrfuxDUSEiubghLZn
+# W+HKhcN35WTDksh88BCf243zE8DuIhVn1Vt9hiUxh/42jCYXUVwn6wEWmLQlLkO0
+# AjaP86e6OpXNEBI83vkyC8luVB1GbqheXy1faGyqkayY1q8SN2XAVlczluXc1TWs
+# 31bRhShBkjLdyMcxXkYxshklJBrsNa7Xw9G9XZRlNcYFLNlFMRw1
 # SIG # End signature block

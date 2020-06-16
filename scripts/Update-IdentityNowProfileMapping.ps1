@@ -1,44 +1,154 @@
-function New-IdentityNowGovernanceGroup {
+function Update-IdentityNowProfileMapping {
     <#
 .SYNOPSIS
-    Create a new IdentityNow Governance Group.
+Update IdentityNow Profile Attribute Mapping.
 
 .DESCRIPTION
-    Create a new IdentityNow Governance Group.
+Update IdentityNow Profile Attribute Mapping.
 
-.PARAMETER group
-    The Governance Group details.
+.PARAMETER ID
+(required) ID of the Identity Profile to update
+
+.PARAMETER IdentityAttribute
+(required) Priority value for the Identity Profile
+
+.PARAMETER sourceType
+(required) specify Null to clear the mapping, complex for setting a rule, or Standard for account attribute or account attribute with transform
+
+.PARAMETER source
+not needed for null
+for account attribute specify source:accountAttribute or as a two part array
+for transform specify source:accountAttribute:transform or as a three part array
+for complex provide the name of the rule
 
 .EXAMPLE
-    New-IdentityNowGovernanceGroup 
+Update-IdentityNowProfileOrder -id 1285 -IdentityAttribute uid -sourceType Standard -source 'AD:SamAccountName'
+
+.EXAMPLE
+Update-IdentityNowProfileOrder -id 1285 -IdentityAttribute uid -sourceType Standard -source @('AD','SamAccountName','transform-UID')
+
+.EXAMPLE
+Update-IdentityNowProfileOrder -id 1285 -IdentityAttribute uid -sourceType Null
+
+.EXAMPLE
+Update-IdentityNowProfileOrder -id 1285 -IdentityAttribute managerDn -sourceType Complex -source 'Rule - IdentityAttribute - Get Manager'
+
+.EXAMPLE
+$idp=Get-IdentityNowProfile
+$source=@('AD','samAccountName','Transform-UID')
+$idp.id | foreach {Update-IdentityNowProfileMapping -ID $_ -IdentityAttribute uid -sourceType Standard -source $source; Start-IdentityNowProfileUserRefresh -id $_}
 
 .LINK
-    http://darrenjrobinson.com/sailpoint-identitynow
+http://darrenjrobinson.com/sailpoint-identitynow
 
 #>
 
     [cmdletbinding()]
-    param(
+    param( 
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$group
+        [string]$ID,
+        [Parameter(Mandatory = $true)]
+        [string]$IdentityAttribute,
+        [Parameter(Mandatory = $true)]
+        [validateset('Null', 'Standard','Complex')][string]$sourceType,
+        $source
+        
     )
-    $Headersv2 = Get-IdentityNowAuth -return V2Header
-    $Headersv2."Content-Type" = "application/json" 
 
-    try {          
-        $IDNNewGroup = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/workgroups?&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2 -Body $group
-        return $IDNNewGroup              
+    $v3Token = Get-IdentityNowAuth
+
+    if ($v3Token.access_token) {
+        try {
+            $updateProfile = Get-IdentityNowProfile -ID $id
+            switch($sourceType){
+                Null{$mapping=$null}
+                Standard{
+                    $source=$source.Split(':')
+                    $idnsource=Get-IdentityNowSource
+                    $idnsource=$idnsource.where{$_.name -eq $source[0]}[0]
+                    if ($idnsource.count -ne 1){Write-Error "Problem getting source '$($source[0])'";exit}
+                    $attributes=[pscustomobject]@{
+                        applicationId=$idnsource.externalId
+                        applicationName=$idnsource.health.name
+                        attributeName=$source[1]
+                        sourceName=$idnsource.name
+                    }
+                    $mapping=[pscustomobject]@{
+                        attributeName=$IdentityAttribute
+                        attributes=$null
+                        type=$null
+                    }
+                    switch ($source.count){
+                        2{
+                            $mapping.type='accountAttribute'
+                            $mapping.attributes=$attributes
+                        }
+                        3{
+                            $mapping.type='reference'
+                            $mapping.attributes=[pscustomobject]@{
+                                id=$source[2]
+                                input=$attributes
+                            }
+                        }
+                        default{
+                            write-error "unable to get two or three items from source parameter $($_)"
+                            quit
+                        }
+                    }
+
+                }
+                Complex{
+                    $idnrule=Get-IdentityNowRule -ID $source
+                    $rule=[pscustomobject]@{
+                        id=$idnrule.id
+                        name=$idnrule.name
+                    }
+                    $mapping=[pscustomobject]@{
+                        attributeName=$IdentityAttribute
+                        attributes=$rule
+                        type='rule'
+                    }
+                    if ($idnrule -eq $null){Write-Error "rule $source not found";exit}
+                }
+            }
+            $body=[pscustomobject]@{
+                id=$id
+                attributeConfig=$updateprofile.attributeConfig
+            }
+            if ($mapping){
+                if ($body.attributeConfig.attributeTransforms.attributename -contains $IdentityAttribute){
+                    $index=$body.attributeConfig.attributeTransforms.attributename.IndexOf($IdentityAttribute)
+                    $body.attributeConfig.attributeTransforms[$index]=$mapping
+                }else{
+                    $body.attributeConfig.attributeTransforms+=$mapping
+                }
+            }else{
+                $index=$body.attributeConfig.attributeTransforms.attributename.IndexOf($IdentityAttribute)
+                if ($index -ne -1){
+                    $body.attributeConfig.attributeTransforms=$body.attributeConfig.attributeTransforms.where{$_.attributename -ne $identityattribute}
+                }
+            }
+            
+            $url="https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/update/$($ID)"
+            $response = Invoke-WebRequest -Uri $url -Method Post -UseBasicParsing -Body ($body | convertto-json -depth 100) -ContentType 'application/json' -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+            return $response
+        }
+        catch {
+            Write-Error "update failed $($_)" 
+        }
     }
-    catch {
-        Write-Error "Failed to create group. Check group details. $($_)" 
-    }
+    else {
+        Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
+        return $v3Token
+    } 
 }
+
 
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUIYdWQ4pnTnqMXBMCp0UTXPOU
-# jCGgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUHUXSFE2fj8z0UhS8nazSY/nZ
+# hK2gghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -145,22 +255,22 @@ function New-IdentityNowGovernanceGroup {
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUGiNxXtaKh4nSjy0T7FO/
-# 1J3j8vMwDQYJKoZIhvcNAQEBBQAEggEARisEMhsS3ptLVylDtnBh6QozxSunW5aH
-# WE9B4W+zEDmVbP6G3bieXq68n2QHrSiPchhfUgkBj7+RnYUnG34Rzr/T5m1F5wlV
-# ohQhNIzMchPI8fksc9Bfyh/IcCJo6WxIJQkkVl+fgKHjTx0X9WQssw30nyT17d/f
-# JT1+O9AGuC2gDIS9TW7sKj6ZczT8rHymKgEXrzyZthKIZBCwf65fkvk+I/cIfTsa
-# vI4OUhq/4SQ21BYPBhuI5dzbA/jQBATfU5oD16iPIQCwMZfYTRUgm180fxY2XDpy
-# xoh2t7gt88vasD4TZffiDsMP1GDhpDKwI6LHyW/hcbPT2lDl+Fk8xaGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUIh8jbIyDtow7IFOp1Esb
+# 2HkOUhswDQYJKoZIhvcNAQEBBQAEggEAUhGH6FWR+qxF/8y8/7g3Ct297SRMTSEJ
+# 3zHKbAK1N3YfkcSgGfo4Zhe2wpDjW2sXWTGIQPM+B0nBk3qgXOVK8oy3PZNgvDjv
+# RfjmFLS1eXbiOPfvpW6TFa1QgZsfMmbwOZhHTqxAsaI/R7GkhoXEm48wptojZRnG
+# Flm9PsXp0P3x6/OZUi1YF7Tu/jIe1l2MewfBKKf4c1ZWWcBfWk9roLmPIuoCIU/v
+# NirS1qGfj3Ua19vxLgcjyvRIrKXNHi6FNT2bqPcBC8NwYZupGKPoItAMNs+97lLn
+# hRvDlaiNJYvGpjjL9QuZob4ZfMFDK72eJDPbiWTHqVXHIna//krr+KGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjAyNDFaMCMGCSqGSIb3DQEJBDEWBBTEBUUPZjJoMedGokY0T5uf
-# iyLMVzANBgkqhkiG9w0BAQEFAASCAQAJor30NSH8CesChY/M5tsrBc79DbWjpPaY
-# /vgfdpc5XJLgbHtfikKJeoMpIyg9pIsbbRHgi401rFA0VEW0OoMMFw4CPRrSYV2v
-# uxB7Gu2vAVeyAr1Ty6ChFsRljfc7jJgUkGJqrxxkxf5o25LBXygCGPEg63G7LO5H
-# 7b9awACb+CqR14daPuQ320Cj1U93oHXNSCH+BsHxnQPV4Je0GrSGXJRYMeWhxaQd
-# IMhRedryuiMfIT++QE+x5fB8qVpLKVv9sv/HLAg/u47ajJ1Pxm/wn4o1TCkOjJS4
-# KGF2qCcmbAhhp05mupjeRReyU1429C1kdIfV97UPois0s5i9RieH
+# Fw0yMDA2MTUwMjAyNTNaMCMGCSqGSIb3DQEJBDEWBBTHtARuC7RsngEPTo/ElAJH
+# AsTBVzANBgkqhkiG9w0BAQEFAASCAQA3/36qIbrxCI/LfztrFCzzbEDkuAZBttxU
+# 7Da6jgqNARLe47nPUoflZnRvzLkZPzQ98CvAzdmwIt/4s3boLOZal9EE/mz5Z2xi
+# lmjxhjocXGoc2xPEN6/XhnZDV+FeHRtTyxSrvJTOfDt3E/HRh5d/+W0kVBBtz04p
+# 5sECJavcxKYN+yJze/NUZA+/xsXemTenNSaYkRbu/1znDsM9ROD86ZEVYWPfeRtm
+# yb3LkVa6k5GvMm8ExbUF9GGdGDZUSzFCcq/a0GZ5YU4vUozUpdprCzJ6cXmHp72Q
+# w1VnxKZ1O19bMrr6R6ih9oCiAwU9tljYVj2DqlCG0a94noFFcaGX
 # SIG # End signature block

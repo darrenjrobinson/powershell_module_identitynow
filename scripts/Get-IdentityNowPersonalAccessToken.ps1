@@ -1,44 +1,61 @@
-function New-IdentityNowGovernanceGroup {
+function Get-IdentityNowPersonalAccessToken {
     <#
 .SYNOPSIS
-    Create a new IdentityNow Governance Group.
+List IdentityNow Personal Access Tokens.
 
 .DESCRIPTION
-    Create a new IdentityNow Governance Group.
+List IdentityNow Personal Access Tokens. 
 
-.PARAMETER group
-    The Governance Group details.
+.PARAMETER limit
+(optional) Number of personal access tokens to return
 
 .EXAMPLE
-    New-IdentityNowGovernanceGroup 
+Get-IdentityNowPersonalAccessToken
+
+.EXAMPLE
+Get-IdentityNowPersonalAccessToken -limit 10
 
 .LINK
-    http://darrenjrobinson.com/sailpoint-identitynow
+http://darrenjrobinson.com/sailpoint-identitynow
 
 #>
 
     [cmdletbinding()]
-    param(
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$group
+    param( 
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [string]$limit = 999
     )
-    $Headersv2 = Get-IdentityNowAuth -return V2Header
-    $Headersv2."Content-Type" = "application/json" 
 
-    try {          
-        $IDNNewGroup = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/workgroups?&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2 -Body $group
-        return $IDNNewGroup              
+    $v3Token = Get-IdentityNowAuth
+
+    if ($v3Token.access_token) {
+        try {    
+            $IDNGetPAT = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/personal-access-tokens?limit=$($limit)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+            
+            if ($IDNGetPAT) {
+                return $IDNGetPAT
+            }
+            else {
+                return "No 'Personal Access Tokens' found. Use New-IdentityNowPersonalAccessToken to create personal access tokens."
+            }
+            
+        }
+        catch {
+            Write-Error "Get Personal Access Token failed. $($_)" 
+        }
     }
-    catch {
-        Write-Error "Failed to create group. Check group details. $($_)" 
-    }
+    else {
+        Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
+        return $v3Token
+    } 
 }
+
 
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUIYdWQ4pnTnqMXBMCp0UTXPOU
-# jCGgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUe09OguXVlN3gcywkwgvHj5MZ
+# zWKgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -145,22 +162,22 @@ function New-IdentityNowGovernanceGroup {
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUGiNxXtaKh4nSjy0T7FO/
-# 1J3j8vMwDQYJKoZIhvcNAQEBBQAEggEARisEMhsS3ptLVylDtnBh6QozxSunW5aH
-# WE9B4W+zEDmVbP6G3bieXq68n2QHrSiPchhfUgkBj7+RnYUnG34Rzr/T5m1F5wlV
-# ohQhNIzMchPI8fksc9Bfyh/IcCJo6WxIJQkkVl+fgKHjTx0X9WQssw30nyT17d/f
-# JT1+O9AGuC2gDIS9TW7sKj6ZczT8rHymKgEXrzyZthKIZBCwf65fkvk+I/cIfTsa
-# vI4OUhq/4SQ21BYPBhuI5dzbA/jQBATfU5oD16iPIQCwMZfYTRUgm180fxY2XDpy
-# xoh2t7gt88vasD4TZffiDsMP1GDhpDKwI6LHyW/hcbPT2lDl+Fk8xaGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUQ6A896S9tAA76q93VpaQ
+# AJtH7iYwDQYJKoZIhvcNAQEBBQAEggEAeiSKc8Rpt8ALfotL3Wpbh6fyVJ4SkGp7
+# sH1mKLqg/5TIKF3qxwsDhxVzjhIRmN8B4D9GO3D0+I0GXWntrRhavnOr0RZATQna
+# Mbi2WK47OeIcvSdg51bL9yfKIVFHufers+C1mzfNivoH31rck/8uVLFLkzCEEjIE
+# Q+9uJOGAYbIIPf8hRYTtkiDyuCPQ5fof9Lmq2GoLlzTkWqU1A/HKs+96Sh6xSz4I
+# Jyi2cxaUBbB/4n8UUGSAcqjFGXuSRga28OoptjgKCxS60Vp+fe8Oct3T5JQ/tpdL
+# aqWA0vfk9jk2G3DjzBZbIxgDPjXdmStPBIP9t+8SMq/Xt5jadMu56aGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjAyNDFaMCMGCSqGSIb3DQEJBDEWBBTEBUUPZjJoMedGokY0T5uf
-# iyLMVzANBgkqhkiG9w0BAQEFAASCAQAJor30NSH8CesChY/M5tsrBc79DbWjpPaY
-# /vgfdpc5XJLgbHtfikKJeoMpIyg9pIsbbRHgi401rFA0VEW0OoMMFw4CPRrSYV2v
-# uxB7Gu2vAVeyAr1Ty6ChFsRljfc7jJgUkGJqrxxkxf5o25LBXygCGPEg63G7LO5H
-# 7b9awACb+CqR14daPuQ320Cj1U93oHXNSCH+BsHxnQPV4Je0GrSGXJRYMeWhxaQd
-# IMhRedryuiMfIT++QE+x5fB8qVpLKVv9sv/HLAg/u47ajJ1Pxm/wn4o1TCkOjJS4
-# KGF2qCcmbAhhp05mupjeRReyU1429C1kdIfV97UPois0s5i9RieH
+# Fw0yMDA2MTUwMjAyMzVaMCMGCSqGSIb3DQEJBDEWBBT1xGzleP7RrtGwo9GnXBLh
+# ILf0bzANBgkqhkiG9w0BAQEFAASCAQCP2IIfao2r1Rx0Xz+nsju+FqRMVC0Nf2mF
+# NqdG5f7+nNO0TDAke0mgpFGq8ObWgsFLJjl1Pj7niq4olayENnjnoENdCUVWFQFk
+# +zYHp2H8giMVsQ8RtqGhjGy82iKjCG/VWHqesZnjuzGHNono0wyrQeiGyLIUsbDx
+# kCjc1/HzWuOUADWBaXJHfHpyjM6tvZsZADsVCP3YHnrllvmjnAjbHg3ZUyavCc4y
+# ueN9BR7IzADguNKHOd2SYHGdOt+HP1jrDfLfi03tHRgjwlesWq1UzPGR+1EZUzIl
+# We8CiO4xIfP901wV3kvHWh5BAuXv/dUgkBiB0QRkgIiEmJ+lZArH
 # SIG # End signature block

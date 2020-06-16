@@ -52,12 +52,12 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * List Account Activities
 * Get Account Activity 
 * Reset an IdentityNow Source
-* .... and if they don't fit Invoke-IdentityNowRequest to make any other API call (examples for Get Source Schema, Get IdentityNow Identity Profiles, Get IdentityNow Identity Attributes)
+* .... and if they don't fit <b>Invoke-IdentityNowRequest</b> to make any other API call (examples for Get Source Schema, Get IdentityNow Identity Profiles, Get IdentityNow Identity Attributes)
 
 ## Installation ##
 
 ### v1.0.6 and later ##
-No dependencies. v1.0.6 and later is compatable with PowerShell Desktop 5+ and PowerShell Core 6+
+No dependencies. v1.0.6 and later is compatable with PowerShell Desktop 5+ and PowerShell Core 6+ / PowerShell 7
 
 ### v1.0.5 and earlier ##
 The dependencies are PowerShell version 5 and the PowerShell Community eXtension. If for some reason (like you're on an airgapped network), you can get [PSCx it from here](https://github.com/Pscx/Pscx)
@@ -232,13 +232,15 @@ Example
 ```
 Get-IdentityNowOrg 
 
-Name                           Value                                                                                                                       
-----                           -----                                                                                                                       
-Organisation Name              customer-sb                                                                                                                   
-Organisation URI               https://customer-sb.identitynow.com                                                                                           
+Name                           Value                                                                                                                                     
+----                           -----                                                                                                                                     
+Organisation Name              customer-sb
+Organisation URI               https://customer-sb.identitynow.com
 v1 Base API URI                https://customer-sb.identitynow.com/api
 v2 Base API URI                https://customer-sb.api.identitynow.com/v2
-v3 / Private Base API URI      https://customer-sb.api.identitynow.com/cc/api
+v3 Base API URI                https://customer-sb.api.identitynow.com/v3
+Private Base API URI           https://customer-sb.api.identitynow.com/cc/api
+Beta                           https://customer-sb.api.identitynow.com/beta
 ```
 
 Update an IdentityNow Organisation Setting
@@ -1400,7 +1402,25 @@ Invoke-IdentityNowSourceReset -sourceID 12345 -skip Accounts
 ### ... and the ultimate flexible cmdlet Invoke-IdentityNowRequest ###
 The cmdlet that lets you do your thing, with a little help. 
 This cmdlet has options for v2 and v3 authentication and will provide the web request headers (with and without content-type = application/json / application/json-patch+json set).
-You supply the URI for the request, the method (POST, GET, DELETE, PATCH) and the request will be sent, and the results sent back.
+
+(URI) You supply the URI for the request, the method (POST, GET, DELETE, PATCH) and the request will be sent, and the results sent back.
+or
+(API Version and Path) You supply the API version and the path for the API request along with the method (POST, GET, DELETE, PATCH) and the request will be sent, and the results sent back.
+- *Hint* Get-IdentityNowOrg will show you the API Version to Path mappings
+
+```
+Get-IdentityNowOrg  
+
+Name                           Value                                                                                                                                     
+----                           -----                                                                                                                                     
+Organisation Name              customer-sb
+Organisation URI               https://customer-sb.identitynow.com
+v1 Base API URI                https://customer-sb.identitynow.com/api
+v2 Base API URI                https://customer-sb.api.identitynow.com/v2
+v3 Base API URI                https://customer-sb.api.identitynow.com/v3
+Private Base API URI           https://customer-sb.api.identitynow.com/cc/api
+Beta                           https://customer-sb.api.identitynow.com/beta
+```
 
 Request Methods are;
 * Get
@@ -1418,7 +1438,7 @@ Header options are;
 
 <b>OPTION:</b> -json switch to return request result as JSON. 
 
-Example 1
+Example 1 - URI
 Get the Schema of a Source
 [Reference post](https://blog.darrenjrobinson.com/creating-sailpoint-identitynow-source-configuration-backups-and-html-reports-with-powershell/)
 
@@ -1428,7 +1448,13 @@ $sourceID = "12345"
 Invoke-IdentityNowRequest -Method Get -Uri "https://$($orgName).api.identitynow.com/cc/api/source/getAccountSchema/$($sourceID)" -headers HeadersV3                
 ```
 
-Example 2
+Example 1 - API & Path
+```
+$sourceID = "12345"
+Invoke-IdentityNowRequest -API Private -path "source/getAccountSchema/$($sourceID)" -method Get -headers Headersv3               
+```
+
+Example 2 - URI
 List Identity Profiles
 [Reference post](https://blog.darrenjrobinson.com/changing-sailpoint-identitynow-identity-profiles-priorities-using-powershell/)
 
@@ -1437,13 +1463,23 @@ $orgName = "customer-sb"
 Invoke-IdentityNowRequest -Method Get -Uri "https://$($orgName).identitynow.com/api/profile/list" -headers Headersv2_JSON 
 ```
 
-Example 3
+Example 2 - API & Path
+```
+Invoke-IdentityNowRequest -API V1 -Method Get -path "profile/list" -headers Headersv2_JSON  
+```
+
+Example 3 - URI
 Get IdentityNow Identity Attributes
 [Reference post](https://blog.darrenjrobinson.com/indexing-a-sailpoint-identitynow-attribute-in-an-identity-cube-for-use-in-correlation-rules/)
 
 ```
 $orgName = "customer-sb"
 Invoke-IdentityNowRequest -Method Get -Uri "https://$($orgName).api.identitynow.com/cc/api/identityAttribute/list" -headers HeadersV3 
+```
+
+Example 3 - API & Path
+```
+Invoke-IdentityNowRequest -API Private -path "identityAttribute/list" -method Get -headers HeadersV3
 ```
 
 ## Disclaimer - Fine Print ##

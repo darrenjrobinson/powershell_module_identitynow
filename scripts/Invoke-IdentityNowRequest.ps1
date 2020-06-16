@@ -77,11 +77,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
     )
 
     switch ($API){
-        "Private"{$uri="$((Get-IdentityNowOrg).'v3 / Private Base API URI')/$path"}
+        "Private"{$uri="$((Get-IdentityNowOrg).'Private Base API URI')/$path"}
         "V1"{$uri="$((Get-IdentityNowOrg).'v1 Base API URI')/$path"}
         "V2"{$uri="$((Get-IdentityNowOrg).'v2 Base API URI')/$path"}
-        "V3"{$uri="https://$((Get-IdentityNowOrg).'Organisation Name').api.identitynow.com/v3/$path"}
-        "Beta"{$uri="https://$((Get-IdentityNowOrg).'Organisation Name').api.identitynow.com/beta/$path"}
+        "V3"{$uri="$((Get-IdentityNowOrg).'v3 Base API URI')/$path"}
+        "Beta"{$uri="$((Get-IdentityNowOrg).'Beta')/$path"}
     }
     switch ($headers) {
         HeadersV2 { 
@@ -150,8 +150,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU1xOrqaDfMeUR1jllOqC+m6u2
-# niOgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUnHWPc/IyG9OEIympgH4/mgM+
+# sVqgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -258,22 +258,22 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUfeZiJw1mkz+rKEzNAeuP
-# i6ZJEb4wDQYJKoZIhvcNAQEBBQAEggEAZqBHOSyDpbIAwAty6FeZcdXcCmRW8sOx
-# 97e/90w2+6PgXcPpQUDZYc5UQnkb89AHFtdoleBlCllVUV8rrkz/O4whQmL+Q8ek
-# mztMJzWTMjOXqq4RBe4LA7ECzjCS0ZoL9nNU+Ayl4i9SdZz8Bbie0Vc1a05rVivJ
-# OblnkSn0NYVuSB/rf5e+3P0gH7O3jZBLpnocpE88tZ7YarWoNgXfN/O20XVTYJq3
-# hh6miwxAYY8mWgPiJZlSerPqDE3v5AroFHGWoJ7jpwcg59ExdbUmMGO+TmLNGtOF
-# pdOHXE+JvJx22J5teFZx8xwrTQaF6E3LVeRR6QEpVO6LFUwG84EFLKGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUWOhkCkBdIADCZ+7SXdUp
+# 3zhp/RcwDQYJKoZIhvcNAQEBBQAEggEAUydu2AWSzXbiZfMqYgDrghp5asrkqZxN
+# SKAgwgMfDGVzWk86MFi1g5pUOea9IOgw6dYleuFUeZXaBABedr4EKds4PmVV8Hh9
+# YbEcpnea+5r3HCoNrNAoaufemQx5XoRB6cOYcazpP9g5/SsBfs/gHFCuZRjNfmo7
+# 6hf/Qtw5QWU1GhO7+Qm0K5kUNmxSwObyTorM7Sb0I9iswkV79BNEWriaCLIUC766
+# AMJhn0Omd2Hzt5Wh/v0StrGG/E39FjlCF/EOOCZg2MnFkZk709naXOOGy446cFI8
+# ugYCDz3aKU6VuR4+Js8ov8NqmZrATJuNiJsovtQFDcStC40WkbjYTaGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjAyMzlaMCMGCSqGSIb3DQEJBDEWBBTE0w8kksb6YQNyS41dmU2v
-# qOrNCjANBgkqhkiG9w0BAQEFAASCAQAXP+iCcr0FMia0t68haK7dW8u18wkK62bj
-# IVkZm1866ZsDG8HcwCZ/pWD9H3FdhYm0K2nEkyZtgoE55WAeWdSpCZuTIiwa8Lbw
-# 1HHevaLFwAi7dmuSmnVSv8U6CIHixQ2BvrX6gBb5NZiRHwk2w2/02Rd+D5Gy6Gmy
-# mNuQw/e254M6Uwdmao5FArG1rf+FCfAwxGe/XxR6A4TMIHcPqXfvxtzlSeL7WEUL
-# RLykHm0h9AiHmd6xhD/eJattFjWoUfndnbqRxZ+KFcpsGv+teL3GtFlLKsajNN+V
-# woC/Ng98z1CF4WrFB6+cyrxNbZWeS1r+2hwcG5Y8HmANefEDYJkv
+# Fw0yMDA2MTYwMDMwMzRaMCMGCSqGSIb3DQEJBDEWBBQW+vwd7A35YfnFuJK6phGn
+# GfHn4zANBgkqhkiG9w0BAQEFAASCAQBob/2ozM3OsZCADW3+fK/V3Pjh8TvPiZkM
+# Q9UkffnGG9mVbLyf7cKroHKtFt+YXjP/Aj3ATL9NIgxKQqIsW/+4YNCycfEsD3ry
+# NXOVg4XH5rFGszefD/WNfwAan5pObD4rlD9DwX6tzA9qK8zEAZ+Fio3ncDML/VAg
+# Dy8nGJwswMXcgf0aGrcKUHa++XZGLICY93Xo3guMxXMSK8PM7UdMyeD7C8V4smCt
+# jvRq3Gm8vlCVZ4uz6MEmGIUa62PQ3YIuXRYPlEGcUOF6CzQEiETd8GD2xXY7YNnE
+# 5nceny8hx59ivtyvzQ3Eonftxm0WVYibjtRqTvvG0Uyf+rjbPlYj
 # SIG # End signature block

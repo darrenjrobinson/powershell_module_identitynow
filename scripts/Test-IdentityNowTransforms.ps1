@@ -27,8 +27,7 @@ https://github.com/darrenjrobinson/powershell_module_identitynow
     foreach ($s in $sources) {
         Write-Progress -Activity 'getting sources' -PercentComplete ($i/$sources.count*100)
         $i++
-        $url = (Get-IdentityNowOrg).'Private Base API URI' + '/source/getAccountSchema/' + $s.id                
-        $target = Invoke-IdentityNowRequest -headers Headersv3 -method Get -uri $url
+        $target = Get-IdentityNowSourceSchema -sourceID $s.id
         $s | Add-Member -NotePropertyName schema -NotePropertyValue $target.attributes -Force
     }
     $identity = Get-IdentityNowIdentityAttribute
@@ -101,8 +100,8 @@ https://github.com/darrenjrobinson/powershell_module_identitynow
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUFAZcG/yvDr+QAd6EDRN14NyD
-# 0OygghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUe2OdS3AhSJ0YL4hm18M6nIAy
+# KPGgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -209,22 +208,22 @@ https://github.com/darrenjrobinson/powershell_module_identitynow
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUu4erAAfnSOxPlGK+4NRm
-# WMQPASMwDQYJKoZIhvcNAQEBBQAEggEApbWu4tFzPbE+lKfxGFLjj6Pxx/KR6sIF
-# stHSwAGs+qCI6VqmfKbzWahCbvdlcP3SRC0wxlcz/zPKZS88SQhQW9ICDHPg89FV
-# zAkVyBXAjfMYaBGNOZfZtKwuWrqcqk7n+8NNfHkQK5tRA3hz136q00Z2kvBQsLq1
-# y2vFmJ8P92kUdeIT6/svEHHlRjYMXFD6S5MYUizgS9+sbGneaWNE1o6OQ26UTLeO
-# 9g/u0FYvC4zXBBeOZxsqwEIZ5CjzhElEaPFd64H5eHL4syvH5mBuqP161Uk5LJxy
-# 75LPqgVjp0rQCJ1sjjJ6PW3zhx1R5EqQ9QB8LwE89BfG5pXtVP1o76GCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUWNHAAc4T+tQxjl/mHtvF
+# ELt4wxowDQYJKoZIhvcNAQEBBQAEggEAkHsU7Ti1N0ya4CCwPqA5CnbxP7lEgu/v
+# gQH6JabjYunRkyll38fAwOZA1E9BUIzAEglxWx+OqCVE6441E7kZ/lWRDEKSaLxF
+# 4WWRjZ7WTa1Ba2DWsgK/o1WmcVMFBcntOq77hzCCo89ujekUSAqIwlkwChTAdbWw
+# vIQbNio4XdQhKd1eQ6MjBV0boB571P+VVygHoq4XORvxXWaNkPaoucY/9Iz2pove
+# VvTEWDFRgF9wx0icCDadjd52tnGjhBgc+J/TPHzfoTkPjcU3fyZ0USfr80efV8rL
+# QwJ6VKoAoYr6c9TtwvRY2LEo790diLq2MQ7vOCf5mGJaqOQJ+LJfQKGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTcyMTQxNDdaMCMGCSqGSIb3DQEJBDEWBBRllTgGx5dGfdXmUnkcgkb0
-# h266GDANBgkqhkiG9w0BAQEFAASCAQAWNM/18zSE6f79V4iYwuXFbttITrJxJOEi
-# aSuLL1JNLwqcLnPBodVYJ73jks+6Ti5q+I6yDtyS3dKU2Sk77fT321XCUbaStt4J
-# NkZpGRsFzVyNpaCiqjqhYYoCpKYdrwqfCjMurS7PWFbv9rPD319bReeT0BqpvNHd
-# HcOBpV7flgsMzBzfTpLyoDYepn/uodZgbJxoMeSITyN4eZNjz7TQFPO7yu4mKsA9
-# uq6UBlZ8s0IdB1QAidSnyIxTqZsHv2q+6mLbSFayKGx+u8jHYeUJ9QWyigC6BEdt
-# 1PIpItNax81IaGYlu3QJ4ILGaAYmhmcvVOOD1T+NQEFcxet1toN1
+# Fw0yMDA2MTcyMjM1MDBaMCMGCSqGSIb3DQEJBDEWBBRv0wnZNBk1choBUWOybfSo
+# PSqtvDANBgkqhkiG9w0BAQEFAASCAQAiZGYLAcD+zvFiCDI1z95hmmhdj9mNglkK
+# sWmyZmCbIvnqHmqg6e/YcoTdHRil7vtS5QJTsIDo/sPWTQqrEB/AoI9zYZdPyLlZ
+# A0s3qWmbhEReLWlW/yhicnyERpDTOO9PQZpchY1KrkQQogRNz5exd4m8iC/BpC+V
+# J/VZVFfp/hYVXmtHsm84utZuxA6DiRmcwCItwvQN91l/YwQGyk3bHxf7zFWDLnYt
+# jV4GA3d1OrHnOatkseHb8Q7YOeeCrDsXjKoVUJWTxAFmvJ6klr4rmDriU0vChRXf
+# Ax6zYOpSCJwG5YypaxAEL3Eqaed+NX2Zjkk5xIlAJGWryG44E/SA
 # SIG # End signature block

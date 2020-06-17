@@ -63,7 +63,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName='Path')]
         [string]$path,
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName='Path')]
-        [string][ValidateSet("V1", "V2", "V3","Private", "Beta")]$API,
+        [string][ValidateSet("V1", "V2", "V3", "Private", "Beta")]$API,
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [ValidateNotNullOrEmpty()]
         [string][ValidateSet("Get", "Put", "Patch", "Delete", "Post")]$method,
@@ -150,8 +150,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUnHWPc/IyG9OEIympgH4/mgM+
-# sVqgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUnrmi/abfMuzCWUkRVgto4AFD
+# yOigghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -258,22 +258,22 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUWOhkCkBdIADCZ+7SXdUp
-# 3zhp/RcwDQYJKoZIhvcNAQEBBQAEggEAUydu2AWSzXbiZfMqYgDrghp5asrkqZxN
-# SKAgwgMfDGVzWk86MFi1g5pUOea9IOgw6dYleuFUeZXaBABedr4EKds4PmVV8Hh9
-# YbEcpnea+5r3HCoNrNAoaufemQx5XoRB6cOYcazpP9g5/SsBfs/gHFCuZRjNfmo7
-# 6hf/Qtw5QWU1GhO7+Qm0K5kUNmxSwObyTorM7Sb0I9iswkV79BNEWriaCLIUC766
-# AMJhn0Omd2Hzt5Wh/v0StrGG/E39FjlCF/EOOCZg2MnFkZk709naXOOGy446cFI8
-# ugYCDz3aKU6VuR4+Js8ov8NqmZrATJuNiJsovtQFDcStC40WkbjYTaGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUQgCF6W2A4kDrVOtRD4PR
+# HCVgAWEwDQYJKoZIhvcNAQEBBQAEggEAHSxj3OIwkklhy4UrFNY3HPLbv0pTXQMu
+# J4ZPcMLWHKE6IIVVOHlVFLO052guCf6+EXHUAI58HKU2khopF+B2t891oci/k8o2
+# JRjqSFT1XpdjKV+qDTsEyHAw6mmnnlQ2Sx1XAtU8pXy5gWgbMInsrdB4QmabpA4h
+# MVuuQTrnwFCs35aDa9+CY8AsB0QVEeHy1M1vUUqnPdPtNHsHAOtM5dLPzQ1eE83U
+# PSEgqdy1vb8ShDdW8cYcdDqU9mnB/+njAU9ofRkq3TQX8495nbpfQ7KKtGnBQTvU
+# WHPNTKkhdzAPlzGxhfhGUuEEclrHmmWGUlegqsYVl1fCx+ugTEAzxKGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTYwMDMwMzRaMCMGCSqGSIb3DQEJBDEWBBQW+vwd7A35YfnFuJK6phGn
-# GfHn4zANBgkqhkiG9w0BAQEFAASCAQBob/2ozM3OsZCADW3+fK/V3Pjh8TvPiZkM
-# Q9UkffnGG9mVbLyf7cKroHKtFt+YXjP/Aj3ATL9NIgxKQqIsW/+4YNCycfEsD3ry
-# NXOVg4XH5rFGszefD/WNfwAan5pObD4rlD9DwX6tzA9qK8zEAZ+Fio3ncDML/VAg
-# Dy8nGJwswMXcgf0aGrcKUHa++XZGLICY93Xo3guMxXMSK8PM7UdMyeD7C8V4smCt
-# jvRq3Gm8vlCVZ4uz6MEmGIUa62PQ3YIuXRYPlEGcUOF6CzQEiETd8GD2xXY7YNnE
-# 5nceny8hx59ivtyvzQ3Eonftxm0WVYibjtRqTvvG0Uyf+rjbPlYj
+# Fw0yMDA2MTcyMTQxNDZaMCMGCSqGSIb3DQEJBDEWBBT7dCXqjdMyDPxb3l+YVyVb
+# 2CDSszANBgkqhkiG9w0BAQEFAASCAQAJFIdAw/951GKortJygSk4onI+XkBaTecw
+# W0joBqU+awfuYWPLeM4he+RTdJh6iMLGLUhmH48qswz01WQP+k3PT78zJYOE844h
+# GrcXT17NEe+kMdahre5z3t1sB5TqyiIFsqa/YPJlbjp6XUixROf5M+loFs3RtHWa
+# xitmFobXpSNZxGBcOxeXTAYcvEaMkVF7wPdyFsoML2VrJVjiQsW+6vedyALe7Ejv
+# Lj2HN70FFPsCqyCplhFD8qvH3EMkk6u+gtpHUkXqQdyn7vBLZZSr3t2RZddf6LFw
+# jtZgQjpM1rRWDcJEMAwdf9InBdEbe5Dhyyywayf+KeaGdXh/WpWm
 # SIG # End signature block

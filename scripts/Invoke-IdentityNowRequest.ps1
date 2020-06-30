@@ -14,8 +14,8 @@ Submit an IdentityNow API Request.
 
 .PARAMETER API
 (required for path parameter set) will determine the base url
-Private will use the base url HTTPS://{your org}.api.identitynow.com/cc/api/
-V1  will use the base url HTTPS://{your org}.identitynow.com/api/
+Private will use the base url https://{your org}.api.identitynow.com/cc/api/
+V1  will use the base url https://{your org}.identitynow.com/api/
 V2  will use the base url https://{your org}.api.identitynow.com/v2/
 V3  will use the base url https://{your org}.api.identitynow.com/v3/
 Beta  will use the base url https://{your org}.api.identitynow.com/beta/
@@ -63,7 +63,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName='Path')]
         [string]$path,
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName='Path')]
-        [string][ValidateSet("V1", "V2", "V3","Private", "Beta")]$API,
+        [string][ValidateSet("V1", "V2", "V3", "Private", "Beta")]$API,
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [ValidateNotNullOrEmpty()]
         [string][ValidateSet("Get", "Put", "Patch", "Delete", "Post")]$method,
@@ -150,8 +150,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUnHWPc/IyG9OEIympgH4/mgM+
-# sVqgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJeYmULVhKV9IaUI4hrVkbHv1
+# txmgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -258,22 +258,22 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUWOhkCkBdIADCZ+7SXdUp
-# 3zhp/RcwDQYJKoZIhvcNAQEBBQAEggEAUydu2AWSzXbiZfMqYgDrghp5asrkqZxN
-# SKAgwgMfDGVzWk86MFi1g5pUOea9IOgw6dYleuFUeZXaBABedr4EKds4PmVV8Hh9
-# YbEcpnea+5r3HCoNrNAoaufemQx5XoRB6cOYcazpP9g5/SsBfs/gHFCuZRjNfmo7
-# 6hf/Qtw5QWU1GhO7+Qm0K5kUNmxSwObyTorM7Sb0I9iswkV79BNEWriaCLIUC766
-# AMJhn0Omd2Hzt5Wh/v0StrGG/E39FjlCF/EOOCZg2MnFkZk709naXOOGy446cFI8
-# ugYCDz3aKU6VuR4+Js8ov8NqmZrATJuNiJsovtQFDcStC40WkbjYTaGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUaLbvwt43jnU02B/bDqQs
+# icL+SdQwDQYJKoZIhvcNAQEBBQAEggEASX1QCKM0Y4MVGkD3q6VtNxHnTg+gwvV5
+# BjLUm14g6+Izpe+IJObzOB+iMmkCt5E9ItPFpav5cbzIWzJ8Cc6VDDnLCG1YQKp3
+# YCHpGhc4UAo4RpxlFiKf/oTafOzYVj0SMO9lVOrsgasa9Y+QEYJnekVmK1oxLwZS
+# hwf4cOnda/08JP+wkEY4jguAiBXAipFwsMq8RaUMzgkV32kjXiO6jTD5ByBqguDf
+# S1jZHpcHWn/oXkgUxIBFtNopNgX0h117sy2arysNP9ZBiLv3aAaUevBGjTZJttTJ
+# Ge9uw3K5IYbbVBqcH5NvM9JNLnmmzQYexWVIsiuycSoJzj2jb4ndO6GCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTYwMDMwMzRaMCMGCSqGSIb3DQEJBDEWBBQW+vwd7A35YfnFuJK6phGn
-# GfHn4zANBgkqhkiG9w0BAQEFAASCAQBob/2ozM3OsZCADW3+fK/V3Pjh8TvPiZkM
-# Q9UkffnGG9mVbLyf7cKroHKtFt+YXjP/Aj3ATL9NIgxKQqIsW/+4YNCycfEsD3ry
-# NXOVg4XH5rFGszefD/WNfwAan5pObD4rlD9DwX6tzA9qK8zEAZ+Fio3ncDML/VAg
-# Dy8nGJwswMXcgf0aGrcKUHa++XZGLICY93Xo3guMxXMSK8PM7UdMyeD7C8V4smCt
-# jvRq3Gm8vlCVZ4uz6MEmGIUa62PQ3YIuXRYPlEGcUOF6CzQEiETd8GD2xXY7YNnE
-# 5nceny8hx59ivtyvzQ3Eonftxm0WVYibjtRqTvvG0Uyf+rjbPlYj
+# Fw0yMDA2MTcyMjM0MDZaMCMGCSqGSIb3DQEJBDEWBBRuikyUtttZx1871vkA7cAv
+# IyZwEjANBgkqhkiG9w0BAQEFAASCAQBoKPpBPoWD1A/XWotPcXq0hJ0KOXgANnaJ
+# EQra3me1wNvExO1tBcRLJJH8SPABRnaOpd5EK1fdCNB8kbFWbtumxBjJDglz23Bk
+# CoS90f0cj6UiUNWIOQ0onBazqE0w5i3Bx5B27GcJtwpOMEIMdPkuZlsqOvjtmBbC
+# 9X75uqtj45Sclf9aYxPb4Hv+W7Td88GuNAqdjU8SKWc3TOZQsXcD/rberlWXrs4C
+# Q3EXjoumnPj4KBwUQTuf7nWwimIYuQtFASwGAxtHPpGvTiRt0w6msSm6BBZs0YVy
+# /dpVD2lauC9TbhDgQ0jWtP6EhC4Q1yf2NXsjg7jiw834hXFmamgg
 # SIG # End signature block

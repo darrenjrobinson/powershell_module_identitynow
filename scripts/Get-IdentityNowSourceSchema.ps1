@@ -1,148 +1,41 @@
-function Invoke-IdentityNowRequest {
+function Get-IdentityNowSourceSchema {
     <#
 .SYNOPSIS
-Submit an IdentityNow API Request.
+    Get the Schema for an IdentityNow Source.
 
 .DESCRIPTION
-Submit an IdentityNow API Request.
+    Get the Schema for an IdentityNow Source.
 
-.PARAMETER uri
-(required for Full URI parameter set) API URI
-
-.PARAMETER path
-(Required for path parameter set) specify the rest of the api query after the base api url as determined when picking the API variable 
-
-.PARAMETER API
-(required for path parameter set) will determine the base url
-Private will use the base url https://{your org}.api.identitynow.com/cc/api/
-V1  will use the base url https://{your org}.identitynow.com/api/
-V2  will use the base url https://{your org}.api.identitynow.com/v2/
-V3  will use the base url https://{your org}.api.identitynow.com/v3/
-Beta  will use the base url https://{your org}.api.identitynow.com/beta/
-
-.PARAMETER method
-(required) API Method
-e.g Post, Get, Patch, Delete
-
-.PARAMETER headers
-(required) Headers for the request
-Headersv2 Digest Auth with no Content-Type set 
-Headersv2_JSON is Digest Auth with Content-Type set for application/json
-Headersv3 is JWT oAuth with no Content-Type set 
-Headersv3_JSON is JWT oAuth with Content-Type set for application/json
-Headersv3_JSON-Patch is JWT oAuth with Content-Type set for application/json-patch+json
-
-.PARAMETER body
-(optional - JSON) Payload for a webrequest
-
-.PARAMETER json
-(optional) Return IdentityNow Request response as JSON.
+.PARAMETER sourceID
+    (required) The ID of an IdentityNow Source. eg. 45678
 
 .EXAMPLE
-Invoke-IdentityNowRequest -method Get -headers Headersv2 -uri "https://YOURORG.api.identitynow.com/v2/accounts?sourceId=12345&limit=20&org=YOURORG"
-
-.EXAMPLE
-Invoke-IdentityNowRequest -method Get -headers Headersv3 -uri "https://YOURORG.api.identitynow.com/cc/api/integration/listSimIntegrations"
-
-.EXAMPLE
-Invoke-IdentityNowRequest -API Beta -path 'sources' -method get -headers Headersv3
-Invoke-IdentityNowRequest -API Private -path 'source/list' -method get -headers Headersv3
-
-.EXAMPLE
-Invoke-IdentityNowRequest -API Beta -path 'sources/2c9140847578a74611727de965d91c5c' -method patch -headers Headersv3_JSON-Patch -body '[{"op":"remove","path":"/connectorAttributes/timeoutinseconds"}]'
+    Get-IdentityNowSourceSchema -sourceID 12345
 
 .LINK
-http://darrenjrobinson.com/sailpoint-identitynow
+    http://darrenjrobinson.com/sailpoint-identitynow
 
 #>
 
     [cmdletbinding()]
     param(
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName='Full URL')]
-        [string]$uri,
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName='Path')]
-        [string]$path,
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName='Path')]
-        [string][ValidateSet("V1", "V2", "V3", "Private", "Beta")]$API,
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [ValidateNotNullOrEmpty()]
-        [string][ValidateSet("Get", "Put", "Patch", "Delete", "Post")]$method,
-        [ValidateNotNullOrEmpty()]
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string][ValidateSet("HeadersV2", "HeadersV3", "Headersv2_JSON", "Headersv3_JSON", "Headersv3_JSON-Patch")]$headers,
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$body,
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [switch]$json
+        [string]$sourceID
     )
 
-    switch ($API){
-        "Private"{$uri="$((Get-IdentityNowOrg).'Private Base API URI')/$path"}
-        "V1"{$uri="$((Get-IdentityNowOrg).'v1 Base API URI')/$path"}
-        "V2"{$uri="$((Get-IdentityNowOrg).'v2 Base API URI')/$path"}
-        "V3"{$uri="$((Get-IdentityNowOrg).'v3 Base API URI')/$path"}
-        "Beta"{$uri="$((Get-IdentityNowOrg).'Beta')/$path"}
-    }
-    switch ($headers) {
-        HeadersV2 { 
-            $requestHeaders = Get-IdentityNowAuth -return V2Header
-            Write-Verbose "$requestheaders"
-        }
-        HeadersV3 { 
-            $v3Token=Get-IdentityNowAuth
-            $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)" }
-            Write-Verbose "Authorization = Bearer $($v3Token.access_token)"
-        }
-        Headersv2_JSON { 
-            $requestHeaders = Get-IdentityNowAuth -return V2Header
-            $requestHeaders.'Content-Type' = "application/json" 
-            Write-Verbose "Authorization = 'Basic $($encodedAuth)' ; 'Content-Type' = 'application/json' "
-        }
-        Headersv3_JSON { 
-            $v3Token=Get-IdentityNowAuth
-            $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json" }
-            Write-Verbose "Authorization = 'Bearer $($v3Token.access_token)' ; 'Content-Type' = 'application/json'"
-            Write-verbose ($v3Token | convertTo-json)
-        }
-        Headersv3_JSON-Patch { 
-            $v3Token=Get-IdentityNowAuth
-            $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json-patch+json" }
-            Write-Verbose "Authorization = 'Bearer $($v3Token.access_token)'; 'Content-Type' = 'application/json-patch+json'"
-            Write-verbose ($v3Token | convertTo-json)
-        }
-        default { 
-            $requestHeaders = $headers 
-        } 
-    }
-    
-    Write-Verbose $requestHeaders
-    
-    if ($requestHeaders) {
+    $v3Token = Get-IdentityNowAuth
+  
+    if ($v3Token.access_token) {
         try {
-            if ($body) {
-                if ($json) {
-                    $result = (Invoke-WebRequest -Method $method -Uri $uri -Headers $requestHeaders -Body $body).content
-                }
-                else {
-                    $result = Invoke-RestMethod -Method $method -Uri $uri -Headers $requestHeaders -Body $body 
-                }
-            }
-            else {   
-                if ($json) {
-                    $result = (Invoke-WebRequest -Method $method -Uri $uri -Headers $requestHeaders).content
-                }
-                else {      
-                    $result = Invoke-RestMethod -Method $method -Uri $uri -Headers $requestHeaders        
-                }
-            }
-            return $result
+            $sourceSchema = Invoke-RestMethod -method Get -uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/cc/api/source/getAccountSchema/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+                return $sourceSchema
         }
         catch {
-            Write-Error "Request Failed. Check your request parameters. $($_)" 
+            Write-Error "Source doesn't exist? Check SourceID. $($_)" 
         }
     }
     else {
-        Write-Error "No Request Headers computed. Check your request `$headers parameter. $($_)"
+        Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
         return $v3Token
     } 
 }
@@ -150,8 +43,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUJeYmULVhKV9IaUI4hrVkbHv1
-# txmgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU5xdJ9T1x6aZx713EYZXRAvjl
+# fTagghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -258,22 +151,22 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUaLbvwt43jnU02B/bDqQs
-# icL+SdQwDQYJKoZIhvcNAQEBBQAEggEASX1QCKM0Y4MVGkD3q6VtNxHnTg+gwvV5
-# BjLUm14g6+Izpe+IJObzOB+iMmkCt5E9ItPFpav5cbzIWzJ8Cc6VDDnLCG1YQKp3
-# YCHpGhc4UAo4RpxlFiKf/oTafOzYVj0SMO9lVOrsgasa9Y+QEYJnekVmK1oxLwZS
-# hwf4cOnda/08JP+wkEY4jguAiBXAipFwsMq8RaUMzgkV32kjXiO6jTD5ByBqguDf
-# S1jZHpcHWn/oXkgUxIBFtNopNgX0h117sy2arysNP9ZBiLv3aAaUevBGjTZJttTJ
-# Ge9uw3K5IYbbVBqcH5NvM9JNLnmmzQYexWVIsiuycSoJzj2jb4ndO6GCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUg7byWGdS+tkotxoh8yjP
+# 5DB+gFkwDQYJKoZIhvcNAQEBBQAEggEAAgyafOfbq0o8p/+/BBde5GTtg7WXzWOc
+# 56sRei5cpjSVEtppgK2PFZ2EYFy6rO/redYojkEdnCGT4lLyTcmlMu0M7ILzFzF6
+# dnpN5yiMO1n3305qffNXy1+gx7WPIWxula+VqHC1oCj0WHHadOquz7C0pmTdzxYI
+# nMklro45jMFgfNiYtEutiGUWxP0SeU5xSD76ALGK1e6Oq/eqjk/ZoLADzg+ufP7l
+# 8BQAlmuQzgvSV9wJ2kABk6IDVKMs372zVITvEYca3/kM2T4vMb1aik58VQjyZ8r8
+# e26uRApPh6r8KQE8leiODVtcO3z3wOWaVA3WwJ4IeQ3S147HdIh0l6GCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTcyMjM0MDZaMCMGCSqGSIb3DQEJBDEWBBRuikyUtttZx1871vkA7cAv
-# IyZwEjANBgkqhkiG9w0BAQEFAASCAQBoKPpBPoWD1A/XWotPcXq0hJ0KOXgANnaJ
-# EQra3me1wNvExO1tBcRLJJH8SPABRnaOpd5EK1fdCNB8kbFWbtumxBjJDglz23Bk
-# CoS90f0cj6UiUNWIOQ0onBazqE0w5i3Bx5B27GcJtwpOMEIMdPkuZlsqOvjtmBbC
-# 9X75uqtj45Sclf9aYxPb4Hv+W7Td88GuNAqdjU8SKWc3TOZQsXcD/rberlWXrs4C
-# Q3EXjoumnPj4KBwUQTuf7nWwimIYuQtFASwGAxtHPpGvTiRt0w6msSm6BBZs0YVy
-# /dpVD2lauC9TbhDgQ0jWtP6EhC4Q1yf2NXsjg7jiw834hXFmamgg
+# Fw0yMDA2MTYwNDMwMzdaMCMGCSqGSIb3DQEJBDEWBBSxRD8ueNyUrbvVjWye+yMC
+# Duz01jANBgkqhkiG9w0BAQEFAASCAQCCEJ7imle4sjj767JrXi6bf8NEIWMC7mnl
+# mKV6Eh4OeFhJe0OOFipHfpko6hz9bwrnYt9lL0J3YcBxw3TLXuS/f5ERl+3TDIJK
+# zrP0aSx0Mq5j6+SIB0SQ0dZeegid6ibubkf1jqgDfO7Og1a/84bC4ZG+27EgQiwQ
+# QgjnDcL/Altu25fBLo7+69l4y0lPlIPoqp0JjX0yVfMR3nnxfhMElPvFDdFMnCqQ
+# xlgjiAjpMvYFJ0h0rfXji+uIL61uibL+szblSmrnFy8GUhw2iXPjVhcO/rLll0t7
+# /mDIybkYLx8Af6A+dFBytM8JR3zC+CpqnfGvZq1ezO1gR6w9fSRr
 # SIG # End signature block

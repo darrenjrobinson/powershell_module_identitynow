@@ -22,7 +22,9 @@ function Get-IdentityNowOrg {
             "Organisation URI"          = "https://$($IdentityNowConfiguration.orgName).identitynow.com";
             "v1 Base API URI"           = "https://$($IdentityNowConfiguration.orgName).identitynow.com/api";
             "v2 Base API URI"           = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2";
-            "v3 / Private Base API URI" = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api"
+            "v3 Base API URI"           = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v3";
+            "Private Base API URI"      = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api";
+            "Beta"                      = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta";
         }
         return $identityNowOrg
     }
@@ -35,8 +37,8 @@ function Get-IdentityNowOrg {
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUD7ZGrK9uhAFVbu+JbSA2AOQk
-# MDWgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzoPyhe+cBOBUYCDJNdQOEYdk
+# NgegghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -143,22 +145,22 @@ function Get-IdentityNowOrg {
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUD9oQfx8vsgzqLRuo7VJ6
-# OtoBUzswDQYJKoZIhvcNAQEBBQAEggEALPPLBeEfm8e6ZHYBT2RA0orAFVeh5SJn
-# T/+qBOw63vQ6u4ywVEu1KcGm6h6QpTH6TXLI97RVtZbcV/PhG+tkDXdNCqMpg5TB
-# bKxrQp7e15KLmfujEmTnLkymuqyudtM7y8Jbn4VU1XY3nJV6/5R8dubPKIOU45lD
-# Al+fLxldG0VuOxHmHxc1MgBIDIk4+V5M4oIrnINHAWDS26nhsWc/VikDMRWYfw12
-# gUcR9knRVk2sffgSYgz6uWjHBilyHgTDPPqRh29gpSpF2utNqwJTrjRLto7+Itsc
-# OBWaqIEOeGi4vri48xUlBkXKXt6IUKmgjaEIw0U0g5t40lSTZb3LL6GCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUkEqL1BW6JaGE1fyBZDgD
+# Mh6b+YYwDQYJKoZIhvcNAQEBBQAEggEAh5omW16PRrEdVimZ59E69wyVfIuUkAlh
+# O+ZkBRN8b0fit3iSo0gF9IB0DB0gNfhhJW2d/dQchRu1e4JEn8FIQiYTXfgzyNSh
+# B+6VFEktoog+JMI/epTUFsYjgc1JAEVcwqAsHPhLgWqMLJeDUiDOSqaZUcXcNd5l
+# MrRrq+mBvZJq1R+vlHLcTWgl+l91bC+bTi2hCGgAoZ6vq+Z5wQVfuTUaxKTVIrOe
+# zUGG4tUZNtDIkc+ZpB4Q6VcBNoT9DgfMuC4qPCrQ/g1MX07ihWbmmx0PVCkv5fKG
+# 1TgE+0T2KQjVOQK0MsCu1KlccEc2gX0TSUrdexw5GhWkK3Enjjunu6GCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjQyNTFaMCMGCSqGSIb3DQEJBDEWBBSaLQwR18rWky1tvJbzD/Bk
-# OdUouDANBgkqhkiG9w0BAQEFAASCAQCWu7bV9sk/qpAoOwa4d/hekJ6aCFq1HoPj
-# abCOrCON/sYBUc7GU19vsJfS+pTAdoHgahgl4uqfdgjO6Lf0Iv/5sKYGaB2ZTsen
-# 0CGnQh46DOJuaztExj6KgRBIokyU+sd4qp0HXzDuGsIV93rhpdaSXLYLiGFMpVYH
-# RtkU0s/msAtvNNByuR7ayRaCxTkcmwhnkiNpyHHKpi8FgVt4GCOD9YIcAussEccb
-# YWoviLjXDcJT8IPv4XuSDnVuI0vtP8CY+M2Kj3/5Y9ND6g6kV9Y9IE/fdzE+GB1u
-# Wpu76fMvBcnnfIzAvo3VJFUHv2F1RXe08RkxzSpRppVGdS2Ppf3t
+# Fw0yMDA2MTYwMDMwMzRaMCMGCSqGSIb3DQEJBDEWBBS8Nkrlwc6rocG+1z9aRHys
+# LZBPbDANBgkqhkiG9w0BAQEFAASCAQAn10Cmu6RJYS9OjJEHwGVNo/+rG9Pq2Jwx
+# MevhmqoNjEW45RjmZARWSWmxx+AIZL/HWqu0Ly+Edw7a5YnvsevEO/tybiWuWQ0B
+# gZ7Grkqz7KyyE1ii5OuPW3bUssjPBh7Nn80M3O9PzdtwuR2e5tCbnH/rUiAi8hkf
+# iJ/nJPN8RCWbdiGO6FkIdV7FhnuBjmOAswcE6BjUqzDfKWn0Owi20mFPRzS0zv4H
+# x1bdSuJCZA9L5Nk4tLrIpx64Z+69QiPgonKe1YaWo90+juCDEZsqmb97WANZ4haB
+# uSb8vGwZhLdtX2bNE6uL9YlP64BdE9KYPO6me/legAXB4LOlVKX7
 # SIG # End signature block

@@ -31,57 +31,55 @@ function Get-IdentityNowSourceAccounts {
 
     
     $Headersv2 = Get-IdentityNowAuth -return V2Header
-        
-    try {
-        if ($sourceID) {                
-            $sourceObjects = @()                 
-            
-            $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceID)&limit=$($searchLimit)&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2                            
+    if ($sourceID) {
+        $sourceObjects = @()
+        $offset = 0
+        $i=0
+        do { 
+            # Get Next Page
+            [int]$offset = $i * $searchLimit           
+            do {
+                $results = $null
+                try {
+                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceID)&limit=$($searchLimit)&offset=$($offset)&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2
+                }
+                catch {
+                    write-host "Sleeping 2 seconds:$($_)"
+                    Start-Sleep -Seconds 2
+                }
+            }until($null -ne $results)
             if ($results) {
                 $sourceObjects += $results
             }
-            $offset = 0
-            do { 
-                if ($results.Count -eq $searchLimit) {
-                    # Get Next Page
-                    [int]$offset = $offset + $searchLimit
-                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceID)&limit=$($searchLimit)&offset=$($offset)&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2
-                    if ($results) {
-                        $sourceObjects += $results
+            Write-Verbose "iteration = $i ; searchlimit = $searchLimit ; offset = $offset ; results = $($sourceObjects.count)"
+            $i++ 
+        } until ($results.Count -lt $searchLimit)
+        if ($attributes) {
+            $temp = $sourceObjects
+            $sourceObjects = @()
+            $i = 0
+            $currenterroraction = $ErrorActionPreference
+            $ErrorActionPreference = 'continue'
+            
+            foreach ($object in $temp) {
+                $i++
+                Write-Progress -Activity "fetching account attributes $($i) of $($temp.count)" -PercentComplete ($i / $temp.count * 100)
+                do {
+                    $result = $null
+                    try {
+                        $result = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts/$($object.id)" -Headers $Headersv2
                     }
-                }
-            } until ($results.Count -lt $searchLimit)
-
-            if ($attributes) {
-                $temp = $sourceObjects
-                $sourceObjects = @()
-                $i = 0
-                $currenterroraction = $ErrorActionPreference
-                $ErrorActionPreference = 'continue'
+                    catch {
+                        write-host "Sleeping 2 seconds:$($_)"
+                        Start-Sleep -Seconds 2
+                    }
+                }until($null -ne $result)
                 
-                foreach ($object in $temp) {
-                    $i++
-                    Write-Progress -Activity "fetching account attributes $($i) of $($temp.count)" -PercentComplete ($i / $temp.count * 100)
-                    do {
-                        $result = $null
-                        try {
-                            $result = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts/$($object.id)" -Headers $Headersv2
-                        }
-                        catch {
-                            write-host "Sleeping 2 seconds:$($_)"
-                            Start-Sleep -Seconds 2
-                        }
-                    }until($null -ne $result)
-                    
-                    $sourceObjects += $result
-                }
-                $ErrorActionPreference = $currenterroraction
+                $sourceObjects += $result
             }
-            return $sourceObjects
+            $ErrorActionPreference = $currenterroraction
         }
-    }
-    catch {
-        Write-Error "Source doesn't exist? Check SourceID and OrgName. $($_)" 
+        return $sourceObjects
     }
 }
 

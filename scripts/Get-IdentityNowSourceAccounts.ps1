@@ -34,7 +34,6 @@ function Get-IdentityNowSourceAccounts {
         
     try {
         if ($sourceID) {                
-            $searchLimit = "2500"
             $sourceObjects = @()                 
             
             $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceID)&limit=$($searchLimit)&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2                            

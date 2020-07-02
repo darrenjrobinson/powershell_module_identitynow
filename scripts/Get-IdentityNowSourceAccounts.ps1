@@ -25,7 +25,8 @@ function Get-IdentityNowSourceAccounts {
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$sourceID,
-        [switch]$attributes
+        [switch]$attributes,
+        [int]$searchLimit = "2500"
     )
 
     

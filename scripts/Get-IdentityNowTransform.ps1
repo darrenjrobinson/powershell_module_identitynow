@@ -50,7 +50,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
             } else {
                 if ($ID) {
                     $IDNTransform = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/transform/get/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } 
-                    return $IDNTransform.items
+                    return $IDNTransform
                 }
                 else {
                     $IDNTransform = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/transform/list" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }

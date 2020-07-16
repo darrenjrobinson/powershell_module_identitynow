@@ -76,6 +76,7 @@
         'Set-IdentityNowCredential',
         'Set-IdentityNowOrg',
         'Set-IdentityNowTimeZone',
+        'Set-IdentityNowTransformLookup',
         'Start-IdentityNowCertCampaign',
         'Start-IdentityNowProfileUserRefresh',
         'Test-IdentityNowCredentials',

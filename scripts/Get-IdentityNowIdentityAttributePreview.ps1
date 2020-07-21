@@ -35,9 +35,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
     $queryFilter = "{`"query`":{`"query`":`"$uid`"},`"includeNested`":false}"
     $user=Search-IdentityNowIdentities $queryFilter
     $Uri="$((Get-IdentityNowOrg).'Private Base API URI')/user/preview/$($user[0].id)"
-    $a=(Get-IdentityNowProfile).where{$_.name -eq $idpname -or $_.id -eq $idpname}.id | get-identitynowprofile
-    $body=$a.attributeConfig | select attributeTransforms | convertto-json -depth 10
+    $a=(Get-IdentityNowProfile).where{$_.name -eq $IDP -or $_.id -eq $IDP}.id | get-identitynowprofile
+    $body=$a.attributeConfig | Select-Object attributeTransforms | convertto-json -depth 10
     $preview=Invoke-IdentityNowRequest -method POST -uri $uri -headers Headersv3_JSON -body $body
     $atr=$preview.previewAttributes.where{$_.name -eq $attribute}
-    if ($atr.messages){Write-Warning $atr.messages.message}else{$atr.previousValue;"\/\/\/\/\/\/";$atr.value}
+    $result=@()
+    if ($atr.messages){Write-Warning $atr.messages.message}else{$result+=$atr.previousValue;$result+="\/\/\/\/\/\/";$result+=$atr.value}
+    return $result
 }

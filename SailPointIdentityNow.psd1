@@ -22,6 +22,7 @@
         'Get-IdentityNowEmailTemplate',
         'Get-IdentityNowGovernanceGroup',
         'Get-IdentityNowIdentityAttribute',
+        'Get-IdentityNowIdentityAttributePreview',
         'Get-IdentityNowOAuthAPIClient',
         'Get-IdentityNowOrg',
         'Get-IdentityNowOrgConfig',

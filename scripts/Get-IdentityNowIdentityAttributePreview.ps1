@@ -7,7 +7,7 @@ Get an IdentityNow Identity Attribute Mapping Preview.
 see the before and after on a person for a single attribute
 
 .PARAMETER attribute
-(Required) The identity attribue to retrieve.
+(optional) The identity attribue to retrieve. 
 
 .PARAMETER uid
 (Required) The uid of the user.
@@ -16,7 +16,10 @@ see the before and after on a person for a single attribute
 (Required) the name or ID of the Identity Profile
 
 .EXAMPLE
-Get-IdentityNowIdentityAttributePreview -attribute country -uid testUser
+Get-IdentityNowIdentityAttributePreview -IDP "Employees" -attribute country -uid testUser
+
+.EXAMPLE
+Get-IdentityNowIdentityAttributePreview -uid testUser -IDP "Employees" -attributes @('division','c') -differencesOnly
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -26,11 +29,12 @@ http://darrenjrobinson.com/sailpoint-identitynow
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$attribute,
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$uid,
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$IDP
+        [string]$IDP,
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [string[]]$attributes,
+        [switch]$differencesOnly
     )
     $queryFilter = "{`"query`":{`"query`":`"$uid`"},`"includeNested`":false}"
     $user=Search-IdentityNowIdentities $queryFilter
@@ -38,8 +42,18 @@ http://darrenjrobinson.com/sailpoint-identitynow
     $a=(Get-IdentityNowProfile).where{$_.name -eq $IDP -or $_.id -eq $IDP}.id | get-identitynowprofile
     $body=$a.attributeConfig | Select-Object attributeTransforms | convertto-json -depth 10
     $preview=Invoke-IdentityNowRequest -method POST -uri $uri -headers Headersv3_JSON -body $body
-    $atr=$preview.previewAttributes.where{$_.name -eq $attribute}
-    $result=@()
-    if ($atr.messages){Write-Warning $atr.messages.message}else{$result+=$atr.previousValue;$result+="\/\/\/\/\/\/";$result+=$atr.value}
-    return $result
+    if ($attributes){
+        if ($differencesOnly){
+            return $preview.previewAttributes.where{$_.previousValue -ne $_.value -and $_.name -in $attributes}
+        }else{
+            return $preview.previewAttributes.where{$_.name -in $attributes}
+        }        
+    }else{
+        if ($differencesOnly){
+            $preview.previewAttributes=$preview.previewAttributes.where{$_.previousValue -ne $_.value}
+            return $preview
+        }else{
+            return $preview
+        }
+    }    
 }

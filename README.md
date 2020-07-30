@@ -41,6 +41,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Get IdentityNow Virtual Appliance Clusters (and clients (VA's))
 * Get / Update IdentityNow Applications
 * Create / Get / Update / Remove IdentityNow Transforms
+* Set Identity Transforms Lookup
 * Get IdentityNow Rules
 * Get / Update Email Templates
 * Create / Get / Remove IdentityNow Identity Profiles
@@ -1102,6 +1103,16 @@ Delete an IdentityNow Transform
 Example 
 ```
 Remove-IdentityNowTransform -ID "Firstname.LastName"
+```
+
+### Identity Transforms Lookup ###
+Create or update a dynamic reference transform based on external data.
+Set-IdentityNowTransformLookup will look to see if the transform exists. If it does it will be updated with the mappings provided. Otherwise it will be created with the mappings provided. 
+
+Example
+```
+$mappings = @{"US"="+1";"UK"="+44";"AU"="+61"}
+Set-IdentityNowTransformLookup -Name "iso3166 2char to e164 prefix" -Mappings $mappings
 ```
 
 ### Get IdentityNow Rules ###

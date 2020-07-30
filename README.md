@@ -47,6 +47,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Refresh an IdentityNow Identity Profile
 * Get / Update IdentityNow Profiles Order
 * Get / Update Identity Attributes
+* Get Identity Attribute Preview
 * Create / Get / Remove API Management Clients (Legacy v2)
 * Create / Get / Remove oAuth API Clients (v3)
 * Search Events - Elasticsearch
@@ -1277,6 +1278,24 @@ This requires the attribute has first been added to an Identity Profile (under M
 Example 
 ```
 Update-IdentityNowIdentityAttribute -attribute adsid
+```
+### Get Identity Attribute Preview 
+Get an IdentityNow Identity Attribute Mapping Preview. See the before and after attribute values on a person object for a single attribute.
+
+-IDP Identity Profile; (Required) the name or ID of the Identity Profile
+
+Get a preview of changes for user darren.robinson and the 'country' attribute using the Employees Identity Profile. 
+
+Example 
+```
+Get-IdentityNowIdentityAttributePreview -IDP "Employees" -attribute country -uid darren.robinson
+```
+
+Get a preview of the differences for user darren.robinson and the 'c' and 'division' attributes using the Employees Identity Profile. 
+
+Example
+```
+Get-IdentityNowIdentityAttributePreview -uid darren.robinson -IDP "Employees" -attributes @('division','c') -differencesOnly
 ```
 
 ### Create / Get / Remove API Management Clients (Legacy v2) ###

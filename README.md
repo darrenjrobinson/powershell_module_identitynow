@@ -145,94 +145,96 @@ Save-IdentityNowConfiguration -default
 ```
 Get-Command -Module SailPointIdentityNow | Sort-Object Name | Get-Help | Format-Table Name, Synopsis -Autosize
 
-Name                                        Synopsis                                                                                             
-----                                        --------                                                                                             
-Complete-IdentityNowTask                    Complete an IdentityNow Task.                                                                        
-Convert-UnixTime                            Convert UnixTime to PowerShell DateTime                                                              
-Get-HashString                              Generate IdentityNow Admin User Password Hash to obtain oAuth Access Token.                          
-Get-IdentityNowAccessProfile                Get an IdentityNow Access Profile(s).                                                                
-Get-IdentityNowAccountActivities            Get IdentityNow Activities.                                                                          
-Get-IdentityNowAccountActivity              Get IdentityNow Activity for an account.                                                             
-Get-IdentityNowActiveJobs                   Get IdentityNow Active Jobs.                                                                         
-Get-IdentityNowAPIClient                    Get IdentityNow API Client(s).                                                                       
-Get-IdentityNowApplication                  Get IdentityNow Application(s).                                                                      
-Get-IdentityNowAuth                         Get IdentityNow JWT access token or basic auth header.                                               
-Get-IdentityNowCertCampaign                 Get IdentityNow Certification Campaign(s).                                                           
-Get-IdentityNowCertCampaignReport           Get IdentityNow Certification Campaign Report(s).                                                    
-Get-IdentityNowEmailTemplate                Get IdentityNow Email Template(s).                                                                   
-Get-IdentityNowGovernanceGroup              Get an IdentityNow Governance Group.                                                                 
-Get-IdentityNowIdentityAttribute            Get an IdentityNow Identity Attribute(s).                                                            
-Get-IdentityNowOAuthAPIClient               Get IdentityNow oAuth API Client(s).                                                                 
-Get-IdentityNowOrg                          Displays the default Uri value for all or a particular Organisation based on configured OrgName.     
-Get-IdentityNowOrgConfig                    Get IdentityNow Org Global Reminders and Escalation Policies Configuration.                          
-Get-IdentityNowOrgStatus                    Get an IdentityNow Org Status.                                                                       
-Get-IdentityNowPersonalAccessToken          List IdentityNow Personal Access Tokens.                                                             
-Get-IdentityNowProfile                      Get IdentityNow Identity Profile(s).                                                                 
-Get-IdentityNowProfileOrder                 Get IdentityNow Profiles Order.                                                                      
-Get-IdentityNowQueue                        Get IdentityNow Queues.                                                                              
-Get-IdentityNowRole                         Get an IdentityNow Role(s).                                                                          
-Get-IdentityNowRule                         Get IdentityNow Rule(s).                                                                             
-Get-IdentityNowSource                       Get IdentityNow Source(s).                                                                           
-Get-IdentityNowSourceAccounts               Get IdentityNow Accounts on a Source.                                                                
-Get-IdentityNowSourceSchema                 Get the Schema for an IdentityNow Source.                                                            
-Get-IdentityNowTask                         Get an IdentityNow Task(s).                                                                          
-Get-IdentityNowTimeZone                     Get IdentityNow Time Zone(s).                                                                        
-Get-IdentityNowTransform                    Get IdentityNow Transform(s).                                                                        
-Get-IdentityNowVACluster                    Get IdentityNow Virtual Appliance Cluster(s).                                                        
-Invoke-IdentityNowAggregateSource           Initiate Aggregation of an IdentityNow Source.                                                       
-Invoke-IdentityNowRequest                   Submit an IdentityNow API Request.                                                                   
-Invoke-IdentityNowSourceReset               Reset an IdentityNow Source.                                                                         
-Join-IdentityNowAccount                     Join an IdentityNow User Account to an Identity.                                                     
-New-IdentityNowAccessProfile                Create an IdentityNow Access Profile.                                                                
-New-IdentityNowAPIClient                    Create an IdentityNow v2 API Client.                                                                 
-New-IdentityNowCertCampaign                 Create an IdentityNow Certification Campaign.                                                        
-New-IdentityNowGovernanceGroup              Create a new IdentityNow Governance Group.                                                           
-New-IdentityNowIdentityProfilesReport       Generate a HTML Report of IdentityNow Identity Profiles and export each Identity Profile config.     
-New-IdentityNowOAuthAPIClient               Create an IdentityNow v3 oAuth API Client.                                                           
-New-IdentityNowPersonalAccessToken          Create an IdentityNow Personal Access Token.                                                         
-New-IdentityNowProfile                      Create new IdentityNow Identity Profile(s).                                                          
-New-IdentityNowRole                         Create an IdentityNow Role.                                                                          
-New-IdentityNowSource                       Create an IdentityNow Source.                                                                        
-New-IdentityNowSourceAccountSchemaAttribute Discover or add to a sources' account schema.                                                        
+Name                                        Synopsis
+----                                        --------
+Complete-IdentityNowTask                    Complete an IdentityNow Task.
+Convert-UnixTime                            Convert UnixTime to PowerShell DateTime
+Get-HashString                              Generate IdentityNow Admin User Password Hash to obtain oAuth Access Token.
+Get-IdentityNowAccessProfile                Get an IdentityNow Access Profile(s).
+Get-IdentityNowAccountActivities            Get IdentityNow Activities.
+Get-IdentityNowAccountActivity              Get IdentityNow Activity for an account.
+Get-IdentityNowActiveJobs                   Get IdentityNow Active Jobs.
+Get-IdentityNowAPIClient                    Get IdentityNow API Client(s).
+Get-IdentityNowApplication                  Get IdentityNow Application(s).
+Get-IdentityNowAuth                         Get IdentityNow JWT access token or basic auth header.
+Get-IdentityNowCertCampaign                 Get IdentityNow Certification Campaign(s).
+Get-IdentityNowCertCampaignReport           Get IdentityNow Certification Campaign Report(s).
+Get-IdentityNowEmailTemplate                Get IdentityNow Email Template(s).
+Get-IdentityNowGovernanceGroup              Get an IdentityNow Governance Group.
+Get-IdentityNowIdentityAttribute            Get an IdentityNow Identity Attribute(s).
+Get-IdentityNowIdentityAttributePreview     Get an IdentityNow Identity Attribute Mapping Preview.
+Get-IdentityNowOAuthAPIClient               Get IdentityNow oAuth API Client(s).
+Get-IdentityNowOrg                          Displays the default Uri value for all or a particular Organisation based on configured OrgName.
+Get-IdentityNowOrgConfig                    Get IdentityNow Org Global Reminders and Escalation Policies Configuration.
+Get-IdentityNowOrgStatus                    Get an IdentityNow Org Status.
+Get-IdentityNowPersonalAccessToken          List IdentityNow Personal Access Tokens.
+Get-IdentityNowProfile                      Get IdentityNow Identity Profile(s).
+Get-IdentityNowProfileOrder                 Get IdentityNow Profiles Order.
+Get-IdentityNowQueue                        Get IdentityNow Queues.
+Get-IdentityNowRole                         Get an IdentityNow Role(s).
+Get-IdentityNowRule                         Get IdentityNow Rule(s).
+Get-IdentityNowSource                       Get IdentityNow Source(s).
+Get-IdentityNowSourceAccounts               Get IdentityNow Accounts on a Source.
+Get-IdentityNowSourceSchema                 Get the Schema for an IdentityNow Source.
+Get-IdentityNowTask                         Get an IdentityNow Task(s).
+Get-IdentityNowTimeZone                     Get IdentityNow Time Zone(s).
+Get-IdentityNowTransform                    Get IdentityNow Transform(s).
+Get-IdentityNowVACluster                    Get IdentityNow Virtual Appliance Cluster(s).
+Invoke-IdentityNowAggregateSource           Initiate Aggregation of an IdentityNow Source.
+Invoke-IdentityNowRequest                   Submit an IdentityNow API Request.
+Invoke-IdentityNowSourceReset               Reset an IdentityNow Source.
+Join-IdentityNowAccount                     Join an IdentityNow User Account to an Identity.
+New-IdentityNowAccessProfile                Create an IdentityNow Access Profile.
+New-IdentityNowAPIClient                    Create an IdentityNow v2 API Client.
+New-IdentityNowCertCampaign                 Create an IdentityNow Certification Campaign.
+New-IdentityNowGovernanceGroup              Create a new IdentityNow Governance Group.
+New-IdentityNowIdentityProfilesReport       Generate a HTML Report of IdentityNow Identity Profiles and export each Identity Profile config.
+New-IdentityNowOAuthAPIClient               Create an IdentityNow v3 oAuth API Client.
+New-IdentityNowPersonalAccessToken          Create an IdentityNow v3 oAuth Personal Access Token.
+New-IdentityNowProfile                      Create new IdentityNow Identity Profile(s).
+New-IdentityNowRole                         Create an IdentityNow Role.
+New-IdentityNowSource                       Create an IdentityNow Source.
+New-IdentityNowSourceAccountSchemaAttribute Discover or add to a sources' account schema.
 New-IdentityNowSourceConfigReport           Generate a HTML Report of IdentityNow Sources configuration and export each Source and Schema config.
-New-IdentityNowTransform                    Create an IdentityNow Transform.                                                                     
-New-IdentityNowUserSourceAccount            Create an IdentityNow User Account on a Flat File Source.                                            
-Remove-IdentityNowAccessProfile             Delete an IdentityNow Access Profile.                                                                
-Remove-IdentityNowAPIClient                 Delete an IdentityNow API Client.                                                                    
-Remove-IdentityNowGovernanceGroup           Delete an IdentityNow Governance Group.                                                              
-Remove-IdentityNowOAuthAPIClient            Delete an IdentityNow oAuth API Client.                                                              
-Remove-IdentityNowPersonalAccessToken       Delete a personal access token in IdentityNow.                                                       
-Remove-IdentityNowProfile                   Delete an IdentityNow Identity Profile.                                                              
-Remove-IdentityNowRole                      Delete an IdentityNow Role.                                                                          
-Remove-IdentityNowSource                    Deletes an IdentityNow Source.                                                                       
-Remove-IdentityNowTransform                 Delete an IdentityNow Transform.                                                                     
-Remove-IdentityNowUserSourceAccount         Delete an IdentityNow User Account on a Flat File Source.                                            
-Save-IdentityNowConfiguration               Saves default IdentityNow configuration to a file in the current users Profile.                      
-Search-IdentityNowEntitlements              Get IdentityNow Entitlements.                                                                        
-Search-IdentityNowEvents                    Search IdentityNow Event(s) using Elasticsearch queries.                                             
-Search-IdentityNowIdentities                Search IdentityNow Identitie(s) using Elasticsearch queries.                                         
-Search-IdentityNowUserProfile               Get an IdentityNow Users Identity Profile.                                                           
-Search-IdentityNowUsers                     Get IdentityNow Users.                                                                               
-Set-IdentityNowCredential                   Sets the default IdentityNow API credentials.                                                        
-Set-IdentityNowOrg                          Sets the default Organisation name for an IdentityNow Tenant.                                        
-Set-IdentityNowTimeZone                     Set IdentityNow Time Zone.                                                                           
-Start-IdentityNowCertCampaign               Start an IdentityNow Certification Campaign that is currently 'Staged'.                              
-Start-IdentityNowProfileUserRefresh         Triggers a user refresh for an IdentityNow Identity Profile(s).                                      
-Test-IdentityNowCredentials                 Tests IdentityNow Live credentials.                                                                  
-Test-IdentityNowSourceConnection            Tests connection on an IdentityNow Source.                                                           
-Test-IdentityNowTransforms                  Test IdentityNow transforms to detect common problems                                                
-Update-IdentityNowAccessProfile             Update an IdentityNow Access Profile(s).                                                             
-Update-IdentityNowApplication               Update an IdentityNow Application.                                                                   
-Update-IdentityNowEmailTemplate             Update an IdentityNow Email Template.                                                                
-Update-IdentityNowGovernanceGroup           Add or Remove member(s) from an IdentityNow Governance Group.                                        
-Update-IdentityNowIdentityAttribute         Update an IdentityNow Identity Attribute to be listed in Identity Profiles.                          
-Update-IdentityNowOrgConfig                 Update IdentityNow Org Global Reminders and Escalation Policies Configuration.                       
-Update-IdentityNowProfileMapping            Update IdentityNow Profile Attribute Mapping.                                                        
-Update-IdentityNowProfileOrder              Update IdentityNow Profile Order.                                                                    
-Update-IdentityNowRole                      Update an IdentityNow Role.                                                                          
-Update-IdentityNowSource                    Update the configuration of an IdentityNow Source.                                                   
-Update-IdentityNowTransform                 Update an IdentityNow Transform.                                                                     
-Update-IdentityNowUserSourceAccount         Update an IdentityNow User Account on a Flat File Source.                                            
+New-IdentityNowTransform                    Create an IdentityNow Transform.
+New-IdentityNowUserSourceAccount            Create an IdentityNow User Account on a Flat File Source.
+Remove-IdentityNowAccessProfile             Delete an IdentityNow Access Profile.
+Remove-IdentityNowAPIClient                 Delete an IdentityNow API Client.
+Remove-IdentityNowGovernanceGroup           Delete an IdentityNow Governance Group.
+Remove-IdentityNowOAuthAPIClient            Delete an IdentityNow oAuth API Client.
+Remove-IdentityNowPersonalAccessToken       Delete a personal access token in IdentityNow.
+Remove-IdentityNowProfile                   Delete an IdentityNow Identity Profile.
+Remove-IdentityNowRole                      Delete an IdentityNow Role.
+Remove-IdentityNowSource                    Deletes an IdentityNow Source.
+Remove-IdentityNowTransform                 Delete an IdentityNow Transform.
+Remove-IdentityNowUserSourceAccount         Delete an IdentityNow User Account on a Flat File Source.
+Save-IdentityNowConfiguration               Saves default IdentityNow configuration to a file in the current users Profile.
+Search-IdentityNowEntitlements              Get IdentityNow Entitlements.
+Search-IdentityNowEvents                    Search IdentityNow Event(s) using Elasticsearch queries.
+Search-IdentityNowIdentities                Search IdentityNow Identitie(s) using Elasticsearch queries.
+Search-IdentityNowUserProfile               Get an IdentityNow Users Identity Profile.
+Search-IdentityNowUsers                     Get IdentityNow Users.
+Set-IdentityNowCredential                   Sets the default IdentityNow API credentials.
+Set-IdentityNowOrg                          Sets the default Organisation name for an IdentityNow Tenant.
+Set-IdentityNowTimeZone                     Set IdentityNow Time Zone.
+Set-IdentityNowTransformLookup              Update lookup transform
+Start-IdentityNowCertCampaign               Start an IdentityNow Certification Campaign that is currently 'Staged'.
+Start-IdentityNowProfileUserRefresh         Triggers a user refresh for an IdentityNow Identity Profile(s).
+Test-IdentityNowCredentials                 Tests IdentityNow Live credentials.
+Test-IdentityNowSourceConnection            Tests connection on an IdentityNow Source.
+Test-IdentityNowTransforms                  Test IdentityNow transforms to detect common problems
+Update-IdentityNowAccessProfile             Update an IdentityNow Access Profile(s).
+Update-IdentityNowApplication               Update an IdentityNow Application.
+Update-IdentityNowEmailTemplate             Update an IdentityNow Email Template.
+Update-IdentityNowGovernanceGroup           Add or Remove member(s) from an IdentityNow Governance Group.
+Update-IdentityNowIdentityAttribute         Update an IdentityNow Identity Attribute to be listed in Identity Profiles.
+Update-IdentityNowOrgConfig                 Update IdentityNow Org Global Reminders and Escalation Policies Configuration.
+Update-IdentityNowProfileMapping            Update IdentityNow Profile Attribute Mapping.
+Update-IdentityNowProfileOrder              Update IdentityNow Profile Order.
+Update-IdentityNowRole                      Update an IdentityNow Role.
+Update-IdentityNowSource                    Update the configuration of an IdentityNow Source.
+Update-IdentityNowTransform                 Update an IdentityNow Transform.
+Update-IdentityNowUserSourceAccount         Update an IdentityNow User Account on a Flat File Source.
 
 ```
 

@@ -1,13 +1,16 @@
 function New-IdentityNowAPIClient {
     <#
 .SYNOPSIS
-Create an IdentityNow v2 API Client.
+Create an IdentityNow v2 API Client for use with a Virtual Appliance.
 
 .DESCRIPTION
-Create an IdentityNow v2 API Client.
+Create an IdentityNow v2 API Client for use with a Virtual Applicance.
+
+.PARAMETER clusterId
+(required) The VA Cluster ID that the v2 Creds will be used for.
 
 .EXAMPLE
-New-IdentityNowAPIClient 
+New-IdentityNowAPIClient -clusterId 111
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -15,13 +18,16 @@ http://darrenjrobinson.com/sailpoint-identitynow
 #>
 
     [cmdletbinding()]
-    param()
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]$clusterId
+    )
 
     $v3Token = Get-IdentityNowAuth
 
     if ($v3Token.access_token) {
         try {             
-                $IDNAPIClient = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/client/create?type=API" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" }
+                $IDNAPIClient = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/cc/api/client/create?clusterId=$($clusterId)&type=VA" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" }
                 return $IDNAPIClient            
         }
         catch {

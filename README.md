@@ -88,6 +88,8 @@ To get started with Local PowerShell Jupyter Notebook [see this post](https://bl
 [Reference Post](https://blog.darrenjrobinson.com/generate-sailpoint-identitynow-v2-v3-api-credentials/)
 <b>Note: You can configure oAuth Client Authentication configuration and then use the New-IdentityNowAPIClient cmdlet to generate the v2 API Client.</b>
 
+<b>Update: Aug 2020 - v2 API Clients have been deprecated for API use. They still exist for VA use and can still be generated, but now must reference the VA Cluster. The New-IdentityNowAPIClient now contains the mandatory -clusterId option to acheive this. </b>
+
 ```
     $orgName = "customername-sb"
     Set-IdentityNowOrg -orgName $orgName
@@ -1326,11 +1328,11 @@ Example
 Get-IdentityNowAPIClient -ID 123
 ```
 
-Create a v2 API Client
+Create a v2 API Client for VA Cluster 123
 
 Example 
 ```
-New-IdentityNowAPIClient 
+New-IdentityNowAPIClient -clusterId 123
 ```
 
 Remove a v2 API Client

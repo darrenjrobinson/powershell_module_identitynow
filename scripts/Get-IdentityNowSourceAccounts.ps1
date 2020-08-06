@@ -31,7 +31,6 @@ function Get-IdentityNowSourceAccounts {
 
     $v3Token = Get-IdentityNowAuth
 
-    "https://apac-partner02.api.identitynow.com/cc/api/source/getAccounts/?id=96805"
     if ($v3Token.access_token) {
         $sourceObjects = @()
         $offset = 0
@@ -79,6 +78,9 @@ function Get-IdentityNowSourceAccounts {
                 }until($null -ne $result)
                 
                 $sourceObjects += $result
+
+                # Trigger Token expiry check and refresh
+                $v3Token = Get-IdentityNowAuth
             }
             $ErrorActionPreference = $currenterroraction
         }

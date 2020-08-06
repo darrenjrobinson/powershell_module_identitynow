@@ -4,10 +4,11 @@ function Test-IdentityNowCredentials {
     Tests IdentityNow Live credentials.
 
 .DESCRIPTION
-    Test APIv3 and APIv2 credentials.
+    Test APIv3, APIv2 and Personal Access Token credentials.
 
 .NOTES
     written by Sean McGovern 11/27/2019 (twitter @410sean)
+    updated by Darren Robinson 6 Aug 2020
 
 .EXAMPLE
     Test-IdentityNowCredentials
@@ -18,23 +19,72 @@ function Test-IdentityNowCredentials {
 
     [cmdletbinding()]
     param ( )
-    try {    
-        $lowusersource = (Get-IdentityNowSource | Where-Object { $_.usercount -ne 0 } | Sort-Object usercount)[0]
-    }
-    catch {
-        write-warning "Testing APIv3 credentials failed for $($IdentityNowConfiguration.orgName). Unable to continue."
-        return $null
-    }
-    "Validated APIv3 credentials."
+   
     try {
-        $accounts = Get-IdentityNowSourceAccounts -sourceID $lowusersource.id 
+        if ($IdentityNowConfiguration.v2) {            
+            $profileList = Invoke-IdentityNowRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/list" -headers Headersv2_JSON  
+            "Validated APIv2 credentials."
+        }
+        else {
+            "APIv2 credentials not stored in IdentityNow Configuration."
+        }
     }
     catch {
         write-warning "Testing APIv2 credentials failed for $($IdentityNowConfiguration.orgName)."
-        return $null
     }
-    "Validated APIv2 credentials."
-    return "APIv2 and APIv3 credentials are working for organisation '$($IdentityNowConfiguration.orgName)'"
+
+    try {    
+        if ($IdentityNowConfiguration.v3) { 
+            $lowusersource = (Get-IdentityNowSource | Where-Object { $_.usercount -ne 0 } | Sort-Object usercount)[0]
+            "Validated APIv3 credentials."
+        }
+        else {
+            "APIv3 credentials not stored in IdentityNow Configuration."
+        }
+    }
+    catch {
+        write-warning "Testing APIv3 credentials failed for $($IdentityNowConfiguration.orgName). Unable to continue."
+    }
+    
+    try {    
+        if ($IdentityNowConfiguration.PAT) { 
+           
+            try {
+                # oAuth URI
+                $oAuthURI = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/oauth/token"
+
+                $oAuthTokenBody = @{
+                    grant_type    = "client_credentials"
+                    client_id     = $IdentityNowConfiguration.PAT.UserName
+                    client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
+                }
+            
+                $v3PAT = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody
+                if ($v3PAT) {
+                    $requestHeaders = @{Authorization = "Bearer $($v3PAT.access_token)" }
+                    $idnProfiles = $null 
+                    $idnProfiles = Invoke-RestMethod -Method Get `
+                        -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/list" `
+                        -Headers $requestHeaders
+                    if ($idnProfiles) {
+                        "Validated Personal Access Token."
+                    }
+                    else {
+                        "FAILED. Request using IdentityNow Personal Access Token failed."
+                    }
+                }
+            }
+            catch {
+                "Unable to obtain an Access Token using the configured Personal Access Token."
+            }
+        }
+        else {
+            "Personal Access Token not stored in IdentityNow Configuration."
+        }
+    }
+    catch {
+        write-warning "Testing Personal Access Token credential failed for $($IdentityNowConfiguration.orgName). Unable to continue."
+    }
 }
 
 # SIG # Begin signature block

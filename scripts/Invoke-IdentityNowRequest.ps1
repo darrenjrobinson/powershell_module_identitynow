@@ -58,11 +58,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     [cmdletbinding()]
     param(
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName='Full URL')]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName = 'Full URL')]
         [string]$uri,
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName='Path')]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName = 'Path')]
         [string]$path,
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName='Path')]
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName = 'Path')]
         [string][ValidateSet("V1", "V2", "V3", "Private", "Beta")]$API,
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [ValidateNotNullOrEmpty()]
@@ -76,12 +76,12 @@ http://darrenjrobinson.com/sailpoint-identitynow
         [switch]$json
     )
 
-    switch ($API){
-        "Private"{$uri="$((Get-IdentityNowOrg).'Private Base API URI')/$path"}
-        "V1"{$uri="$((Get-IdentityNowOrg).'v1 Base API URI')/$path"}
-        "V2"{$uri="$((Get-IdentityNowOrg).'v2 Base API URI')/$path"}
-        "V3"{$uri="$((Get-IdentityNowOrg).'v3 Base API URI')/$path"}
-        "Beta"{$uri="$((Get-IdentityNowOrg).'Beta')/$path"}
+    switch ($API) {
+        "Private" { $uri = "$((Get-IdentityNowOrg).'Private Base API URI')/$path" }
+        "V1" { $uri = "$((Get-IdentityNowOrg).'v1 Base API URI')/$path" }
+        "V2" { $uri = "$((Get-IdentityNowOrg).'v2 Base API URI')/$path" }
+        "V3" { $uri = "$((Get-IdentityNowOrg).'v3 Base API URI')/$path" }
+        "Beta" { $uri = "$((Get-IdentityNowOrg).'Beta')/$path" }
     }
     switch ($headers) {
         HeadersV2 { 
@@ -89,7 +89,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
             Write-Verbose "$requestheaders"
         }
         HeadersV3 { 
-            $v3Token=Get-IdentityNowAuth
+            $v3Token = Get-IdentityNowAuth 
             $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)" }
             Write-Verbose "Authorization = Bearer $($v3Token.access_token)"
         }
@@ -99,13 +99,13 @@ http://darrenjrobinson.com/sailpoint-identitynow
             Write-Verbose "Authorization = 'Basic $($encodedAuth)' ; 'Content-Type' = 'application/json' "
         }
         Headersv3_JSON { 
-            $v3Token=Get-IdentityNowAuth
+            $v3Token = Get-IdentityNowAuth 
             $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json" }
             Write-Verbose "Authorization = 'Bearer $($v3Token.access_token)' ; 'Content-Type' = 'application/json'"
             Write-verbose ($v3Token | convertTo-json)
         }
         Headersv3_JSON-Patch { 
-            $v3Token=Get-IdentityNowAuth
+            $v3Token = Get-IdentityNowAuth 
             $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json-patch+json" }
             Write-Verbose "Authorization = 'Bearer $($v3Token.access_token)'; 'Content-Type' = 'application/json-patch+json'"
             Write-verbose ($v3Token | convertTo-json)

@@ -106,7 +106,7 @@ To get started with Local PowerShell Jupyter Notebook [see this post](https://bl
 
     # IdentityNow Personal Access Token
     $personalAccessToken = New-IdentityNowPersonalAccessToken -name "IDN Automation" 
-    $patCreds = [pscredential]::new("IDN Automation", ($personalAccessToken.secret | ConvertTo-SecureString -AsPlainText -Force))
+    $patCreds = [pscredential]::new("$($personalAccessToken.id)", ($personalAccessToken.secret | ConvertTo-SecureString -AsPlainText -Force))
 
     Set-IdentityNowCredential -AdminCredential $adminCreds -v3APIKey $v3Creds -PersonalAccessToken $patCreds # -v2APIKey $v2Creds
     Save-IdentityNowConfiguration

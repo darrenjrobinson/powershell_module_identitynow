@@ -179,6 +179,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
             Write-Verbose "Refresh Token expired: $($refreshTokenExpiry)" 
             
             # Can't use Refresh Token to get a new Access Token
+            Write-Verbose "AuthType: Admin Creds"
             $oAuthTokenBody = @{
                 grant_type = "password"
                 username   = $adminUSR
@@ -191,15 +192,20 @@ http://darrenjrobinson.com/sailpoint-identitynow
                 client_secret = $null
                 refresh_token = $IdentityNowConfiguration.JWT.refresh_token
             }
+            Write-Verbose "AuthType: v3 JWT Refresh Token"
+
             if ($oAuthTokenBody.client_id -eq $IdentityNowConfiguration.v3.UserName) {
+                Write-Verbose "AuthType: v3"
                 $oAuthTokenBody.client_secret = $clientSecretv3
             }
             elseif ($oAuthTokenBody.client_id -eq $IdentityNowConfiguration.PAT.UserName) {
+                Write-Verbose "AuthType: Personal Access Token"
                 $oAuthTokenBody.client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
             }
         }
     }
     elseif ($IdentityNowConfiguration.PAT) {
+        Write-Verbose "AuthType: Personal Access Token"
         $oAuthTokenBody = @{
             grant_type    = "client_credentials"
             client_id     = $IdentityNowConfiguration.PAT.UserName
@@ -211,17 +217,28 @@ http://darrenjrobinson.com/sailpoint-identitynow
             grant_type = "password"
             username   = $adminUSR
             password   = $adminPWD
-        }        
+        }
+        Write-Verbose "AuthType: Admin Creds"        
     }
-    if (-not $IdentityNowConfiguration.JWT) { $forcerefresh = $true }
+    
+    if (-not $IdentityNowConfiguration.JWT) { 
+        $forcerefresh = $true 
+    }
+
     if ($ForceRefresh -or ((Get-JWTDetails $IdentityNowConfiguration.JWT.access_token).expiryDateTime -lt (get-date).addminutes(1) -and (Get-JWTDetails $IdentityNowConfiguration.JWT.access_token).org -eq $IdentityNowConfiguration.orgName)) {
         Write-Verbose ($oAuthTokenBody | convertto-json)
-        if ($oAuthTokenBody.grant_type -ne 'password') { $Headersv3 = $null }
+        
+        if ($oAuthTokenBody.grant_type -ne 'password') { 
+            $Headersv3 = $null 
+        }
+
         $v3Token = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody -Headers $Headersv3
         $IdentityNowConfiguration.JWT = $v3Token
+        Write-Verbose "AuthType: v3 JWT Access Token"
     }
     else {
         $v3Token = $IdentityNowConfiguration.JWT
+        Write-Verbose "AuthType: v3 JWT Access Token"
     }
 
     # v2 Auth
@@ -230,6 +247,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         $clientSecretv2 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v2.Password))
         $Bytes = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v2.UserName):$($clientSecretv2)") 
         $encodedAuth = [Convert]::ToBase64String($Bytes)     
+        Write-Verbose "AuthType: v2 Basic Auth"
     }
 
     switch ($return) {

@@ -104,17 +104,30 @@ To get started with Local PowerShell Jupyter Notebook [see this post](https://bl
     $clientSecretv3 = "770a71abcdef5301848d00000d8760fe0d9f632383775b315aa1234567890"
     $v3Creds = [pscredential]::new($clientIDv3, ($clientSecretv3 | ConvertTo-SecureString -AsPlainText -Force))
 
+    # IdentityNow Personal Access Token
+    $personalAccessToken = New-IdentityNowPersonalAccessToken -name "IDN Automation" 
+    $patCreds = [pscredential]::new("IDN Automation", ($personalAccessToken.secret | ConvertTo-SecureString -AsPlainText -Force))
+
+    Set-IdentityNowCredential -AdminCredential $adminCreds -v3APIKey $v3Creds -PersonalAccessToken $patCreds # -v2APIKey $v2Creds
+    Save-IdentityNowConfiguration
+```
+
+_Optional_ v2 Credentials are now only used for VA's.
+If you have perviously generated v2 creds and wish to utilise them with Invoke-IdentityNowRequest, they can be saved to your profile.
+
+Example
+```
     # IdentityNow API Client ID & Secret generated using New-IdentityNowAPIClient
     $clientID = 'zo7ABCDaTHjA0Rwv'
     # Your API Client Secret
     $clientSecret = '3Zm9Qod4sWhihABCdefgCX9DIfmwAZiP'
     $v2Creds = [pscredential]::new($clientID, ($clientSecret | ConvertTo-SecureString -AsPlainText -Force))
 
-    Set-IdentityNowCredential -AdminCredential $adminCreds -v2APIKey $v2Creds -v3APIKey $v3Creds 
+    Set-IdentityNowCredential -AdminCredential $adminCreds -v3APIKey $v3Creds -v2APIKey $v2Creds -PersonalAccessToken $patCreds
     Save-IdentityNowConfiguration
 ```
 
-<b>Note:</b> you can use New-IdentityNowAPIClient to generate v2 crednetials after setting just the v3 credentials (via the IdentityNow Portal for your first API key).
+<b>Note:</b> you can use New-IdentityNowAPIClient to generate v2 credentials after setting just the v3 credentials (via the IdentityNow Portal for your first API key).
 
 or with credential prompts
 

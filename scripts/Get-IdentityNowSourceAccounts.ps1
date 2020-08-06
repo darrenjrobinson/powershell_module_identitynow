@@ -29,31 +29,33 @@ function Get-IdentityNowSourceAccounts {
         [int]$searchLimit = "2500"
     )
 
-    
-    $Headersv2 = Get-IdentityNowAuth -return V2Header
-    if ($sourceID) {
+    $v3Token = Get-IdentityNowAuth
+
+    "https://apac-partner02.api.identitynow.com/cc/api/source/getAccounts/?id=96805"
+    if ($v3Token.access_token) {
         $sourceObjects = @()
         $offset = 0
-        $i=0
+        $i = 0
         do { 
             # Get Next Page
             [int]$offset = $i * $searchLimit           
             do {
                 $results = $null
                 try {
-                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceID)&limit=$($searchLimit)&offset=$($offset)&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2
+                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/source/getAccounts?id=$($sourceID)&limit=$($searchLimit)&start=$($offset)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
                 }
                 catch {
                     write-host "Sleeping 2 seconds:$($_)"
                     Start-Sleep -Seconds 2
                 }
-            }until($null -ne $results)
+            } until ($null -ne $results.items)
             if ($results) {
-                $sourceObjects += $results
+                $sourceObjects += $results.items
             }
             Write-Verbose "iteration = $i ; searchlimit = $searchLimit ; offset = $offset ; results = $($sourceObjects.count)"
             $i++ 
         } until ($results.Count -lt $searchLimit)
+
         if ($attributes) {
             $temp = $sourceObjects
             $sourceObjects = @()
@@ -67,7 +69,8 @@ function Get-IdentityNowSourceAccounts {
                 do {
                     $result = $null
                     try {
-                        $result = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts/$($object.id)" -Headers $Headersv2
+                        $result = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/accounts/$($object.id)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+
                     }
                     catch {
                         write-host "Sleeping 2 seconds:$($_)"

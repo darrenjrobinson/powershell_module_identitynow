@@ -31,7 +31,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     if ($v3Token.access_token) {
         try {    
-            $IDNGetPAT = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/personal-access-tokens?limit=$($limit)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+            $IDNGetPAT = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/personal-access-tokens?count=true&offset=0&limit=$($limit)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
             
             if ($IDNGetPAT) {
                 return $IDNGetPAT
@@ -55,8 +55,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUOEaKum7gzHBAktpz3osaU18T
-# 8dCgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUp2REdv3DWHyTBeA7eDCzC6Jo
+# HKGgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -163,22 +163,22 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUkhnI+aa+/gHcx0ydL2FP
-# gR89elwwDQYJKoZIhvcNAQEBBQAEggEAG5g/8zLg6G7Ssz2fDfHwOOxEImz4Bbq9
-# aZzATHi5WYHKdJhAaAy58bx0sHZV3JiYpp/Ej/9waZHS/WVI6shNnvE8gkOLLt/7
-# 66jNqf082bLvAvHBrRvAm3xjcO+yyRcuNuGPsPsnn1tP0Al3PGFCw+0/MHWwhMCY
-# PWqnnxZYW5mS8XgdltsdW9w4KqM2ffP3+hCw36InfGVqAP6/7Ea4nBwbjj7kvTFb
-# +hgqu+dM5qRXMmmkgAtIx2QukOUqib3JbtXN1TIsPf1bM45R9qte8u2eyvNqctjO
-# SFr/ScpAbseJiGsNUz1oKEghdD26MhoMMxBV+CF+1KIjJx1JvUT9p6GCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUfn7MHhZmoRO5xqxA/YdH
+# IKjvtNIwDQYJKoZIhvcNAQEBBQAEggEAl/omz83NXEzyQ3FxnFaqKZRsAveBy3+Q
+# 5YoC/UBQN0iZ80pk6q/19IH6TI3xgjxeW7l+9xHWCB1ec6oq0U6fj8VDrFJaRax0
+# J+SLrKDeiZEv8BXGANSjNaIxXGxUAUHfTb8SibCALnMZlFzEYHc/OEX+OYPCwtRN
+# J7qZ2FwfFe3/2xpTy39hB/8OnNY5nhT7pzgeXDt/sJthuDrkTwKsWjzcE38ieJZF
+# HELFFKJvUTmjEHIgHZb+cZyei78Gox1N4dpOHgquLLWgMt992ld8wI/4Ee5hZ4ay
+# mXbsLAPkEHmV5DQlfVH+gv/+LnL2z6CMULDhNnhGPUpPNOLYXjAAt6GCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA4MDMyMzM0MzVaMCMGCSqGSIb3DQEJBDEWBBQDz5NwWk0TTOdUS22JF5cS
-# LgU1jjANBgkqhkiG9w0BAQEFAASCAQBa3a7oV16PdgL0eZFOLCIrq4kj3ckVEZ+t
-# kaURg7YBJ79IUT9rBJMF+3wpYQiorbJ9aLg+NzGYJyFB6nqeFLYF3I6UOZShhUA+
-# KG89kTf6t4mZOE2vxiuS0LN5yhkYJ+naWfFDJGXYOGx7DTISIMTH3mjGNHt2Fevv
-# LogC8joRx2ukXQJzTdnL8Kfem6MqgVq0+gDB9zFrzHKHEThuhG3KfNRvLZkMf+c/
-# 7wUJtFKhl8c85q2r4jcO85yGxGrH/Tgimb+HNGv8IVB35/4K8d/279QnsvK0/7Aw
-# IIs1ty5+1HeBQ1wgodvCxVd8kV0Ejnr1er3jB6mjjMZIwRkbM6bG
+# Fw0yMDA4MDYyMjAyMDlaMCMGCSqGSIb3DQEJBDEWBBTbKVuAz6zgOKVnYKZOiAya
+# A3H6cDANBgkqhkiG9w0BAQEFAASCAQAomi3u6lPdtLvW8By75ZFdVH8ftp5fStyp
+# QUG4uy2KUmgTapOv5rILNiTKarW8FLsZBjigVzDgFYyOqA6fhxzVILw1XkN8NS10
+# AcF0zlOjz0qVTdejDEqSqb2Th3jcDWttrIcVuQ/Es1XiD/1hcYfdlJFDAMUdgkCB
+# Ia/DWPA/69ypjo9TGMNmfxrYoS6xmRe7GAC0kQdLqXopke6lP8nq7I2D7c5A846d
+# Fep/yAjiEvESMDanmD42/GOyqb8+ERfMh36KLOsHKtWCkyhKCepeVlX0KDLgb9AX
+# GGQtpnWhdBQWZtzmCn2J6Xvgp4oALLowEZ3Bv/cCtaC0K2xLVHEI
 # SIG # End signature block

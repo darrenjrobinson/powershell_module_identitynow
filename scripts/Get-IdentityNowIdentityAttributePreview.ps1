@@ -51,8 +51,9 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     $Uri = "$((Get-IdentityNowOrg).'Private Base API URI')/user/preview/$($user[0].id)"
     $a = Get-IdentityNowProfile | Select-Object | Where-Object {$_.name -eq $IDP -or $_.id -eq $IDP}
-    Write-Verbose "IDP: $($a.count)"
-    if (!$a.count -eq 1) {
+    Write-Verbose "IDP: $($a.name) found"
+
+    if (!$a) {
         Write-Error "'$($IDP)' Identity Profile not found. Identity Attribute Preview cannot be performed."
         break 
     }
@@ -80,8 +81,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUPB4+ETdwbIp2X2MWUkdLXyCf
-# LKWgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUlwNfTUEVPsqBwgUCdHaLwaTm
+# 8XmgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -188,22 +189,22 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUyFyLQpHbQHO7apnhDjCm
-# 0bMF2TUwDQYJKoZIhvcNAQEBBQAEggEAY4mdH/Vz9m4vgoqv11ms3NaGKWaHSDBO
-# RTF7HM4tuoZxONL1x1XhN0NQGLofdwMCgmR4bQ6Xplf8JMiZYiqFybQpR97FVgJg
-# LfkhM+nRnEO3qBlphMSl6y/9jq3LofmwYoY7LaRFQuiVrfLGG13GbHhrz5Y+mJOa
-# mxCoH7pAzfSHdUdMS8u4KTc631SaD+RsU2KUUdKne+sI5H2OmjReGmZu8QrGmAz5
-# svp64Z46z0zcKyc/ty8asEI4+o4HNcw5oDTjcoM9QZCZ2kBw9zBxSgnkmm9AN0MX
-# /rikQAXFAQOtoB8pQQSpgpy5Fs074rO/oRS2CV7LJr4Y/yZ3CSCJpqGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQU+YW9tPzU8VgWYpgwMm6I
+# ryLsOScwDQYJKoZIhvcNAQEBBQAEggEAe+ZwbHA1vCjo9f/6+vDlAhe/xa3Wntxd
+# 80tx7jNIMdVxjLScjRD/gufa36zSHMWmH0hZIzVFShw/kcsoGt1cpj0go37u5rCt
+# HiH/3sG6OnMr/4xL/3GVJ7F/57zfRpfbdowrAKTIjSGSjbN73AfpXZFwsmGznwRL
+# r7D/18OeUzHHQurZbuDu8ZaayNiXQ8ytGqIAI4eKRuD0UFHSvQIhpXEBTxejPg1p
+# UBTp12nKUmUr2UO/ff+cRoENZZI8gbsopNmKwuYkeV5mx1wdxLrKGbh/SnOBtO6i
+# +uW/b2YslLPGzo5osgJRMnfcuETuziJwf7a9HTdUlzfKrixXD1cQ2qGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA4MDMyMzM0MzRaMCMGCSqGSIb3DQEJBDEWBBTvqCg1MM9qNLHk96IcLyIv
-# cmOfhjANBgkqhkiG9w0BAQEFAASCAQAOvGFKUM8Cw72jeXowk+HLnIDflc6l0oXz
-# xtVsuE5jWWrbSBDfPzME434FPt+FlVDPivoQ0h3e09pPTGb1+rB7JNle3saIdEu7
-# 0ZQsdVz9tyHWBlR7yVqDO/VgK4mZ5Bn+oc/lCPKcFHbAI1MK02T3WqUEOzmsa1Uv
-# U0WX8WcDo4E3uYFKrRzvp3uWIf9DFFSvBFKnFbLVidrTP28kpAkVBUs8JTnOdaWg
-# 8F7+NEIrwD9A2LWarL6E5zvci0ArQhr0AYKhmRjnGSdXnZbEp9mV+ITp/59UXw5x
-# w5h15MJIDBgoPE/pl6nMhP0ozv9GrE6q/reunLYCi9WP1wwgBWdX
+# Fw0yMDA4MTAyMzU3MzZaMCMGCSqGSIb3DQEJBDEWBBTlI9O7bPse5UE5xVkhp5ey
+# pmyQLTANBgkqhkiG9w0BAQEFAASCAQAOoufNdazPg5pZ5PpVqNQK/KF6BfiCoIOm
+# 5eZubFZBDXpOQyLXUF48bAKf5eAIe4wqTIlJhcBsG1llAplk+ENLlmlhBe54es7F
+# 9/ry1RLGhnWV/m9sVLcJLAleAB7BsboXhmBeI1opDOWOkYCCjEEElV+SWV4U5LFA
+# vZRzs9V3gKTdWEwHrnWTVUKZ1w8stq+sMipp6zrmH4ym4ErbySsbHbdeVH5yzlM8
+# A4HvSfkr2b/owmidobk6loGKFx8BxkDMduJlJGiqK+WFgZBQqlX7oGJtxbhX5ZsU
+# DUcjJrs5WoWjRdsinDysLX7WSJeMWvHGjJdv8lsfqdYV9/4fkTB+
 # SIG # End signature block

@@ -1,25 +1,16 @@
 function New-IdentityNowPersonalAccessToken {
     <#
 .SYNOPSIS
-Create an IdentityNow Personal Access Token.
+Create an IdentityNow v3 oAuth Personal Access Token.
 
 .DESCRIPTION
-Create an IdentityNow Personal Access Token. This is a supported way of authenticating to 
-IdentityNow API without browser prompt.
+Create an IdentityNow v3 oAuth Personal Access Token.
 
 .PARAMETER name
-(required) Identifiable name for a new Personal access token like postman, powershell, or 'sailpointidentitynow module'
-
-.PARAMETER accessToken
-(optional) if a personal access token needs to be made for an account not saved in this module 
-we can pull the access token from https://{org}.identitynow.com/ui/session?refresh=true
-after pulling up the admin section
+(required) e.g MyApps
 
 .EXAMPLE
-New-IdentityNowPersonalAccessToken -name "Sean's Sailpoint IdentityNow module"
-
-.EXAMPLE
-New-IdentityNowPersonalAccessToken -name "Sean's Sailpoint IdentityNow module" -accessToken baa2c01cb5674636b8c0f063f3f13db3
+New-IdentityNowPersonalAccessToken -name "MyApp" 
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -70,8 +61,8 @@ https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-REST-API-Create-
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUWRh5vQTlG33vjxTUChGYQBmI
-# 8rmgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUO8qfoA2K62pWxC7HKHfPRHWI
+# 9eegghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -178,22 +169,22 @@ https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-REST-API-Create-
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUi3NaX9jNOhXXDengBe2B
-# t2SGoQ8wDQYJKoZIhvcNAQEBBQAEggEAE2SKuXzSg3Xo/auGRsJRdjk7WBPvX6vP
-# tff4U3Kn9IoYlUerFq0qCqYv/cmzo9bpbY7WMZXM/eGUQXGaO7RqmRN5LvrZS8eo
-# TA9emafI6/G/mLPsiXbB/xjiB0xC0bl4B/knrmq4ZwXCoMwRkdL6VSh0QzUqQAZs
-# dwX6HQclJFp9SCSU0eF4tSoYreSmqSOxNLp0lhyC74L+1dk4zv+1K/WWBmZ1lb9f
-# UH8BA83o2ohA83p9uz9s7TIDF8wjByePi9881NiT/qddJVz1VX11PKWi+Vlel0jh
-# 8ugJ9Uv3AJvl84EK2ygQfweiAHe9HppUZhtzzG1DY5B7c8Y9zEynxKGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUbnJDVgjjEsLl3arWXxle
+# W1XdPIAwDQYJKoZIhvcNAQEBBQAEggEAcKZfG0srq85jkcBOsCcLIbJTpRIl1A1J
+# KZQmViAKPvFKnXTrNwnwh3f5A+nTrWjsVuBYeKpgmflh4DuIHrZkxl8br//6N5Ye
+# iPqA4Lqx8UW5G6TKsW2i27RaaeY2myD2nxIL+gcM3Vn/OJhLafGW9sXHq7c1oL0d
+# EGDT7jHxoczQm63Ve29zT/gEPKwA5y5c82cnavXYAmOcsdx+RwuAq8DmkklDq0sL
+# hVLpaX7jmzOK0zpc9u9tjbhrcHk5zBtZcf6MvTc/GpqmvV3qVx2fs2ECrgqo7mbv
+# OVC19bpIBDNdfKN05AmugTy2czHRqqqxrHIEKwPKgaslju3SkX3bLqGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjAyNDJaMCMGCSqGSIb3DQEJBDEWBBQNy5MGCPsHpCKwy6Iubwoc
-# Vr4c3DANBgkqhkiG9w0BAQEFAASCAQBuN6LL7cbfZk7adfZBQJzqaeIUsLXZt6oC
-# cuEZo2wpU+tmj7aUxLKahPcj6Y7+7gTcAc8gPpSr/OX49RgjMOg/bzTXCYddcBCd
-# +F8nMwxSsPdKmjRIQqsvhbAU/O8De2C1SxXq3O0qU4oUtFqSrfuxDUSEiubghLZn
-# W+HKhcN35WTDksh88BCf243zE8DuIhVn1Vt9hiUxh/42jCYXUVwn6wEWmLQlLkO0
-# AjaP86e6OpXNEBI83vkyC8luVB1GbqheXy1faGyqkayY1q8SN2XAVlczluXc1TWs
-# 31bRhShBkjLdyMcxXkYxshklJBrsNa7Xw9G9XZRlNcYFLNlFMRw1
+# Fw0yMDA4MDMyMzM0MzVaMCMGCSqGSIb3DQEJBDEWBBTtO63c+H9arqtnaGPTsRH1
+# zMODbTANBgkqhkiG9w0BAQEFAASCAQBW5ZN51ds5UP4uJELeIYOpZHi2MxHfalwk
+# vuADR9qC/NNmPTpggoqqnYRqnW2VWR+QV7dY4vJ++SzVnv+0vJJE4h2ZSRRyN22V
+# s6E2rgjhOCTfqlnqPbZX519GPFwJa8BibK2Sskro7d+4yWdiHivYAg1e8+W0Kra0
+# 7RRrVw3EY7wFeVBErO+9ZRrnk1NVB1jcrkqvIs8mjLJI2PfO/rc5otHWDFdbn/NE
+# wUeTC9uy8oj2psUlmiRu+gK73YqwmCqTOhNtKXaGYvI0u9yOTt1vPp5FQY187ulp
+# RISP1YIUnpX2rf7qPBIlyoR9CShMYlnYUvuaQCg5QDbdMpqse5kr
 # SIG # End signature block

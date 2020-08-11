@@ -1,62 +1,63 @@
-function Get-IdentityNowPersonalAccessToken {
-<#
+function Set-IdentityNowTransformLookup {
+    <#
 .SYNOPSIS
-List IdentityNow Personal Access Tokens.
+Update lookup transform
 
 .DESCRIPTION
-List IdentityNow Personal Access Tokens. 
+Create or update a dynamic reference transform based on external data
 
-.PARAMETER limit
-(optional) Number of personal access tokens to return
+.PARAMETER Name
+(string - Required) The name of the IdentityNow transform to update or create.
+
+.PARAMETER Mappings
+(hastable - required) Include full list of mappings and optionally 'default' key as a catch all
 
 .EXAMPLE
-Get-IdentityNowPersonalAccessToken
+$mappings = @{"US"="+1";"UK"="+44";"AU"="+61"}
+Set-IdentityNowTransformLookup -Name "iso3166 2char to e164 prefix" -Mappings $mappings
 
 .EXAMPLE
-Get-IdentityNowPersonalAccessToken -limit 10
+$mappings = @{"1"="Legal";"2"="Sales";"3"="IS";"default"="Corporate"}
+Set-IdentityNowTransformLookup -Name "Team Code to Team Description" -Mappings $mappings
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
 
 #>
 
-
     [cmdletbinding()]
-    param( 
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$limit = 999
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $false)]
+        [string]$Name,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [hashtable]$Mappings
     )
-
-    $v3Token = Get-IdentityNowAuth
-
-    if ($v3Token.access_token) {
-        try {    
-            $IDNGetPAT = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/personal-access-tokens?limit=$($limit)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-            
-            if ($IDNGetPAT) {
-                return $IDNGetPAT
-            }
-            else {
-                return "No 'Personal Access Tokens' found. Use New-IdentityNowPersonalAccessToken to create personal access tokens."
-            }
-            
-        }
-        catch {
-            Write-Error "Get Personal Access Token failed. $($_)" 
+    $body = [pscustomobject]@{
+        id         = $Name
+        type       = "lookup"
+        attributes = [pscustomobject]@{
+            table = $Mappings
         }
     }
-    else {
-        Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
-        return $_
-    } 
+    $testTransform = Get-IdentityNowTransform
+    try {
+        if ($testTransform.where{ $_.id -eq $name }) {
+            $result = Update-IdentityNowTransform -transform ($body | convertto-json) -ID $name
+        }
+        else {
+            $result = New-IdentityNowTransform -transform ($body | convertto-json)
+        }
+        return $result
+    }
+    catch {
+        Write-Error "Failed to update transform. $($_)" 
+    }
 }
-
-
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUOEaKum7gzHBAktpz3osaU18T
-# 8dCgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUEopeLLJk56Z+MKIu23CJUU7Z
+# KyugghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -163,22 +164,22 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUkhnI+aa+/gHcx0ydL2FP
-# gR89elwwDQYJKoZIhvcNAQEBBQAEggEAG5g/8zLg6G7Ssz2fDfHwOOxEImz4Bbq9
-# aZzATHi5WYHKdJhAaAy58bx0sHZV3JiYpp/Ej/9waZHS/WVI6shNnvE8gkOLLt/7
-# 66jNqf082bLvAvHBrRvAm3xjcO+yyRcuNuGPsPsnn1tP0Al3PGFCw+0/MHWwhMCY
-# PWqnnxZYW5mS8XgdltsdW9w4KqM2ffP3+hCw36InfGVqAP6/7Ea4nBwbjj7kvTFb
-# +hgqu+dM5qRXMmmkgAtIx2QukOUqib3JbtXN1TIsPf1bM45R9qte8u2eyvNqctjO
-# SFr/ScpAbseJiGsNUz1oKEghdD26MhoMMxBV+CF+1KIjJx1JvUT9p6GCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUHkjk4ADSl9ccwhA+60XP
+# oEjAagkwDQYJKoZIhvcNAQEBBQAEggEAjAdPV59fpfRijx4B4XCr86/2c2ycaU0r
+# BBLe3CSbHdTqVtddIF9VrG5YwGb4tt02G4BIHasg1TkcOtXaCAfi4En+31D6ua1e
+# GRYxuX4BzrQfTAB/2XUilwh+0aAXkd+NjJolh6MwXwdBI+DpNEIeCHEOB5hBGXMd
+# +vuDQVuAhwsYPqyafgGuh1IxMY7BYmSyp5DSz/69BpLoB2j1eWxka1mSQN/wAure
+# vk3nbZ3U+tmOquzzMWOnEy50nsDSQ6qjsHscovqajJ/9iroT3G8JdHoMth2dXr3E
+# gCsUSSDc660Gtx/vTKdl1ZmsqIjy9MlL2wNSqslljTxllIen38rc46GCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA4MDMyMzM0MzVaMCMGCSqGSIb3DQEJBDEWBBQDz5NwWk0TTOdUS22JF5cS
-# LgU1jjANBgkqhkiG9w0BAQEFAASCAQBa3a7oV16PdgL0eZFOLCIrq4kj3ckVEZ+t
-# kaURg7YBJ79IUT9rBJMF+3wpYQiorbJ9aLg+NzGYJyFB6nqeFLYF3I6UOZShhUA+
-# KG89kTf6t4mZOE2vxiuS0LN5yhkYJ+naWfFDJGXYOGx7DTISIMTH3mjGNHt2Fevv
-# LogC8joRx2ukXQJzTdnL8Kfem6MqgVq0+gDB9zFrzHKHEThuhG3KfNRvLZkMf+c/
-# 7wUJtFKhl8c85q2r4jcO85yGxGrH/Tgimb+HNGv8IVB35/4K8d/279QnsvK0/7Aw
-# IIs1ty5+1HeBQ1wgodvCxVd8kV0Ejnr1er3jB6mjjMZIwRkbM6bG
+# Fw0yMDA4MDMyMzM0MzZaMCMGCSqGSIb3DQEJBDEWBBSa3nY8Y2aCYN10JJzQLdi/
+# iXwjwzANBgkqhkiG9w0BAQEFAASCAQBCf4D1whcxLuJvIy21dXqAHj4hGgH4e/Q8
+# ocqjIG8OaxwO5hFGwFc4J5yMHivSAQ+2cX1Tx9JUR5581cly+EnK4uUjV39mCeO4
+# rpPZbnRX+mDLDjTLUTsKBMn7fqJUipYIThipXvwwDW2dx70cB+kIgSQpEZlV/UsZ
+# kmQjhjEp8efBJwUz5Fs9odZ74B7W6+IShd6n4aRfspchpwKI7jgf5RJ4fzRpLKCM
+# b61YDwszMc88NWaTEjvGAz3Yqv+Uw8h8Gtn2aUht0jTc2mpFILjYvZHWZtGp/sk3
+# utzIx9mDvYOxoTFdrcKJJVKK7n+mE0sZaCMRdxwZQUZq+j95UD3i
 # SIG # End signature block

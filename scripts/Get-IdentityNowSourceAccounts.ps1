@@ -25,63 +25,61 @@ function Get-IdentityNowSourceAccounts {
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$sourceID,
-        [switch]$attributes
+        [switch]$attributes,
+        [int]$searchLimit = "2500"
     )
 
     
     $Headersv2 = Get-IdentityNowAuth -return V2Header
-        
-    try {
-        if ($sourceID) {                
-            $searchLimit = "2500"
-            $sourceObjects = @()                 
-            
-            $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceID)&limit=$($searchLimit)&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2                            
+    if ($sourceID) {
+        $sourceObjects = @()
+        $offset = 0
+        $i=0
+        do { 
+            # Get Next Page
+            [int]$offset = $i * $searchLimit           
+            do {
+                $results = $null
+                try {
+                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceID)&limit=$($searchLimit)&offset=$($offset)&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2
+                }
+                catch {
+                    write-host "Sleeping 2 seconds:$($_)"
+                    Start-Sleep -Seconds 2
+                }
+            }until($null -ne $results)
             if ($results) {
                 $sourceObjects += $results
             }
-            $offset = 0
-            do { 
-                if ($results.Count -eq $searchLimit) {
-                    # Get Next Page
-                    [int]$offset = $offset + $searchLimit
-                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceID)&limit=$($searchLimit)&offset=$($offset)&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2
-                    if ($results) {
-                        $sourceObjects += $results
+            Write-Verbose "iteration = $i ; searchlimit = $searchLimit ; offset = $offset ; results = $($sourceObjects.count)"
+            $i++ 
+        } until ($results.Count -lt $searchLimit)
+        if ($attributes) {
+            $temp = $sourceObjects
+            $sourceObjects = @()
+            $i = 0
+            $currenterroraction = $ErrorActionPreference
+            $ErrorActionPreference = 'continue'
+            
+            foreach ($object in $temp) {
+                $i++
+                Write-Progress -Activity "fetching account attributes $($i) of $($temp.count)" -PercentComplete ($i / $temp.count * 100)
+                do {
+                    $result = $null
+                    try {
+                        $result = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts/$($object.id)" -Headers $Headersv2
                     }
-                }
-            } until ($results.Count -lt $searchLimit)
-
-            if ($attributes) {
-                $temp = $sourceObjects
-                $sourceObjects = @()
-                $i = 0
-                $currenterroraction = $ErrorActionPreference
-                $ErrorActionPreference = 'continue'
+                    catch {
+                        write-host "Sleeping 2 seconds:$($_)"
+                        Start-Sleep -Seconds 2
+                    }
+                }until($null -ne $result)
                 
-                foreach ($object in $temp) {
-                    $i++
-                    Write-Progress -Activity "fetching account attributes $($i) of $($temp.count)" -PercentComplete ($i / $temp.count * 100)
-                    do {
-                        $result = $null
-                        try {
-                            $result = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts/$($object.id)" -Headers $Headersv2
-                        }
-                        catch {
-                            write-host "Sleeping 2 seconds:$($_)"
-                            Start-Sleep -Seconds 2
-                        }
-                    }until($null -ne $result)
-                    
-                    $sourceObjects += $result
-                }
-                $ErrorActionPreference = $currenterroraction
+                $sourceObjects += $result
             }
-            return $sourceObjects
+            $ErrorActionPreference = $currenterroraction
         }
-    }
-    catch {
-        Write-Error "Source doesn't exist? Check SourceID and OrgName. $($_)" 
+        return $sourceObjects
     }
 }
 
@@ -89,8 +87,8 @@ function Get-IdentityNowSourceAccounts {
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUQjV92eBOvSoq1P3LYksEDKdW
-# cHSgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUVb4YWvV9thmkbGCWh+DDBnwb
+# M1CgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -197,22 +195,22 @@ function Get-IdentityNowSourceAccounts {
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUJSCm3uS2kagpwnJ4DmFE
-# UQEg4DkwDQYJKoZIhvcNAQEBBQAEggEAqSFTZJk519XcbOeRwzh1uOYiNBBTD2vH
-# pYUFWjQ72NiOUz9xdT4XIYMGiRpJETDRD4rG6qNhwiTfgFUe+Q+MJbmzPJuQxznV
-# Hp12bSCkyflFzvXuRk4gGhPbzp/ciXGlYYUFHjx9T3qKnrraGWGjC/kgiBHsoPck
-# XcKL16P8OvX0ZB8gEwso37ebtm1xs96WhCe/W3JTJI7MKuXBNFv69dBYHkz4UfEr
-# 9OMcWTNC4KBo9JdFk5lO3EqvZD7Qs4kPPUTugqh8kJIRy6fCHvdrjAiEUQaruwds
-# sqgrV5aTRkWtTgkZKCZ/Dls5be3L6bAFt54xoiM77jL0dvUm2Wf3maGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUsi1MDX+Ua4hS7apr5TV3
+# O8ZoIF0wDQYJKoZIhvcNAQEBBQAEggEAnj5SKsqIOaup/nexOw6EuJMdTSValALF
+# vh4sDLlvzgtQ66XdFO/NNwpdt6sRjsb5g9PhDMCAlrllCSJ8TfwOVYDd73lTeyZK
+# FwWl70lxpRUt+A1RS0VKlJ+NnFwdfZkgI/Jy9IVTX9SPLDMu7pcSY4OyBrGEJ8dk
+# 0R/INrv14XtFFK0br2A/OdGy4l9Y+AXCChTQhlTjI+J47dftaYFMXt6y/WOr1nMY
+# DS8X++siQFihI+lBU7cKlC40OE/HYxsYpedF95QFmQ4NgvR5+0NJ2my2WFdqU2pc
+# RNONvUBvOOEE9r3/LkKSrhbjjCcjbi5MjbOSDTfOz+TsnLfpnAXCwaGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjAyMzhaMCMGCSqGSIb3DQEJBDEWBBSw5JBhAqWnQh5zzhnsm9lR
-# ky9tyjANBgkqhkiG9w0BAQEFAASCAQBRMWOfP+zincr1lMyzPiefJ3BlVTJCKd06
-# iFn5JisuBaToK6TjvtbHfiULh0W8mvg19YhQWLCohUiXNi5aF7OzrzXBBXX9wMBq
-# tq/bYg1MQx8ko7l5mDSHFeFTCAOtOaeXVtpiUk5uLKXkDWRZTNZ+quLWYVWkr6FI
-# buQYV9gRbme5XFRklWvEfA41ParV6dqMo1CwBgg/cGaghELMDfDiM0f3Lx88mdqI
-# JMLM4HljQPJnwmp/wUZ8NbhFzxhBasy3K1g39Q6e2MoNr3AIBfs1FHoAn5vqGvUB
-# E/0YPD3fTqxk6pvXicsHy71mMktkEsav6kDgsREpcYe526ywE9u4
+# Fw0yMDA4MDMyMzM0MzVaMCMGCSqGSIb3DQEJBDEWBBQLVjK+ZSjstyaf0w8TEPuX
+# JiplBjANBgkqhkiG9w0BAQEFAASCAQB+NbxWL+Ol58ElTYte/7GnvAkL0oPVhv/V
+# cx4i3gxI13uFfuydgXtwAQRjqVVg3x57UPQMeMNz5ExzQVowpnBXmR/8BqQCyZhG
+# sM/6nHzeLXETEWlQ1AI4sUtyIbqgzq31WGeZh2tmYhrxTfw0NKmdSjhiaMrlaYkG
+# PpgZDO8spr1ULoqn35aAJ64HH3ltkdCRcIVCkKw5gTnOjht8QvbyZnpCSupbofiJ
+# JUqDNvWkFmXeg0TYXCVfPI1SGyYmABRjsO9apkMsIfWuwvVNKUwDbFoax2rRYICE
+# tCwr5+dL6jhItFL/FD34Oc0WrTl0OqtA8Dc/o2dVzLocamHvI/V7
 # SIG # End signature block

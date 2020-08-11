@@ -1,6 +1,6 @@
 @{
     RootModule           = 'SailPointIdentityNow.psm1'
-    ModuleVersion        = '1.1.1'
+    ModuleVersion        = '1.1.2'
     GUID                 = 'f82fe16a-7702-46f3-ab86-5de11b7305de'
     Author               = 'Darren J Robinson'
     Copyright            = '(c) 2020 . All rights reserved.'
@@ -22,6 +22,7 @@
         'Get-IdentityNowEmailTemplate',
         'Get-IdentityNowGovernanceGroup',
         'Get-IdentityNowIdentityAttribute',
+        'Get-IdentityNowIdentityAttributePreview',
         'Get-IdentityNowOAuthAPIClient',
         'Get-IdentityNowOrg',
         'Get-IdentityNowOrgConfig',
@@ -76,6 +77,7 @@
         'Set-IdentityNowCredential',
         'Set-IdentityNowOrg',
         'Set-IdentityNowTimeZone',
+        'Set-IdentityNowTransformLookup',
         'Start-IdentityNowCertCampaign',
         'Start-IdentityNowProfileUserRefresh',
         'Test-IdentityNowCredentials',
@@ -104,8 +106,8 @@
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU8UNIMCKO+szatABzMenPLiY4
-# np2gghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUZvMDfqZ485ZNYZ4GRoZ2GTgU
+# slCgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -212,22 +214,22 @@
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQULOa7k6H2WqPVZ3SexDfw
-# UmvMOYgwDQYJKoZIhvcNAQEBBQAEggEAUpEeieTxlutXkQ8NKpbargdTpD/7dtIA
-# 0v2zaM8r9WTdGyhoaLdWrDe/psGjrey7Jac9L3NS0JP4btU0JL+pxUQMHAovpssK
-# NnuQ+aXps6yeguoCnVE6N6PaZg7DFXHhRSwplnUwV8hHiWoV1NL5duMXwJ3pboNk
-# V+3XEV+xQjhpDPaTIZVC2M9Zre9Dw0VMDMB8FRNlwSeVJBar80iN4Kul2yr50S3G
-# s7/9ZqZWxZpTCxbyoFtRBQM+sO44JCQ/cSpADpR8HKuYw6V29BgwfvW8eLqN1HTo
-# GZqWknTJmsWoSUvQOEqG20eRAFfM3MjIkZmr7idDSkS4iMUxaEkJxqGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUhU33ZRNQXePkkh5LFcpx
+# 7leoK2IwDQYJKoZIhvcNAQEBBQAEggEAP4cr6iZ5Nmo/XttpRm1ya1fX3Aa4wGKK
+# e/Xs56Rwh18AGlWqjDoOdqYv7Hd3qZUFiYlosdI2SIPez6eeBmtYJNR27uUCXnKl
+# gtYJ6BM8ChSJW1W4Wq/WFggoqgpFbl1RPZ408HzPQn4TBu2TtRRDAIkQvvC/cn2L
+# D2oR5iJppqkCOsgIM7rYX7Dlq6habrc6uzq2/ozUqhNbzr+zbCFq/Y44kjS236U6
+# OFszILAI7xM3b+Bgq2+W9HV/LBXSipZHYrK2dTCzm+bqgSGD6h6yf3RfnWevrGmG
+# ci/bhzqR/rcSzKr988t9DjCsPSmLfRMoDkiVpLDaEJwijFoNe7hNg6GCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTcyMTQxMzhaMCMGCSqGSIb3DQEJBDEWBBSk2Dqe2nYKzepr8LQkiHj/
-# DIC7cjANBgkqhkiG9w0BAQEFAASCAQA/Sf1qJ0li1tWyVcgBO8s9VKytXOQxAg0H
-# 1miZfn5ZqumQo1L+BpNGtp7qPaOXcUNkJ9V74v90pgZi95CmY+5ijMzig257b6KA
-# 41hEszCSDNU93ZeENgcDuCCvolejAKt1GZXfa0XouaPZKqAuOJiMrnFA/ffq8V0N
-# wnotF3TfBlUjkhJ6KLdxpKzDmUWiZrPMSdE1RtCxa76fiEgc7rOLAaquxsbNS4po
-# rct3TdnfhH2b3LhIlb9LohJ09xA14/zA2/NIuQh6cjL/fXJ2nE68IKBXf0pcuCNT
-# x3BW3aaGzRsDSLg+HMX3s+0djRhZJvBGX6IPM7iC/beAUAcr1Kvo
+# Fw0yMDA4MDMyMzMxNThaMCMGCSqGSIb3DQEJBDEWBBSOx49/8ZJh2b+PkpWO4YYs
+# 3X4yZTANBgkqhkiG9w0BAQEFAASCAQBj3Uz9OUEowUFofIn/fE4SpgHeizDtAoDL
+# y8U5OnIpgPXCbF5oob8CNx4UpKGuFeUXz5Z+rBdxvh9vQl+P+GEIkL0yTHl8+jb9
+# ADRhHOBNTfqEbBgBDMMVk5Dm9QK7o2ZG+KC+fCIXvhcICmlcO2eyKoXcA62g1Zx9
+# t6A02eUltk1/pbKwVYKYa08SsUCAbk8Dk2cE/inosPRr6kGqgvOP9JTNznVDjRfr
+# TBAICH9Y44ASyFi6R4pgJjWYOHYCkuHQ8G9HTbMjioTiOdJWx7c9yxrWLZI37jQI
+# XBSORu+RWJ80bf+KQp2MjJImNuRKFgWPVCsIX3JHaYC+n+5LtNXj
 # SIG # End signature block

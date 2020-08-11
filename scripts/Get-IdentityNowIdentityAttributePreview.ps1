@@ -1,62 +1,87 @@
-function Get-IdentityNowPersonalAccessToken {
-<#
+function Get-IdentityNowIdentityAttributePreview {
+    <#
 .SYNOPSIS
-List IdentityNow Personal Access Tokens.
+Get an IdentityNow Identity Attribute Mapping Preview.
 
 .DESCRIPTION
-List IdentityNow Personal Access Tokens. 
+See the before and after attribute values on a person object for a single attribute.
 
-.PARAMETER limit
-(optional) Number of personal access tokens to return
+.PARAMETER attribute
+(optional) The identity attribue to retrieve. 
+
+.PARAMETER uid
+(Required) The uid of the user.
+
+.PARAMETER IDP
+(Required) the name or ID of the Identity Profile
 
 .EXAMPLE
-Get-IdentityNowPersonalAccessToken
+Get-IdentityNowIdentityAttributePreview -IDP "Employees" -attribute country -uid testUser
 
 .EXAMPLE
-Get-IdentityNowPersonalAccessToken -limit 10
+Get-IdentityNowIdentityAttributePreview -uid testUser -IDP "Employees" -attributes @('division','c') -differencesOnly
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
 
 #>
 
-
     [cmdletbinding()]
-    param( 
+    param(
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]$uid,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]$IDP,
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$limit = 999
+        [string[]]$attributes,
+        [switch]$differencesOnly
     )
+    $queryFilter = "{`"query`":{`"query`":`"$uid`"},`"includeNested`":false}"
 
-    $v3Token = Get-IdentityNowAuth
-
-    if ($v3Token.access_token) {
-        try {    
-            $IDNGetPAT = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/personal-access-tokens?limit=$($limit)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-            
-            if ($IDNGetPAT) {
-                return $IDNGetPAT
-            }
-            else {
-                return "No 'Personal Access Tokens' found. Use New-IdentityNowPersonalAccessToken to create personal access tokens."
-            }
-            
-        }
-        catch {
-            Write-Error "Get Personal Access Token failed. $($_)" 
+    try { 
+        $user = Search-IdentityNowIdentities $queryFilter 
+        if (!$user) {
+            Write-Error "'$($uid)' not found. Identity Attribute Preview cannot be performed."
+            break 
         }
     }
+    catch {
+        return $_ 
+    }
+
+    $Uri = "$((Get-IdentityNowOrg).'Private Base API URI')/user/preview/$($user[0].id)"
+    $a = Get-IdentityNowProfile | Select-Object | Where-Object {$_.name -eq $IDP -or $_.id -eq $IDP}
+    Write-Verbose "IDP: $($a.count)"
+    if (!$a.count -eq 1) {
+        Write-Error "'$($IDP)' Identity Profile not found. Identity Attribute Preview cannot be performed."
+        break 
+    }
+
+    $body = $a.attributeConfig | Select-Object attributeTransforms | convertto-json -depth 10
+    $preview = Invoke-IdentityNowRequest -method POST -uri $uri -headers Headersv3_JSON -body $body
+    if ($attributes) {
+        if ($differencesOnly) {
+            return $preview.previewAttributes.where{ $_.previousValue -ne $_.value -and $_.name -in $attributes }
+        }
+        else {
+            return $preview.previewAttributes.where{ $_.name -in $attributes }
+        }        
+    }
     else {
-        Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
-        return $_
-    } 
+        if ($differencesOnly) {
+            $preview.previewAttributes = $preview.previewAttributes.where{ $_.previousValue -ne $_.value }
+            return $preview
+        }
+        else {
+            return $preview
+        }
+    }    
 }
-
-
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUOEaKum7gzHBAktpz3osaU18T
-# 8dCgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUPB4+ETdwbIp2X2MWUkdLXyCf
+# LKWgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -163,22 +188,22 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUkhnI+aa+/gHcx0ydL2FP
-# gR89elwwDQYJKoZIhvcNAQEBBQAEggEAG5g/8zLg6G7Ssz2fDfHwOOxEImz4Bbq9
-# aZzATHi5WYHKdJhAaAy58bx0sHZV3JiYpp/Ej/9waZHS/WVI6shNnvE8gkOLLt/7
-# 66jNqf082bLvAvHBrRvAm3xjcO+yyRcuNuGPsPsnn1tP0Al3PGFCw+0/MHWwhMCY
-# PWqnnxZYW5mS8XgdltsdW9w4KqM2ffP3+hCw36InfGVqAP6/7Ea4nBwbjj7kvTFb
-# +hgqu+dM5qRXMmmkgAtIx2QukOUqib3JbtXN1TIsPf1bM45R9qte8u2eyvNqctjO
-# SFr/ScpAbseJiGsNUz1oKEghdD26MhoMMxBV+CF+1KIjJx1JvUT9p6GCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUyFyLQpHbQHO7apnhDjCm
+# 0bMF2TUwDQYJKoZIhvcNAQEBBQAEggEAY4mdH/Vz9m4vgoqv11ms3NaGKWaHSDBO
+# RTF7HM4tuoZxONL1x1XhN0NQGLofdwMCgmR4bQ6Xplf8JMiZYiqFybQpR97FVgJg
+# LfkhM+nRnEO3qBlphMSl6y/9jq3LofmwYoY7LaRFQuiVrfLGG13GbHhrz5Y+mJOa
+# mxCoH7pAzfSHdUdMS8u4KTc631SaD+RsU2KUUdKne+sI5H2OmjReGmZu8QrGmAz5
+# svp64Z46z0zcKyc/ty8asEI4+o4HNcw5oDTjcoM9QZCZ2kBw9zBxSgnkmm9AN0MX
+# /rikQAXFAQOtoB8pQQSpgpy5Fs074rO/oRS2CV7LJr4Y/yZ3CSCJpqGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA4MDMyMzM0MzVaMCMGCSqGSIb3DQEJBDEWBBQDz5NwWk0TTOdUS22JF5cS
-# LgU1jjANBgkqhkiG9w0BAQEFAASCAQBa3a7oV16PdgL0eZFOLCIrq4kj3ckVEZ+t
-# kaURg7YBJ79IUT9rBJMF+3wpYQiorbJ9aLg+NzGYJyFB6nqeFLYF3I6UOZShhUA+
-# KG89kTf6t4mZOE2vxiuS0LN5yhkYJ+naWfFDJGXYOGx7DTISIMTH3mjGNHt2Fevv
-# LogC8joRx2ukXQJzTdnL8Kfem6MqgVq0+gDB9zFrzHKHEThuhG3KfNRvLZkMf+c/
-# 7wUJtFKhl8c85q2r4jcO85yGxGrH/Tgimb+HNGv8IVB35/4K8d/279QnsvK0/7Aw
-# IIs1ty5+1HeBQ1wgodvCxVd8kV0Ejnr1er3jB6mjjMZIwRkbM6bG
+# Fw0yMDA4MDMyMzM0MzRaMCMGCSqGSIb3DQEJBDEWBBTvqCg1MM9qNLHk96IcLyIv
+# cmOfhjANBgkqhkiG9w0BAQEFAASCAQAOvGFKUM8Cw72jeXowk+HLnIDflc6l0oXz
+# xtVsuE5jWWrbSBDfPzME434FPt+FlVDPivoQ0h3e09pPTGb1+rB7JNle3saIdEu7
+# 0ZQsdVz9tyHWBlR7yVqDO/VgK4mZ5Bn+oc/lCPKcFHbAI1MK02T3WqUEOzmsa1Uv
+# U0WX8WcDo4E3uYFKrRzvp3uWIf9DFFSvBFKnFbLVidrTP28kpAkVBUs8JTnOdaWg
+# 8F7+NEIrwD9A2LWarL6E5zvci0ArQhr0AYKhmRjnGSdXnZbEp9mV+ITp/59UXw5x
+# w5h15MJIDBgoPE/pl6nMhP0ozv9GrE6q/reunLYCi9WP1wwgBWdX
 # SIG # End signature block

@@ -29,31 +29,32 @@ function Get-IdentityNowSourceAccounts {
         [int]$searchLimit = "2500"
     )
 
-    
-    $Headersv2 = Get-IdentityNowAuth -return V2Header
-    if ($sourceID) {
+    $v3Token = Get-IdentityNowAuth
+
+    if ($v3Token.access_token) {
         $sourceObjects = @()
         $offset = 0
-        $i=0
+        $i = 0
         do { 
             # Get Next Page
             [int]$offset = $i * $searchLimit           
             do {
                 $results = $null
                 try {
-                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceID)&limit=$($searchLimit)&offset=$($offset)&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2
+                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/source/getAccounts?id=$($sourceID)&limit=$($searchLimit)&start=$($offset)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
                 }
                 catch {
                     write-host "Sleeping 2 seconds:$($_)"
                     Start-Sleep -Seconds 2
                 }
-            }until($null -ne $results)
+            } until ($null -ne $results.items)
             if ($results) {
-                $sourceObjects += $results
+                $sourceObjects += $results.items
             }
             Write-Verbose "iteration = $i ; searchlimit = $searchLimit ; offset = $offset ; results = $($sourceObjects.count)"
             $i++ 
         } until ($results.Count -lt $searchLimit)
+
         if ($attributes) {
             $temp = $sourceObjects
             $sourceObjects = @()
@@ -67,7 +68,8 @@ function Get-IdentityNowSourceAccounts {
                 do {
                     $result = $null
                     try {
-                        $result = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts/$($object.id)" -Headers $Headersv2
+                        $result = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/accounts/$($object.id)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+
                     }
                     catch {
                         write-host "Sleeping 2 seconds:$($_)"
@@ -76,6 +78,9 @@ function Get-IdentityNowSourceAccounts {
                 }until($null -ne $result)
                 
                 $sourceObjects += $result
+
+                # Trigger Token expiry check and refresh
+                $v3Token = Get-IdentityNowAuth
             }
             $ErrorActionPreference = $currenterroraction
         }
@@ -87,8 +92,8 @@ function Get-IdentityNowSourceAccounts {
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUVb4YWvV9thmkbGCWh+DDBnwb
-# M1CgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUSjUyWXv2eKmyQq5fS/yhP43Y
+# epagghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -195,22 +200,22 @@ function Get-IdentityNowSourceAccounts {
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUsi1MDX+Ua4hS7apr5TV3
-# O8ZoIF0wDQYJKoZIhvcNAQEBBQAEggEAnj5SKsqIOaup/nexOw6EuJMdTSValALF
-# vh4sDLlvzgtQ66XdFO/NNwpdt6sRjsb5g9PhDMCAlrllCSJ8TfwOVYDd73lTeyZK
-# FwWl70lxpRUt+A1RS0VKlJ+NnFwdfZkgI/Jy9IVTX9SPLDMu7pcSY4OyBrGEJ8dk
-# 0R/INrv14XtFFK0br2A/OdGy4l9Y+AXCChTQhlTjI+J47dftaYFMXt6y/WOr1nMY
-# DS8X++siQFihI+lBU7cKlC40OE/HYxsYpedF95QFmQ4NgvR5+0NJ2my2WFdqU2pc
-# RNONvUBvOOEE9r3/LkKSrhbjjCcjbi5MjbOSDTfOz+TsnLfpnAXCwaGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUXd7zsIfy4dYZCbdfsYpJ
+# l9s7roowDQYJKoZIhvcNAQEBBQAEggEAkmj7zR0D1oKjP6ProILWPzfQuNMhD3LR
+# xx3+bqxLAOx+yLJ+PVUcUVUaIYEphVrrGgE2BX37xrXL9naugwtFo8tuhtUFaL3+
+# jhgwN7EOEabykg62RPUCkkBQPafXFle+OUrkDOj0DVrvviieVcdG6A7LnZr3my+g
+# 7C7xfCKJ3wc4K5lXiEVA0adAgCgML3T2jqgD6n2d4iG3sWaH+0jCwN5mXu49VloH
+# kkbcszxXuEGo1mSxBFKFVNmi3mghH9apHAHNhqcq39N+kUPeXM53c/yB917oyzLp
+# hEBrS9lm+n/deThdm0iGjZwKBv5iLq7s70TQ3ayw5kUro1dhycNpGKGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA4MDMyMzM0MzVaMCMGCSqGSIb3DQEJBDEWBBQLVjK+ZSjstyaf0w8TEPuX
-# JiplBjANBgkqhkiG9w0BAQEFAASCAQB+NbxWL+Ol58ElTYte/7GnvAkL0oPVhv/V
-# cx4i3gxI13uFfuydgXtwAQRjqVVg3x57UPQMeMNz5ExzQVowpnBXmR/8BqQCyZhG
-# sM/6nHzeLXETEWlQ1AI4sUtyIbqgzq31WGeZh2tmYhrxTfw0NKmdSjhiaMrlaYkG
-# PpgZDO8spr1ULoqn35aAJ64HH3ltkdCRcIVCkKw5gTnOjht8QvbyZnpCSupbofiJ
-# JUqDNvWkFmXeg0TYXCVfPI1SGyYmABRjsO9apkMsIfWuwvVNKUwDbFoax2rRYICE
-# tCwr5+dL6jhItFL/FD34Oc0WrTl0OqtA8Dc/o2dVzLocamHvI/V7
+# Fw0yMDA4MDYyMTM4MThaMCMGCSqGSIb3DQEJBDEWBBTDwrxwj3gg3IZecHFKAzd6
+# 2gq3cDANBgkqhkiG9w0BAQEFAASCAQBL979wRExIwX05MU2dqwCaN9RuWe0Odouh
+# q/4yJy78dhcHPjtipM9QaE1bP44yGX3LS+Lq3soh9HyB/NI40QyvHJFTpyLFR+QR
+# 3kqCVqU8RN9T72OgJsAf63DEBV0gt6sbP3ib5NCTmtfpfsnZ30CEenF2TipRPk7q
+# l8l1a+glTaPVZavu3aXbtEna6jdWYP63UfOO2P8Qaik6a7Lv1n9yoGaJfnUUNz+e
+# G7ffFe1X545g0KA4dSuCGq9Dv+jfWjIhq348E/+YiIeaPEwPRYhaRsZ6gmsAVR0G
+# qrZ0dFo2PsxEOT60gEWyEsIfYCNwJMpTfuZqGmJJvA58QklI2eT/
 # SIG # End signature block

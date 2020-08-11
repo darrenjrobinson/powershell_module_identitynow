@@ -22,23 +22,25 @@ function New-IdentityNowGovernanceGroup {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$group
     )
-    $Headersv2 = Get-IdentityNowAuth -return V2Header
-    $Headersv2."Content-Type" = "application/json" 
 
-    try {          
-        $IDNNewGroup = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/workgroups?&org=$($IdentityNowConfiguration.orgName)" -Headers $Headersv2 -Body $group
-        return $IDNNewGroup              
-    }
-    catch {
-        Write-Error "Failed to create group. Check group details. $($_)" 
+    $v3Token = Get-IdentityNowAuth
+
+    if ($v3Token.access_token) {
+        try {          
+            $IDNNewGroup = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/workgroups?&org=$($IdentityNowConfiguration.orgName)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" } -Body $group
+            return $IDNNewGroup              
+        }
+        catch {
+            Write-Error "Failed to create group. Check group details. $($_)" 
+        }
     }
 }
 
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUIYdWQ4pnTnqMXBMCp0UTXPOU
-# jCGgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUoqD6J3fg2n721yuSxPGk4mtg
+# pQGgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -145,22 +147,22 @@ function New-IdentityNowGovernanceGroup {
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUGiNxXtaKh4nSjy0T7FO/
-# 1J3j8vMwDQYJKoZIhvcNAQEBBQAEggEARisEMhsS3ptLVylDtnBh6QozxSunW5aH
-# WE9B4W+zEDmVbP6G3bieXq68n2QHrSiPchhfUgkBj7+RnYUnG34Rzr/T5m1F5wlV
-# ohQhNIzMchPI8fksc9Bfyh/IcCJo6WxIJQkkVl+fgKHjTx0X9WQssw30nyT17d/f
-# JT1+O9AGuC2gDIS9TW7sKj6ZczT8rHymKgEXrzyZthKIZBCwf65fkvk+I/cIfTsa
-# vI4OUhq/4SQ21BYPBhuI5dzbA/jQBATfU5oD16iPIQCwMZfYTRUgm180fxY2XDpy
-# xoh2t7gt88vasD4TZffiDsMP1GDhpDKwI6LHyW/hcbPT2lDl+Fk8xaGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUWVItct0cXZJJlK/KKYqo
+# 4bBgUD4wDQYJKoZIhvcNAQEBBQAEggEAoktmpE3TNhnWL5SMOZY/FnCcV8pApVzj
+# qO2fKr7XCiS9BIuPRMb5SgzbkV6tSvId3I+VIrztQj59fRO9jrYM47JUM4N3SJxL
+# tYfbyUobiJN+5vlD2wzV28LngZjofzl5mf39wk2kmDsDxAkwiboCBE1J0FO+hP+w
+# 01Y8/nArbKte0qt7a8KHHBKLBIgRpXpR/SYEMUSO0IdOozE4svWDvejs02+SoQ1u
+# HhLsddR7Ayd4vxGBq39TDBqSKu5i+7Fp917DKE86pGStuQki5s6BJTWIMivKMEKJ
+# 2DUTJ8ecEaG1li1fYJ0ZhGrqrhMT06On3+Q7FiHyrF7DvmY+r5Su+KGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjAyNDFaMCMGCSqGSIb3DQEJBDEWBBTEBUUPZjJoMedGokY0T5uf
-# iyLMVzANBgkqhkiG9w0BAQEFAASCAQAJor30NSH8CesChY/M5tsrBc79DbWjpPaY
-# /vgfdpc5XJLgbHtfikKJeoMpIyg9pIsbbRHgi401rFA0VEW0OoMMFw4CPRrSYV2v
-# uxB7Gu2vAVeyAr1Ty6ChFsRljfc7jJgUkGJqrxxkxf5o25LBXygCGPEg63G7LO5H
-# 7b9awACb+CqR14daPuQ320Cj1U93oHXNSCH+BsHxnQPV4Je0GrSGXJRYMeWhxaQd
-# IMhRedryuiMfIT++QE+x5fB8qVpLKVv9sv/HLAg/u47ajJ1Pxm/wn4o1TCkOjJS4
-# KGF2qCcmbAhhp05mupjeRReyU1429C1kdIfV97UPois0s5i9RieH
+# Fw0yMDA4MDYwNzI1MDRaMCMGCSqGSIb3DQEJBDEWBBTp6mKavJwQEqbm1AJdKEOp
+# IEUvtTANBgkqhkiG9w0BAQEFAASCAQCTbF7qS2oJyhN1FKQbxe3Ty1HNJBFZE7UZ
+# 4+J2sExp6NhQuY0JPoPTPw3HEENmpwjSA/1uNtfLX0UpAg0x8UgNLz5lGwELuUfM
+# wPkGpQn9rFRqJpLxg59rtV+Zdi4P7uW0S/SUnDsrsRL6l5Y+WATUkKbcPuuR/vRv
+# BzLvuCriX63bBQFaV9F1BtIrc6oGB82NFUmN22OaW/ThDIHkWE5qhzWo/I3Ms47o
+# i51TGxw/mkEwW45DyMgDuHTevEO9PbA+V2Ss1MuiYCtqYUWGGxLcnYPVOPXg8umk
+# BMNi+nN3lAOr1vC7UVgb1aGaIEj5pQvKYr5AmSUc7VgQSEmvmVvQ
 # SIG # End signature block

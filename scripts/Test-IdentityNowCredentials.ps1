@@ -4,10 +4,11 @@ function Test-IdentityNowCredentials {
     Tests IdentityNow Live credentials.
 
 .DESCRIPTION
-    Test APIv3 and APIv2 credentials.
+    Test APIv3, APIv2 and Personal Access Token credentials.
 
 .NOTES
     written by Sean McGovern 11/27/2019 (twitter @410sean)
+    updated by Darren Robinson 6 Aug 2020
 
 .EXAMPLE
     Test-IdentityNowCredentials
@@ -18,30 +19,78 @@ function Test-IdentityNowCredentials {
 
     [cmdletbinding()]
     param ( )
-    try {    
-        $lowusersource = (Get-IdentityNowSource | Where-Object { $_.usercount -ne 0 } | Sort-Object usercount)[0]
-    }
-    catch {
-        write-warning "Testing APIv3 credentials failed for $($IdentityNowConfiguration.orgName). Unable to continue."
-        return $null
-    }
-    "Validated APIv3 credentials."
+   
     try {
-        $accounts = Get-IdentityNowSourceAccounts -sourceID $lowusersource.id 
+        if ($IdentityNowConfiguration.v2) {            
+            $profileList = Invoke-IdentityNowRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/list" -headers Headersv2_JSON  
+            "Validated APIv2 credentials."
+        }
+        else {
+            "APIv2 credentials not stored in IdentityNow Configuration."
+        }
     }
     catch {
         write-warning "Testing APIv2 credentials failed for $($IdentityNowConfiguration.orgName)."
-        return $null
     }
-    "Validated APIv2 credentials."
-    return "APIv2 and APIv3 credentials are working for organisation '$($IdentityNowConfiguration.orgName)'"
+
+    try {    
+        if ($IdentityNowConfiguration.v3) { 
+            $lowusersource = (Get-IdentityNowSource | Where-Object { $_.usercount -ne 0 } | Sort-Object usercount)[0]
+            "Validated APIv3 credentials."
+        }
+        else {
+            "APIv3 credentials not stored in IdentityNow Configuration."
+        }
+    }
+    catch {
+        write-warning "Testing APIv3 credentials failed for $($IdentityNowConfiguration.orgName). Unable to continue."
+    }
+    
+    try {    
+        if ($IdentityNowConfiguration.PAT) { 
+            try {
+                # oAuth URI
+                $oAuthURI = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/oauth/token"
+
+                $oAuthTokenBody = @{
+                    grant_type    = "client_credentials"
+                    client_id     = $IdentityNowConfiguration.PAT.UserName
+                    client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
+                }
+            
+                $v3PAT = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody
+                if ($v3PAT) {
+                    $requestHeaders = @{Authorization = "Bearer $($v3PAT.access_token)" }
+                    $idnProfiles = $null 
+                    $idnProfiles = Invoke-RestMethod -Method Get `
+                        -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/list" `
+                        -Headers $requestHeaders
+                    if ($idnProfiles) {
+                        "Validated Personal Access Token."
+                    }
+                    else {
+                        "FAILED. Request using IdentityNow Personal Access Token failed."
+                    }
+                }
+            }
+            catch {
+                "Unable to obtain an Access Token using the configured Personal Access Token."
+            }
+        }
+        else {
+            "Personal Access Token not stored in IdentityNow Configuration."
+        }
+    }
+    catch {
+        write-warning "Testing Personal Access Token credential failed for $($IdentityNowConfiguration.orgName). Unable to continue."
+    }
 }
 
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU7GTEM4tmRqqlK+GlZ9KmGbnu
-# 0AugghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUhNXBF5RFplO5BApCkj4E7R+o
+# +vSgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -148,22 +197,22 @@ function Test-IdentityNowCredentials {
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUutW2Ut9qsJ5RYAm6x+ba
-# LB/RphkwDQYJKoZIhvcNAQEBBQAEggEAisCRs9+MLRvwQg31Zh70m6uB1vVhFcL5
-# MiBWhTk4wjUOTlI+LQxuFYXFXa+oAtH7phsH80TEOoTJx8bmIQrinbo8q+0B1rlQ
-# OymGwZWGUKnX1u1k6rij3RGO6PB6KqiHzzucMDuYYI5RorJB5BcLUr35rvoZJUo0
-# NsOUOhB9BrDMcymaxEmPEyYGuowLoseKnbfzaoThGh0JHX6VuHqL3jppz1fXeOzR
-# b5RRS6s9WXgdYXrOjL1by8rKJlu/Ar2FFHTo8/EgRQSAZBVNhLBNC/wYdkm1tB8k
-# Ww9T0dN76PVtm5jy34ve/aTrT/WTqmANsk5jvQJKcGmVjnyFHNenrqGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUOwtuXD0D6Wa/8ND7EaMq
+# 9wXt7/4wDQYJKoZIhvcNAQEBBQAEggEAHUJ0k2PhFWCIyd3HxLkuJo8wSw73aexa
+# v/WFHimgmzEXFX84chw3lTlUWuMyjxZ5Thl/efABL5DQZofVO4R4PqtfFmp/eoDU
+# KY2HjvWLihcmWqTqE3iiZJ+Jqbq2m8AHBXooGyOpsiAfYkaYI92hdBXfSpdN5DA5
+# mCfotke+iNw9YN3iptGK/P8+UK32xEy3IKW3te3fDCaS7O1nAVpXEhTUTQ9vpE97
+# FlrUn+eaqGR8NYaZiiS6SvcRawr0YpsUiws9nfknIz/Z6ibewMxVxk1AbFBKeKAu
+# sxuntNpp+3Z7SJFcS3w4VVM1h01L2+7UfpTyh922FBvu2ZtqEVU5P6GCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjQyMDVaMCMGCSqGSIb3DQEJBDEWBBTO7jVw+1dgMSRfFTnOpkI8
-# QiSFRjANBgkqhkiG9w0BAQEFAASCAQAu0ArdoNJGTBBIk24o5utlEMzETzNxuG0Q
-# 1OconpBBCxbgaek+/RLk20BavoztyTD6/ERcMOzFngrxiHfbQcbGE1DLnJAutxaI
-# X/YJfK1PW/dVWzGU4HznJsfotnbOjLtqKv8XDyNGX2ZjNm6/pVHwQLU4WwK6zFgC
-# gPCaDTM9R5YJ547yuMGGlU1a6cOrDOO912ZdaNZxiynsH9dFhfxBlMzfVwlyfkKc
-# 60zAiZiRrO/Dq44F8JU1O3/DRF1G1Q39E4VtmoOMvfsNqYaI4QSyicGACXZnd29h
-# kOd7iFE1Hx2D2hYWoUBolyEFT/pnF0W5TxnJ50O+n56RwTPlSLzk
+# Fw0yMDA4MDYwNzI1MDVaMCMGCSqGSIb3DQEJBDEWBBSIHzbbkV06QvyFJvzT1/Xq
+# Pf8OoTANBgkqhkiG9w0BAQEFAASCAQArerZb5x1DGQ8VLh4n7Beh6PyGtWDCyhMO
+# dwMQ6V7e7FzolRE5xZq3/fn3VjLwkxqYJuh2vtzmk+gj8Qn6j0B8y1bOvkTPnSbJ
+# y2oMAk5XzdlVisDOyhnRDag7z7vKav2xY3kZxMW1/EZVSDfKMDBuhKK3DM9G8Hw0
+# VsX6S43g2gM2PrR2ivKOtZD4l93nDaXo6Ubn4O3ai2cPruGSkgKkKFkI9QlK+Swy
+# 2nd1RRwbgyAge8WyuOPhMTxS5/tgxuZs4s6gLYa/JfsjvThfwZczUWylfiG9bbWj
+# OES/WLvGH2eroUQXBvVeyYT2uH9OqDnYnPO4dLaoSGGO6/wOs/rU
 # SIG # End signature block

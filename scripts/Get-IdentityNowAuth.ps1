@@ -156,23 +156,19 @@ http://darrenjrobinson.com/sailpoint-identitynow
         return $decodedToken
     }
 
-    if (!$hashUser -and !$adminPWD) {
-        # IdentityNow Admin User
-        $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
-        $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
+    # IdentityNow Admin User
+    $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
+    $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
 
-        # Generate the account hash
-        $hashUser = Get-HashString $adminUSR.ToLower() 
-        $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
-    }
+    # Generate the account hash
+    $hashUser = Get-HashString $adminUSR.ToLower() 
+    $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
 
-    if (!$Headersv3) {
-        $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
-        # Basic Auth
-        $Bytesv3 = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v3.UserName):$($clientSecretv3)")
-        $encodedAuthv3 = [Convert]::ToBase64String($Bytesv3)
-        $Headersv3 = @{Authorization = "Basic $($encodedAuthv3)" }
-    }
+    $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
+    # Basic Auth
+    $Bytesv3 = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v3.UserName):$($clientSecretv3)")
+    $encodedAuthv3 = [Convert]::ToBase64String($Bytesv3)
+    $Headersv3 = @{Authorization = "Basic $($encodedAuthv3)" }
     
     # Get v3 oAuth Token
     # oAuth URI
@@ -281,8 +277,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUhEdLwe6msM8+zOCpv6aTxVNU
-# yGugghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUwmuaA3dPwtdd5PH2CCyKx54i
+# vomgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -389,22 +385,22 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUcejwFyERDZokiNC9zk5O
-# 0gQhdRAwDQYJKoZIhvcNAQEBBQAEggEAK+CNhKOI61iLj1Yeo0KX5oNm5XB/gCdB
-# yVREKLy1eocpeHDDgyv1VCOu5L/1jEb0oeSrztZGKkhKnuD4o3vUXo9EXzx7IkHt
-# yMdMnFDMSP6iKoorQyVcfEtLhye+NZERfQaQglqXyVgIn/zdA8JhvBUo1J04XW48
-# /U/P28dOD06rte8jenioqonEbM/0j70Y9Mm+Mb85BDrlkF2W1pmEXN6X42SMpCzZ
-# eCX7YxmTppTKGT0Xngoy2/+1Q49cZsOsq5qGYZLbqCvHyD0YO3yueYNtxKjvPCEm
-# dKdc0emETlxwpRHzJxbrsO7dEBoDuU4tZwmQvMR3NZ+EogvQUzV4JKGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQU5ohr2lQC+MJ6D+9PJCTw
+# oa5A5QYwDQYJKoZIhvcNAQEBBQAEggEAYXBdWbEUHVt6lj8mH4o3Ldm9ZjLixBEL
+# ngm/VjtlyXBkby9uWHOkvWrRc1Y5jh7VdlqQyrEgaElQVF7CoGE/FoU6pOLERAt7
+# idLgQRjcM5fwknLFfneV7dV+xfxt5ywU0HaCufPDHSP9UjgCzXZYxtC1Duk1+tub
+# oyQ1H2lihufb15ECn0O4YHuaZDfwrrRH3/8JZ6Ma6GdX2IRqdMhHW+azciOXznvN
+# o13z+TPPKtSY9+nfRjd/l+3eAlbulZoEu3iMYml6IYfqhlJeWXdJXpll50hT+rsB
+# aVZFl/xf3nn/BmAkI/VrnLBDo2rmk8uuN7ncWGGDyMWMwjqV6GnIK6GCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA4MDYyMjU1MTFaMCMGCSqGSIb3DQEJBDEWBBQGM1SJAMmfJq0rjYeHGCD+
-# 817rbTANBgkqhkiG9w0BAQEFAASCAQASzB1dDSb6nOWNIsJmvj2KdgKdpyYSSoFS
-# wreXnv4Zgo2ZoQsQGspw86HZYpNiQhMw8UiwTatJyM1QX2Q0U7Yim4v7aQxfZDyW
-# YZydmJ9JUjDbEGJKlrIbwkbu40Q/RKaXCDzd3Pi3PPcuE/K/UWVnpZrakIGInE2C
-# 91FXCtbLbhO82Lg+hCjoka4hAvBbBZplxMcnRlCeK098FGPEhJ6BvRKQ8EBKvz2a
-# 25AldFV0BIYgt/1MFaTXDuZK7lRtpws/t2J4JHX781ZMF2wxJPKgYJyRy5p0Il+5
-# I5gGQLTWYRTnflFY0Me3d9eQ9GwjqnOkFjGvMTZ3UUbde57x+mAC
+# Fw0yMDA4MTMwMTE2NDZaMCMGCSqGSIb3DQEJBDEWBBR0fQTxDBCyd5/oYlfPQPpO
+# ij046TANBgkqhkiG9w0BAQEFAASCAQCTAPW3odciffQNi8aKpSifJ0omxJR3xcds
+# RKRzsDUz07wolb9tTKPGS/5tN0YU5hFP4cHkWxy16C5ocHHF4SZ0xe1oj5q8Rju1
+# oms2JYTOuY2UmGUyhID1uf/RMVKUfj/D2AC0VcxXPMyNjhNoSIQa/9S5tSYfL114
+# ki+IgxWYCg1xXgDjbAEK/HTv/9R9lOt5Ff0GBDoo16lE8yr0ztJw2HH9pykzALnE
+# IbFhFqW7zQrY2glstGpQMeZZF2soLoxLAbf6YVhz5J9iv/LFob+Kkns3EWulDd90
+# KFGgehMNbvIpkNdh31VaqGiao5JLMRWKWb7rnDdtpp+Gc1LBubYf
 # SIG # End signature block

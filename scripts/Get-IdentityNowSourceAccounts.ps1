@@ -74,6 +74,10 @@ function Get-IdentityNowSourceAccounts {
                     catch {
                         write-host "Sleeping 2 seconds:$($_)"
                         Start-Sleep -Seconds 2
+
+                        # Trigger Token expiry check and refresh
+                        $v3Token = $null 
+                        $v3Token = Get-IdentityNowAuth
                     }
                 }until($null -ne $result)
                 
@@ -92,8 +96,8 @@ function Get-IdentityNowSourceAccounts {
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUSjUyWXv2eKmyQq5fS/yhP43Y
-# epagghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUPmTcO502sSNt7YsHjQnZ7t7W
+# G02gghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -200,22 +204,22 @@ function Get-IdentityNowSourceAccounts {
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUXd7zsIfy4dYZCbdfsYpJ
-# l9s7roowDQYJKoZIhvcNAQEBBQAEggEAkmj7zR0D1oKjP6ProILWPzfQuNMhD3LR
-# xx3+bqxLAOx+yLJ+PVUcUVUaIYEphVrrGgE2BX37xrXL9naugwtFo8tuhtUFaL3+
-# jhgwN7EOEabykg62RPUCkkBQPafXFle+OUrkDOj0DVrvviieVcdG6A7LnZr3my+g
-# 7C7xfCKJ3wc4K5lXiEVA0adAgCgML3T2jqgD6n2d4iG3sWaH+0jCwN5mXu49VloH
-# kkbcszxXuEGo1mSxBFKFVNmi3mghH9apHAHNhqcq39N+kUPeXM53c/yB917oyzLp
-# hEBrS9lm+n/deThdm0iGjZwKBv5iLq7s70TQ3ayw5kUro1dhycNpGKGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUx0GuokwqgmcEkHjdkGeq
+# k4yy/lgwDQYJKoZIhvcNAQEBBQAEggEAGMeosKh9XhP3GR9BFNb3Nxr9C9IpzjkC
+# bSg5kkVDITQ67tbY88JEjHqZ7au096swxW2mLuYX2awZZp63nBApOajkWYqv30t+
+# OzQ8mVj3e9Pr6tbGRT7LcawGn/IqayvYw9pYXLEa7/tWAv8ctSVd2V7k0yNnHfXn
+# 81N/A8QpB6xp9aOnOLRj83768YQyDLntN0OwLIEn5kFfH4bZSn4zDOo5FYtj4O58
+# S3k1e+hLWVApms2AiyPVMW+W94EB2LAyXyzvKVq2xftN8yaLubAxkHlLICkeTIVL
+# w9DMc+F+zRQY9s44x7dEQsqju9GYMHGFKb9+NytPXBT+BQImcJ4RbaGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA4MDYyMTM4MThaMCMGCSqGSIb3DQEJBDEWBBTDwrxwj3gg3IZecHFKAzd6
-# 2gq3cDANBgkqhkiG9w0BAQEFAASCAQBL979wRExIwX05MU2dqwCaN9RuWe0Odouh
-# q/4yJy78dhcHPjtipM9QaE1bP44yGX3LS+Lq3soh9HyB/NI40QyvHJFTpyLFR+QR
-# 3kqCVqU8RN9T72OgJsAf63DEBV0gt6sbP3ib5NCTmtfpfsnZ30CEenF2TipRPk7q
-# l8l1a+glTaPVZavu3aXbtEna6jdWYP63UfOO2P8Qaik6a7Lv1n9yoGaJfnUUNz+e
-# G7ffFe1X545g0KA4dSuCGq9Dv+jfWjIhq348E/+YiIeaPEwPRYhaRsZ6gmsAVR0G
-# qrZ0dFo2PsxEOT60gEWyEsIfYCNwJMpTfuZqGmJJvA58QklI2eT/
+# Fw0yMDA4MTMyMjA2MzlaMCMGCSqGSIb3DQEJBDEWBBQBz96Sb+4eqEsPetR00jHL
+# mC2WsDANBgkqhkiG9w0BAQEFAASCAQAUrggngTHB7+YtxnEmQ/X+vlQJUb+mSUU0
+# gjWTdgKAFFMQhfUBLYu8RiAExjrtOVOSxOwUWnlWHbY6jlu1Yr8p5nh/Pq2XcoGk
+# r5xTV/z5HVh8iIwF0tuPne8DVSi11PUKeskNBoX6sGbTpfIDRvyvq2Cib7IRtDRH
+# N3W+a5A64+QPizBXkLjq/GOrBJzxvHPBDqjkRwDF3uOLKVVSuOtAOe0Nzw/AbPsC
+# l0Svsl6qQigVIBLF5BdnHeKbs27c/YSOJpJj8cpv0g3j4k8JbG1UKs/jKs51qlXh
+# hhdsfK7VQuzUEzo4pYBpY0EmKIwBTtdTaAL371oKcSyB58LxI1kN
 # SIG # End signature block

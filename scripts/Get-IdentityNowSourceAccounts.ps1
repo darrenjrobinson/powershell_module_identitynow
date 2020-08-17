@@ -53,7 +53,7 @@ function Get-IdentityNowSourceAccounts {
             }
             Write-Verbose "iteration = $i ; searchlimit = $searchLimit ; offset = $offset ; results = $($sourceObjects.count)"
             $i++ 
-        } until ($results.Count -lt $searchLimit)
+        } until ($results.items.Count -lt $searchLimit)
 
         if ($attributes) {
             $temp = $sourceObjects

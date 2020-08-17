@@ -31,8 +31,13 @@ function Search-IdentityNowEntitlements {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$query,
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$limit = 2500
+        [int]$limit = 2500
     )
+
+    if ($limit -gt 10000) {
+        Write-Error "Maximum search limit provided by the API is 10,000 results? Reduce your search limit parameter."
+        break  
+    }
 
     $v3Token = Get-IdentityNowAuth
 
@@ -40,22 +45,30 @@ function Search-IdentityNowEntitlements {
         try {                         
             # Get Users Based on Query
             $sourceObjects = @() 
-            $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/search/entitlements?limit=$($limit)&query=$($query)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                        
+            $body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"entitlements`"],`"sort`":[`"source.name`"],`"includeNested`":false}"
+            $results = Invoke-RestMethod -Method Post `
+                -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v3/search?limit=$($limit)" `
+                -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; 'Content-Type' = 'application/json' } `
+                -Body $body                       
 
             if ($results) {
                 $sourceObjects += $results
             }
             $offset = 0
             do { 
-                if ($results.Count -eq $limit) {
+                if ($results.Count -lt $limit) {
                     # Get Next Page
                     [int]$offset = $offset + $limit 
-                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/search/entitlements?offset=$($offset)&limit=$($limit)&query=$($query)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                
+                    $results = Invoke-RestMethod -Method Post `
+                        -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v3/search?offset=$($offset)&limit=$($limit)" `
+                        -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" ; 'Content-Type' = 'application/json' }  `
+                        -Body $body
+
                     if ($results) {
                         $sourceObjects += $results
                     }
                 }
-            } until ($results.Count -lt $limit)
+            } until ($results.Count -ge $limit)
             return $sourceObjects
         }
         catch {
@@ -72,8 +85,8 @@ function Search-IdentityNowEntitlements {
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUjoejE+wjzTUGaFY39vR6HONI
-# MCCgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUxLTXeUUeaNZ/FOY87NcPSXz5
+# ZSegghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -180,22 +193,22 @@ function Search-IdentityNowEntitlements {
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUtDHpVDErFiY9dTXkL+UN
-# 0YJt9yowDQYJKoZIhvcNAQEBBQAEggEAqFUvtPqyVeggNVge9aMFH9UpcZ2fyeXQ
-# hKCTgeFTqPxZ7YsEs4BwtNezxypYVLK34R1VfniNSTNALvf6tPtoG1RVtJT7KKp5
-# C+TUuCUHZoC36L59DKpFGltV4A0K09kugE5ZTtLo9Tv0cBATwGFBz05iKXOVYchg
-# 8pYAZDcInBsVb4rsd9XWBCfd6EyNokl9HUi9LaaQHVp02D1Ykgw7InSVj3cDbFb9
-# MNOMAit2Ki9H9HWyhDmYunE4oYuOupmJa8w/RGSEspWUEykIyLba9JBZdqEQnPYE
-# pkb4bo7tZLuEJqyOyeVfNQjrVPcsn1L3WEuL9Hd1+wVJ+4BXL2CUgaGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQU8lX2upEKU5hXzMH5eBrl
+# BY6oYVowDQYJKoZIhvcNAQEBBQAEggEAuKk8T80g1PCgETNl2VtE6YG+vMl+cRh8
+# IAxitnVKSdGLwEeJPsm/wOu94JrZA/ipara9YiuNgpWgDgtTYCY/8U2riIibmNXn
+# Gn+Ce+esb7Ia36OAVlhXHvzqtXmsyF/S5URICvZ7ksW4tA7YRO1SNJBYLcyVLR+1
+# MuqwMcrrDn+pA4yfzylT2z5J7P2k2NfWEUtqitjxwQTRJDrOt9I5jSJUHVpbGEIj
+# arUju0j5mcWhC4UOqPHpegD3FwW/iuueRzG08Djc/wArCJXQF5qz8XZ+Y4Wcry9X
+# jFJpqfVYfxwOH34DJ56oVpshpR94R3fFYg5npAwNRNaLT4QLRfQVnaGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjAyNDhaMCMGCSqGSIb3DQEJBDEWBBTZ2Ll5kgHiHyrg+lql941p
-# QrpxODANBgkqhkiG9w0BAQEFAASCAQAIb7//o5QBo/QB5APcmETaWT1UU1ibrPTD
-# jS27T9tylN4L6LhWLUET9oksU70imp2CX43f2WYdghxplFX0dMkKCq1B4mMcUX4Q
-# 95QNghUnTFS9n9MEN0Gpf8D+9PqdeVrDTdCAfZMxM16pSQ834ph8pChgcTZJoFEt
-# q4+stePRPowae5rznp6ttoeM1W3DAE/9FjbPiOU2TcWW1XqYfTF8mtsU0wmYZtNs
-# QFrDn+N9oCyIGaxKefLe3xEcSOCAT4Ez7KLoG2kbMgkwfu+PKxt5oopd6dgI3LMq
-# 6wSW+xGpJH/ecWpws6lR0y2zKyITvJzTYth7OYEaSVOcny1S9zYR
+# Fw0yMDA4MTcwMTA5MDRaMCMGCSqGSIb3DQEJBDEWBBTIgD15/L3uH6uxo1UXu/sD
+# kFLRLDANBgkqhkiG9w0BAQEFAASCAQBR+ZojFZhdUdElyu715NgQETIa8+T4I3P2
+# VZDBYG76G6SHL8dCYXJL+fsk7Q1KtcnhwIHUDRiRKiwF4/Pz6fhNs2RqTlPV8L4J
+# ExP1iHT8APf3514on/KmOwHnEOj+37kCcdk2VcCjLRPsqO8rkObtM1rnwVfPXlpo
+# ETPYUn9gmgRhGq9ehgumfJGuD/YCRFjfj0iQw9XeLpqD2LCu2qalSDEV7yajUVSO
+# nyrbTTu6tlO1AcFRpEH72lcd9JL6jMvb6LTeBhNnjgCHZXoagJ/nTPs5zKGr8SWY
+# NbncdykWXrLZURUuEWpzY7a3fg9O4Q2d1lTNbDT5M0017bPt2/64
 # SIG # End signature block

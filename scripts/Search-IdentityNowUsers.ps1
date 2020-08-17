@@ -1,5 +1,5 @@
 function Search-IdentityNowUsers {
-        <#
+    <#
 .SYNOPSIS
     Get IdentityNow Users.
 
@@ -40,7 +40,11 @@ function Search-IdentityNowUsers {
         try {                         
             # Get Users Based on Query
             $sourceObjects = @() 
-            $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/search/identities?limit=$($limit)&query=$($query)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                
+            $Body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"identities`"],`"sort`":[`"displayName`"],`"includeNested`":false}"
+            $results = Invoke-RestMethod -Method Post `
+                -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v3/search?limit=$($limit)&query=$($query)" `
+                -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; 'Content-Type' = 'application/json' } `
+                -Body $body               
                             
             if ($results) {
                 $sourceObjects += $results
@@ -50,7 +54,11 @@ function Search-IdentityNowUsers {
                 if ($results.Count -eq $limit) {
                     # Get Next Page
                     [int]$offset = $offset + $limit 
-                    $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/search/identities?offset=$($offset)&limit=$($limit)&query=$($query)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                
+                    $results = Invoke-RestMethod -Method Post `
+                        -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v3/search?offset=$($offset)&limit=$($limit)&query=$($query)" `
+                        -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; 'Content-Type' = 'application/json' } `
+                        -Body $Body
+
                     if ($results) {
                         $sourceObjects += $results
                     }
@@ -68,12 +76,11 @@ function Search-IdentityNowUsers {
     } 
 }
 
-
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUWmjAnBgRRugH4z2mQFeXy4zG
-# PzigghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUehxyc7WOYhXgu4DISGSBzW9A
+# +w6gghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -180,22 +187,22 @@ function Search-IdentityNowUsers {
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUJY1BXETk3UXRdyyHZJpJ
-# Le30NBcwDQYJKoZIhvcNAQEBBQAEggEAXSenvo+wI21uVq93TB75vpgvEdLUFj7n
-# NATKBFFfnwGqRMTFKlE4iXvlCIO9x5ZuFsuaPTm01uj44vvLx+gh5Xo9Uf87SmvG
-# p3UBHgWcgafFWM1qA25UVk1S6TIzhgMG/ew6a+NNBFb0AlS8FO/8AodXYn2SwsYm
-# +zRJ6+iwjaZbZwVdVuBSiXUXtclxy10t2StBvXK/e1iOOHXmqdpUVb2zwoNLAe4W
-# Ivm4q86Zj021jmDPcISLace+mtnk/A4txtao93RJp/pz+1yLMQoWkcpiYEm3CR1s
-# zrxh5kC/FtuJxrZPROGcRicpUVRC00HthnP8E+pzWud8Aea6XXe5g6GCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUEcrASMtmZcTMO4loE7ap
+# Sh6DfPYwDQYJKoZIhvcNAQEBBQAEggEANqoT9ltey/cFyoQep7Lwaa7NR1VKXBWM
+# sjZ2tw2/fDBOcwDCEMKJNTLlNf8YmuXefDLkHFkvjMf2gACrMY4pwoygP4u8ZGOm
+# cjN//sjrtQERshDkXZwcgfRYnwidQLEyyZniYX+CXEFTKOVmrqLPJej9q6oKk7x2
+# CR/P3vvfU/VSGVvWAtwMdN9ggv/CY71QQGznK0CoH9v25pkLdVI0LNRXWwVcK3MR
+# VJPm2YgWVf6C5mfgOA0sKYx08I8Wug05UQ8Hx6p8g0Z2taAEzaOj05uQOR6mqzuj
+# mzLht+7doNzsxwuKojzX91y0mwmWeVyCRn6V6DEy65xQjlWEYhdPMqGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjAyNDlaMCMGCSqGSIb3DQEJBDEWBBQ4Q+JFbkdtWoWce6IIu16X
-# OCg/JzANBgkqhkiG9w0BAQEFAASCAQAVC/CRhAfMeB5TEx51Xm8/zenHg7Z/m3uF
-# KiaUDI1Wwnl8rnU59dXfjsDy5cTWXVelqCyJj8fNP9E67XxD/DWpZJ5yH3p71Lyw
-# dzMWfb+/SSSYvuqchmKUGUJXbXx6UJp9zdIUQj52HmgqlChDDls2ObF/lubJvM4Y
-# IQai1cGArvIa4XelvxfT8S3vHvy1mt5gHz8NpADLkVmwwcf6nhNkoWR1/EtFq4OW
-# N9jCy/Tfm+pmlsecu8jaet61KHTT0HQyIZa8C2hfiho3RiEjdfrYzuWNbaxQOLIk
-# nVbdmLFSm0NPKx3rA7+hni2i2rqZICABv+4znmd8Hl/SXYQwivct
+# Fw0yMDA4MTcwMDAwNTRaMCMGCSqGSIb3DQEJBDEWBBS8ODEuvvf1BAfvrONiedLT
+# C1WcazANBgkqhkiG9w0BAQEFAASCAQB9A25q+C8SuqOPfwrL3kWoqbow/XRe0H70
+# 3c0KIlGQ8fL+Llg6+rObRcNo2ss54VGUVoFJ9+lS8ne4ptrTeZZy1etslGrgV9WN
+# ctlUXCaCk569g09cnk9j7Wty3acqSxjTLoPh+eSHLPvopszntzsz9vnga8XpCuPg
+# FEdT2a6wb5npq1Q3Gq+loTHDaTLWJCN3ArkZOsuAPLNtflJSd/IBfc5YdZ4O6kZB
+# cidoYIOjKgAVDEWv5gqGFQaAznhOZRoEgt+qJ/p+xjy0yEUPpEABOg2Ef/S/vRBr
+# QX0eEK4fqg5nmpvnK+fDNDZnySsqostSSxRU0cSJtX5iSWQ+nTLO
 # SIG # End signature block

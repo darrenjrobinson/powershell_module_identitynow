@@ -30,25 +30,30 @@ function Remove-IdentityNowGovernanceGroup {
         [string]$groupID
     )
 
-    $Headersv2 = Get-IdentityNowAuth -return V2Header
-    $Headersv2."Content-Type" = "application/json"
+    $v3Token = Get-IdentityNowAuth
 
-    try {        
-        $grpID = @($groupID)
-        $ids = (@{ids = $grpID } | convertto-json)
-        $DeleteGovGroup = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/workgroups/bulk-delete" -Headers $Headersv2 -Body $ids
-        return $DeleteGovGroup 
+    if ($v3Token.access_token) {
+        try {        
+            $grpID = @($groupID)
+            $ids = (@{ids = $grpID } | convertto-json)
+            $DeleteGovGroup = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/workgroups/bulk-delete" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json" } -Body $ids
+            return $DeleteGovGroup 
+        }
+        catch {
+            Write-Error "Failed to delete Governance Group. Check group details including associations. Only Governance Groups without associations can be deleted. $($_)" 
+        }
     }
-    catch {
-        Write-Error "Failed to delete Governance Group. Check group details including associations. Only Governance Groups without associations can be deleted. $($_)" 
-    }
+    else {
+        Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
+        return $v3Token
+    } 
 }
 
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU78pN5kH+2RJXfz4BOzL0RBdp
-# C5qgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUHdab2r4lQW2B9l2XE+N+UxZm
+# IdygghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -155,22 +160,22 @@ function Remove-IdentityNowGovernanceGroup {
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQU2RvUPNtwGblQmm2kddZ2
-# xqtQEBMwDQYJKoZIhvcNAQEBBQAEggEAo1BvrL/PIjoeMgyRm116GvpFGStFmI0N
-# gSGj78y+WkBmxLxx3cJS2BO5MsRx/i7RkC/DY7fklyBjJueBkxejQH6FqW/a/qGj
-# hTDjjD6DCvO4BLrMGDwQtuimP05CyWZg/rPAHWq5O456IsYzU7qXdxhbyWN9X+MR
-# zabfXYShyXt9NhLcfKHRTP9tAsr51FrGqhFCw/N7wD9E6Nwxh9QWRJsBXWQRBZZ5
-# 6pmPS+3j4KXSfnAnZfaJ8CTcVWfypCYU59HgSLEIcg1KjXK+NSU7EQ3GdN62EyHo
-# q3pOBNLOYtsoBDc6VJhwNMNfQHiH4E6Lu5ClePJloc2Mrk9P3yPAVaGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUOwW5DbxLpQzyBJPJ1rYQ
+# x2xI5S8wDQYJKoZIhvcNAQEBBQAEggEAHwX3w1AnjNRPBj7eD6JuluntHAGNYHcT
+# QBTCALu3MM7n/tHvylVlZTURhu3gweHcF8EYyepgPlB44BiIW/kSu46iZYUdQkQx
+# DUTSKUjYRpFfzg6Wmsly48cdwNkW3XRSO0ArKK2O3Rybt4lS/aCTagY4gODWHLk4
+# +d4cLFVbWwseOmVBKmDHMk7QyuEkCBcSLwWVjN8hZiC70/IOiovRQFmZHlbMTOo/
+# vVXiOtFR34bdDxP05fwSg/4ZvM8hlM0qCb7SUvLoYj2VkEGWYDWJ5JgJXNqxvse1
+# gzC79kfkRBKlfgiC8ATJ0QAjV0fm4w6AMqNCv1tIVmtvQlza3EjslaGCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjAyNDVaMCMGCSqGSIb3DQEJBDEWBBTvCTP3bseea+XlJxphZInk
-# coc0hDANBgkqhkiG9w0BAQEFAASCAQBXHmyk4JVUsz2YqH+FXMGjYgHMNPLbMdB7
-# n96nde2aTN930IWk97QrZTi5J7pIDtE9XGu0t8BpMq8r5moaOIGTiKASLNnjDIQS
-# vkRlOqBAtIEbG9kZqvB1BKBaJn7JPM5Sn1CGopv/Qk1+HWChQRr28p1Dx3oVXDRU
-# 0qh3TwZrHsidSvS5Aog4P1hjroJREaE/jdd8DD9t6vWbeMWr0x81MCuFirS50qAB
-# gIB19mhiamboXMpqiwUn+t2sEHYHIKJfzoct0s9Fb8smisEZwWBTVihST18+hLDw
-# Ch8dw9WWbuBhW5zEz97BaLzk7zkk0nX/oIM/45lcqRcRQK8tKOb5
+# Fw0yMDA4MDYwNzI1MDVaMCMGCSqGSIb3DQEJBDEWBBRsIUVWljS4SkWa69hWoNBt
+# MkC7VTANBgkqhkiG9w0BAQEFAASCAQAIvRhUx1ilxU49OrgjDf8TSn5Iq9fXI/Uv
+# EEMI02tVn3Mrkg+S0YEHUDtON7NG1YHHBHGdBGBkZrHoPbsLYFzTiET42Hnot0N6
+# lUPuGLVgBTcBGVPDbASGMPw2HKrMb9mHDoB5wxEkOUV7KqgOj7XnfWgWuAk9OSUx
+# 98oWW1MiNeLOUM1RoAncRtl/c25DrMFAXvTARkjuCE4ssuFR42b1eoHxMgjH50sU
+# Zt1WLlh4o/AuLw1qUT8NMGqXAPCA254Mlm5ccLUTbpSKdV+undZjDmMUrCFoEir2
+# 2YNBq3hWPYHEe68foicJr6LdKo/2AcgqXcy97c21CkpXClwdEAgw
 # SIG # End signature block

@@ -146,7 +146,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         $timeZone = Get-TimeZone
         $utcTime = $orig.AddSeconds($decodedToken.exp)
         $offset = $timeZone.GetUtcOffset($(Get-Date)).TotalMinutes #Daylight saving needs to be calculated
-		$localTime = $utcTime.AddMinutes($offset)     # Return local time,
+        $localTime = $utcTime.AddMinutes($offset)     # Return local time,
         $decodedToken | Add-Member -Type NoteProperty -Name "expiryDateTime" -Value $localTime
         
         # Time to Expiry
@@ -155,6 +155,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
     
         return $decodedToken
     }
+
     # IdentityNow Admin User
     $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
     $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
@@ -168,38 +169,45 @@ http://darrenjrobinson.com/sailpoint-identitynow
     $Bytesv3 = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v3.UserName):$($clientSecretv3)")
     $encodedAuthv3 = [Convert]::ToBase64String($Bytesv3)
     $Headersv3 = @{Authorization = "Basic $($encodedAuthv3)" }
-
+    
     # Get v3 oAuth Token
     # oAuth URI
     $oAuthURI = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/oauth/token"
     if ($IdentityNowConfiguration.JWT.refresh_token) {
 
-        if ((Convert-UnixTime (Get-JWTDetails $IdentityNowConfiguration.JWT.refresh_token).exp) -lt (get-date) ){
+        if ((Convert-UnixTime (Get-JWTDetails $IdentityNowConfiguration.JWT.refresh_token).exp) -lt (get-date) ) {
             $refreshTokenExpiry = (Get-JWTDetails $IdentityNowConfiguration.JWT.refresh_token).exp
             Write-Verbose "Refresh Token expired: $($refreshTokenExpiry)" 
             
             # Can't use Refresh Token to get a new Access Token
+            Write-Verbose "AuthType: Admin Creds"
             $oAuthTokenBody = @{
                 grant_type = "password"
                 username   = $adminUSR
                 password   = $adminPWD
             } 
-        } else {
+        }
+        else {
             $oAuthTokenBody = @{
                 grant_type    = "refresh_token"
                 client_id     = (Get-JWTDetails $IdentityNowConfiguration.JWT.access_token).client_id
                 client_secret = $null
                 refresh_token = $IdentityNowConfiguration.JWT.refresh_token
             }
+            Write-Verbose "AuthType: v3 JWT Refresh Token"
+
             if ($oAuthTokenBody.client_id -eq $IdentityNowConfiguration.v3.UserName) {
+                Write-Verbose "AuthType: v3"
                 $oAuthTokenBody.client_secret = $clientSecretv3
             }
             elseif ($oAuthTokenBody.client_id -eq $IdentityNowConfiguration.PAT.UserName) {
+                Write-Verbose "AuthType: Personal Access Token"
                 $oAuthTokenBody.client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
             }
         }
     }
     elseif ($IdentityNowConfiguration.PAT) {
+        Write-Verbose "AuthType: Personal Access Token"
         $oAuthTokenBody = @{
             grant_type    = "client_credentials"
             client_id     = $IdentityNowConfiguration.PAT.UserName
@@ -211,17 +219,28 @@ http://darrenjrobinson.com/sailpoint-identitynow
             grant_type = "password"
             username   = $adminUSR
             password   = $adminPWD
-        }        
+        }
+        Write-Verbose "AuthType: Admin Creds"        
     }
-    if (-not $IdentityNowConfiguration.JWT) { $forcerefresh = $true }
+    
+    if (-not $IdentityNowConfiguration.JWT) { 
+        $forcerefresh = $true 
+    }
+
     if ($ForceRefresh -or ((Get-JWTDetails $IdentityNowConfiguration.JWT.access_token).expiryDateTime -lt (get-date).addminutes(1) -and (Get-JWTDetails $IdentityNowConfiguration.JWT.access_token).org -eq $IdentityNowConfiguration.orgName)) {
         Write-Verbose ($oAuthTokenBody | convertto-json)
-        if ($oAuthTokenBody.grant_type -ne 'password') { $Headersv3 = $null }
+        
+        if ($oAuthTokenBody.grant_type -ne 'password') { 
+            $Headersv3 = $null 
+        }
+
         $v3Token = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody -Headers $Headersv3
         $IdentityNowConfiguration.JWT = $v3Token
+        Write-Verbose "AuthType: v3 JWT Access Token"
     }
     else {
         $v3Token = $IdentityNowConfiguration.JWT
+        Write-Verbose "AuthType: v3 JWT Access Token"
     }
 
     # v2 Auth
@@ -230,6 +249,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         $clientSecretv2 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v2.Password))
         $Bytes = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v2.UserName):$($clientSecretv2)") 
         $encodedAuth = [Convert]::ToBase64String($Bytes)     
+        Write-Verbose "AuthType: v2 Basic Auth"
     }
 
     switch ($return) {
@@ -257,8 +277,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # SIG # Begin signature block
 # MIIX8wYJKoZIhvcNAQcCoIIX5DCCF+ACAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUvmJ3E1uzd7veHqb1LpbCBwIn
-# /SagghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUwmuaA3dPwtdd5PH2CCyKx54i
+# vomgghMmMIID7jCCA1egAwIBAgIQfpPr+3zGTlnqS5p31Ab8OzANBgkqhkiG9w0B
 # AQUFADCBizELMAkGA1UEBhMCWkExFTATBgNVBAgTDFdlc3Rlcm4gQ2FwZTEUMBIG
 # A1UEBxMLRHVyYmFudmlsbGUxDzANBgNVBAoTBlRoYXd0ZTEdMBsGA1UECxMUVGhh
 # d3RlIENlcnRpZmljYXRpb24xHzAdBgNVBAMTFlRoYXd0ZSBUaW1lc3RhbXBpbmcg
@@ -365,22 +385,22 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # A1UEAxMoRGlnaUNlcnQgU0hBMiBBc3N1cmVkIElEIENvZGUgU2lnbmluZyBDQQIQ
 # DOzRdXezgbkTF+1Qo8ZgrzAJBgUrDgMCGgUAoHgwGAYKKwYBBAGCNwIBDDEKMAig
 # AoAAoQKAADAZBgkqhkiG9w0BCQMxDAYKKwYBBAGCNwIBBDAcBgorBgEEAYI3AgEL
-# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQUA+u6LwUM9fcuD4N6GFNa
-# J/l5/vswDQYJKoZIhvcNAQEBBQAEggEAoLy2LvXMAYniakScJ8VShRhFeVsnFKdn
-# jU0ANoG4kN4bpxzs5a1vVH4o4jw0CFYVRh/bCE9AJ8SIqazeTeDsRZwi2Mrb+dGj
-# S2W2ovrYIn0JT7uLqH+l0zo1+aOilx440TTRt0gXWdFWu0WynanFXMiXPZhufGkd
-# d8LTQKr1qxqe7Ed0kyddCRRHmbApem1+pNtmF0Y3rViice16B2kawbRoer7aZJg2
-# 79DZrsxmFsvMpNtk1poCCeCntZjJZchKceePLiosas4O0zgUEEa/UasfAF2vHBNL
-# DTh8fPTSEFxNjRMZPAXXiLQ8bSxwE7wgnqih/U0a1pA4/024sLmd7aGCAgswggIH
+# MQ4wDAYKKwYBBAGCNwIBFTAjBgkqhkiG9w0BCQQxFgQU5ohr2lQC+MJ6D+9PJCTw
+# oa5A5QYwDQYJKoZIhvcNAQEBBQAEggEAYXBdWbEUHVt6lj8mH4o3Ldm9ZjLixBEL
+# ngm/VjtlyXBkby9uWHOkvWrRc1Y5jh7VdlqQyrEgaElQVF7CoGE/FoU6pOLERAt7
+# idLgQRjcM5fwknLFfneV7dV+xfxt5ywU0HaCufPDHSP9UjgCzXZYxtC1Duk1+tub
+# oyQ1H2lihufb15ECn0O4YHuaZDfwrrRH3/8JZ6Ma6GdX2IRqdMhHW+azciOXznvN
+# o13z+TPPKtSY9+nfRjd/l+3eAlbulZoEu3iMYml6IYfqhlJeWXdJXpll50hT+rsB
+# aVZFl/xf3nn/BmAkI/VrnLBDo2rmk8uuN7ncWGGDyMWMwjqV6GnIK6GCAgswggIH
 # BgkqhkiG9w0BCQYxggH4MIIB9AIBATByMF4xCzAJBgNVBAYTAlVTMR0wGwYDVQQK
 # ExRTeW1hbnRlYyBDb3Jwb3JhdGlvbjEwMC4GA1UEAxMnU3ltYW50ZWMgVGltZSBT
 # dGFtcGluZyBTZXJ2aWNlcyBDQSAtIEcyAhAOz/Q4yP6/NW4E2GqYGxpQMAkGBSsO
 # AwIaBQCgXTAYBgkqhkiG9w0BCQMxCwYJKoZIhvcNAQcBMBwGCSqGSIb3DQEJBTEP
-# Fw0yMDA2MTUwMjAyMzJaMCMGCSqGSIb3DQEJBDEWBBTfRtBvUpfuehvXbSX2iKLZ
-# bWdgETANBgkqhkiG9w0BAQEFAASCAQCbNE/VX0d0saqiZ4WEn6+az9KdwvQh28h0
-# Nys+8Z1J+PVWZXQ6ty8o+EVwqqroneHkBFG4bpSCsTh3HrVgvzoAhoepxs2FFA8Y
-# QL+TstcFh6dod5mZ9z678SKtEudvFZDz6FrtbT2SpOIAOksnAiqWkhC/R52CunhG
-# 2fQFjYcwDpvSarBXgAQqoUqDEfpaNKx1EfQWzFFuCGBEJu0vXEyNbLdDQhzF2K/K
-# +jMduG4uc0l3B/OLaVEDpJkgXfZkJzN9mhJDFhoY78fJIAH6KLKKb6Xe2jt3xsy+
-# QVUmsY6BTf7RBfnt3SSLynk4MvCTNdAd5KijOiHk9iJ5qqU7il9H
+# Fw0yMDA4MTMwMTE2NDZaMCMGCSqGSIb3DQEJBDEWBBR0fQTxDBCyd5/oYlfPQPpO
+# ij046TANBgkqhkiG9w0BAQEFAASCAQCTAPW3odciffQNi8aKpSifJ0omxJR3xcds
+# RKRzsDUz07wolb9tTKPGS/5tN0YU5hFP4cHkWxy16C5ocHHF4SZ0xe1oj5q8Rju1
+# oms2JYTOuY2UmGUyhID1uf/RMVKUfj/D2AC0VcxXPMyNjhNoSIQa/9S5tSYfL114
+# ki+IgxWYCg1xXgDjbAEK/HTv/9R9lOt5Ff0GBDoo16lE8yr0ztJw2HH9pykzALnE
+# IbFhFqW7zQrY2glstGpQMeZZF2soLoxLAbf6YVhz5J9iv/LFob+Kkns3EWulDd90
+# KFGgehMNbvIpkNdh31VaqGiao5JLMRWKWb7rnDdtpp+Gc1LBubYf
 # SIG # End signature block

@@ -8,7 +8,8 @@
     PowerShellVersion    = '5.1'
     CompatiblePSEditions = 'Core', 'Desktop'
     FunctionsToExport    = @('Complete-IdentityNowTask',
-        'Convert-UnixTime'
+        'Convert-UnixTime',
+        'Export-IdentityNowConfig',
         'Get-HashString',
         'Get-IdentityNowAccessProfile',
         'Get-IdentityNowAccountActivities',

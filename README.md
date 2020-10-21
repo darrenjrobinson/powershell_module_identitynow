@@ -103,6 +103,7 @@ To get started with Local PowerShell Jupyter Notebook [see this post](https://bl
     $clientIDv3 = "badbeef6-5f24-4448-ac0b-abcdefG"
     $clientSecretv3 = "770a71abcdef5301848d00000d8760fe0d9f632383775b315aa1234567890"
     $v3Creds = [pscredential]::new($clientIDv3, ($clientSecretv3 | ConvertTo-SecureString -AsPlainText -Force))
+    Set-IdentityNowCredential -AdminCredential $adminCreds -v3APIKey $v3Creds
 
     # IdentityNow Personal Access Token
     $personalAccessToken = New-IdentityNowPersonalAccessToken -name "IDN Automation" 

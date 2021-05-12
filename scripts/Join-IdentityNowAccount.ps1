@@ -58,22 +58,27 @@ provide a powershell object or array of objects with the property 'identity' and
     )
     begin{
         if ($org){set-identitynoworg $org}
+        try{
+            $org=(get-identitynoworg).'Organisation Name'
+        }catch{
+            throw "possibly missing sailpointidentitynow module:$_"
+        }
         $csv = @()
         $csv = $csv + 'account,displayName,userName,type'
-        
+
     }
     process{
         if ($account){
             $csv = $csv + "$account,$account,$identity,"
         }elseif($_){
-            $csv = $csv + "$_.account,$_.displayName,$_.identity,$_.type"
+            $csv = $csv + "$($_.account),$($_.displayName),$($_.userName),$($_.type)"
         }
     }
     end{
         $v3Token = Get-IdentityNowAuth
         if ($v3Token.access_token) {
             try {
-                $result = Invoke-restmethod -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/source/loadUncorrelatedAccounts/$source" `
+                $result = Invoke-restmethod -Uri "https://$org.api.identitynow.com/cc/api/source/loadUncorrelatedAccounts/$source" `
                     -Method "POST" `
                     -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Accept-Encoding" = "gzip, deflate, br"} `
                     -ContentType "multipart/form-data; boundary=----WebKitFormBoundaryU1hSZTy7cff3WW27" `

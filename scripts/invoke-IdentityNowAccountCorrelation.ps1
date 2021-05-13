@@ -50,12 +50,18 @@ function Invoke-IdentityNowAccountCorrelation {
         [string]$identityAttribute,
         [Parameter(Mandatory = $true)]
         [string]$accountAttribute,
-        [string]$missingAccountQuery="NOT @accounts(source.name:`"$sourcename`")",
-        [integer]$limit=250,
+        [string]$missingAccountQuery="NOT @accounts(source.name:`"$sourcename`") AND attributes.$($identityAttribute):*",
+        [ValidateRange(0, 250)]
+        [int]$limit=250,
         [switch]$triggerJoin
     )
     if ($org){set-identitynoworg $org}
-    $org=(get-identitynoworg).'Organisation Name'
+    try{
+        $org=(get-identitynoworg).'Organisation Name'
+    }catch{
+        throw "possibly missing sailpointidentitynow module:$_"
+    }
+    
     $searchBody=[pscustomobject]@{
         indices = @("identities")
         query = [pscustomobject]@{
@@ -68,17 +74,27 @@ function Invoke-IdentityNowAccountCorrelation {
     $auth=Get-IdentityNowAuth
     $i=0
     $accounts=@()
+    write-output "getting from beta accounts API 'sourceId eq `"$($source.externalId)`" and uncorrelated eq true'"
     do{
         $url="https://$org.api.identitynow.com/beta/accounts?count=true&limit=$limit&offset=$($limit*$i)&filters=sourceId eq `"$($source.externalId)`" and uncorrelated eq true"
-        $temp=Invoke-RestMethod -UseBasicParsing -Uri $url -Headers @{"Authorization"="Bearer $($auth.access_token)"} -Method Get
+        try{
+            $temp=Invoke-RestMethod -UseBasicParsing -Uri $url -Headers @{"Authorization"="Bearer $($auth.access_token)"} -Method Get
+        }catch{
+            switch($_.Exception.Response.StatusCode){
+                'GatewayTimeout'{Write-Error "$($_.Exception.Response.StatusCode):$_"}
+                default{"$($_.Exception.Response.StatusCode):$_"}
+            }
+        }
+        if ($temp.count -eq 1){$temp=ConvertFrom-Json ($temp -creplace '\"ImmutableId\"\:(null|\"[\w\d\\\+\-\@\.\/]{1,}\"),','')}
         $accounts+=$temp
         $i++
         write-progress -activity 'get accounts' -status $accounts.Count
     }until($temp.count -lt $limit)
-
+    write-output "retrieved $($accounts.count)"
     $auth=Get-IdentityNowAuth
     $i=0
     $missingaccount=@()
+    write-output "getting from identities from v3 search API:$missingAccountQuery"
     do{
         $url="https://$org.api.identitynow.com/v3/search?count=true&limit=$limit&offset=$($limit*$i)"
         $temp=$null
@@ -87,6 +103,7 @@ function Invoke-IdentityNowAccountCorrelation {
         if ($temp.Count -eq $limit){$i++}
         write-progress -activity 'get identities' -status $missingaccount.Count
     }until($temp.count -lt $limit)
+    write-output "retrieved $($missingAccount.count) identities"
     $i=0
     $joins=@()
     foreach($user in $missingaccount){
@@ -98,10 +115,110 @@ function Invoke-IdentityNowAccountCorrelation {
                 userName = $user.name
                 type = $null
             }
-            $joins[-1]
+            write-output $joins[-1] | ConvertTo-Json
         }
     }
-    if ($triggerJoin){
+function Join-IdentityNowAccount {
+    <#
+        .SYNOPSIS
+            Join an IdentityNow User Account to an Identity.
+
+        .DESCRIPTION
+            Manually correlate an IdentityNow User Account with an identity account.
+
+        .PARAMETER source
+            provide the source ID containing the accounts we wish to join
+            SailPoint IdentityNow Source ID
+            e.g 12345
+
+        .PARAMETER Identity
+            Identity UID
+
+        .PARAMETER Account
+            Account ID
+
+        .PARAMETER org
+        Specifies the identitynow org
+
+        .PARAMETER joins
+        provide a powershell object or array of objects with the property 'identity' and 'account'
+
+        .EXAMPLE
+            Join-IdentityNowAccount -source 12345 -identity jsmith -account 012345
+
+        .EXAMPLE
+            $joins=@()
+            $joins+=[pscustomobject]@{
+                    account = $account.nativeIdentity
+                    displayName = $account.nativeIdentity
+                    userName = $identity.name
+                    type = $null
+                }
+            $joins | join-IdentityNowAccount -org $org -source $source.id
+            
+        .LINK
+            http://darrenjrobinson.com/sailpoint-identitynow
+
+    #>
+
+    [cmdletbinding(DefaultParameterSetName = 'SingleAccount')]
+    param(
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true, ParameterSetName = 'SingleAccount')]    
+        [Parameter(Mandatory = $false, ParameterSetName = 'MultipleAccounts')]
+        [string]$org,    
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName = 'SingleAccount')]
+        [Parameter(Mandatory = $true, ParameterSetName = 'MultipleAccounts')]
+        [string]$source,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName = 'SingleAccount')]
+        [string]$account,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName = 'SingleAccount')]
+        [string]$Identity,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName = 'MultipleAccounts')]
+        [pscustomobject[]]$joins
+    )
+    begin{
+        if ($org){set-identitynoworg $org}
+        try{
+            $org=(get-identitynoworg).'Organisation Name'
+        }catch{
+            throw "possibly missing sailpointidentitynow module:$_"
+        }
+        $csv = @()
+        $csv = $csv + 'account,displayName,userName,type'
+        
+    }
+    process{
+        if ($account){
+            $csv = $csv + "$account,$account,$identity,"
+        }elseif($_){
+            $csv = $csv + "$($_.account),$($_.displayName),$($_.userName),$($_.type)"
+        }
+    }
+    end{
+        $v3Token = Get-IdentityNowAuth
+        if ($v3Token.access_token) {
+            try {
+                $result = Invoke-restmethod -Uri "https://$org.api.identitynow.com/cc/api/source/loadUncorrelatedAccounts/$source" `
+                    -Method "POST" `
+                    -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Accept-Encoding" = "gzip, deflate, br"} `
+                    -ContentType "multipart/form-data; boundary=----WebKitFormBoundaryU1hSZTy7cff3WW27" `
+                    -Body ([System.Text.Encoding]::UTF8.GetBytes("------WebKitFormBoundaryU1hSZTy7cff3WW27$([char]13)$([char]10)Content-Disposition: form-data; name=`"file`"; filename=`"temp.csv`"$([char]13)$([char]10)Content-Type: application/vnd.ms-excel$([char]13)$([char]10)$([char]13)$([char]10)$($csv | out-string)$([char]13)$([char]10)------WebKitFormBoundaryU1hSZTy7cff3WW27--$([char]13)$([char]10)")) `
+                    -UseBasicParsing
+                return $result           
+            }
+            catch {
+                Write-Error "Account couldn't be joined. $($_)" 
+            }
+        }
+        else {
+            Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
+            return $v3Token
+        } 
+    }
+}
+
+    if ($triggerJoin -and $joins.count -ge 1){
         $joins | Join-IdentityNowAccount -org $org -source $source.id
     }
+
 }

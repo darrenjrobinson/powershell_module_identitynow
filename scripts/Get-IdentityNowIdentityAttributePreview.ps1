@@ -57,6 +57,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         Write-Error "'$($IDP)' Identity Profile not found. Identity Attribute Preview cannot be performed."
         break 
     }
+    $a = Get-IdentityNowProfile -ID $a[0].id
 
     $body = $a.attributeConfig | Select-Object attributeTransforms | convertto-json -depth 10
     $preview = Invoke-IdentityNowRequest -method POST -uri $uri -headers Headersv3_JSON -body $body

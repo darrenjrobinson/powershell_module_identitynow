@@ -18,10 +18,10 @@ function Join-IdentityNowAccount {
     Account ID
 
 .PARAMETER org
-Specifies the identitynow org
+Specifies the IdentityNow Org
 
 .PARAMETER joins
-provide a powershell object or array of objects with the property 'identity' and 'account'
+Provide a PowerShell object or array of objects with the property 'identity' and 'account'
 
 .EXAMPLE
     Join-IdentityNowAccount -source 12345 -identity jsmith -account 012345
@@ -34,7 +34,7 @@ provide a powershell object or array of objects with the property 'identity' and
             userName = $identity.name
             type = $null
         }
-    $joins | join-IdentityNowAccount -org $org -source $source.id
+    $joins | Join-IdentityNowAccount -org $org -source $source.id
     
 .LINK
     http://darrenjrobinson.com/sailpoint-identitynow
@@ -56,31 +56,33 @@ provide a powershell object or array of objects with the property 'identity' and
         [Parameter(Mandatory = $true, ValueFromPipeline = $true, ParameterSetName = 'MultipleAccounts')]
         [pscustomobject[]]$joins
     )
-    begin{
-        if ($org){set-identitynoworg $org}
-        try{
-            $org=(get-identitynoworg).'Organisation Name'
-        }catch{
-            throw "possibly missing sailpointidentitynow module:$_"
+    begin {
+        if ($org) { Set-IdentityNowOrg $org }
+        try {
+            $org = (Get-IdentityNowOrg).'Organisation Name'
+        }
+        catch {
+            throw "Possibly missing SailpointIdentityNow PowerShell module:$_"
         }
         $csv = @()
         $csv = $csv + 'account,displayName,userName,type'
 
     }
-    process{
-        if ($account){
+    process {
+        if ($account) {
             $csv = $csv + "$account,$account,$identity,"
-        }elseif($_){
+        }
+        elseif ($_) {
             $csv = $csv + "$($_.account),$($_.displayName),$($_.userName),$($_.type)"
         }
     }
-    end{
+    end {        
         $v3Token = Get-IdentityNowAuth
         if ($v3Token.access_token) {
             try {
-                $result = Invoke-restmethod -Uri "https://$org.api.identitynow.com/cc/api/source/loadUncorrelatedAccounts/$source" `
+                $result = Invoke-RestMethod -Uri "https://$org.api.identitynow.com/cc/api/source/loadUncorrelatedAccounts/$source" `
                     -Method "POST" `
-                    -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Accept-Encoding" = "gzip, deflate, br"} `
+                    -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Accept-Encoding" = "gzip, deflate, br" } `
                     -ContentType "multipart/form-data; boundary=----WebKitFormBoundaryU1hSZTy7cff3WW27" `
                     -Body ([System.Text.Encoding]::UTF8.GetBytes("------WebKitFormBoundaryU1hSZTy7cff3WW27$([char]13)$([char]10)Content-Disposition: form-data; name=`"file`"; filename=`"temp.csv`"$([char]13)$([char]10)Content-Type: application/vnd.ms-excel$([char]13)$([char]10)$([char]13)$([char]10)$($csv | out-string)$([char]13)$([char]10)------WebKitFormBoundaryU1hSZTy7cff3WW27--$([char]13)$([char]10)")) `
                     -UseBasicParsing

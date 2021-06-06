@@ -32,6 +32,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Get / Update / Test / Create / Remove IdentityNow Sources
 * Get IdentityNow Source Schema
 * Create IdentityNow Source Account Schema Attributes
+* Export IdentityNow Configuration
 * Generate IdentityNow Sources Configuration Report
 * Generate IdentityNow Identity Profiles Configuration Report
 * Get Accounts from an IdentityNow Source
@@ -847,12 +848,24 @@ Example
 New-IdentityNowSourceAccountSchemaAttribute -sourceID 12345 -name 'myNewAttr' -description 'My new attribute' -type 'STRING' 
 ```
 
+### Export IdentityNow Configuration ###
+Exports IdentityNow Access Profiles, APIClients, Applications, Cert Campaigns, Email Templates, Governance Groups, Identity Attributes, Identity Profiles, OAuth API Clients, Roles, Rules, Sources, Transforms, VAClusters, to files to make comparisons or check into source control.
+
+Example: Export all configuration items
+```
+Export-IdentityNowConfig -path 'c:\repos\IDN-Prod'
+```
+
+Example: Export only Rules and Roles configurations
+```
+Export-IdentityNowConfig -path 'c:\repos\IDN-Prod' -Items Rules,Roles
+```
+
 ### IdentityNow Sources Configuration HTML Report ###
 Generate an HTML Report of all configured IdentityNow Sources.
 Outputs the configuration of each Source and the Source Schema to a local directory
 
 [Reference post](https://blog.darrenjrobinson.com/creating-sailpoint-identitynow-source-configuration-backups-and-html-reports-with-powershell/)
-
 
 Generate a Source Configuration Report to the C:\Reports directory
 By default the report uses an embedded SailPoint IdentityNow Image logo.

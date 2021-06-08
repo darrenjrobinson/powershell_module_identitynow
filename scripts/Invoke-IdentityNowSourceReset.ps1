@@ -33,7 +33,7 @@ function Invoke-IdentityNowSourceReset {
         [string]$skip        
     )
 
-    $token = Get-IdentityNowAuth -return V2Header
+    $token = Get-IdentityNowAuth -return V3JWT
 
     if ($token) {
         try {
@@ -47,7 +47,7 @@ function Invoke-IdentityNowSourceReset {
             }
         }
         catch {
-            Write-Error "Source doesn't exist? Check SourceID. $($_)" 
+            Write-Error "$($_)" 
         }
     }
     else {

@@ -23,26 +23,23 @@ http://darrenjrobinson.com/sailpoint-identitynow
         [string]$attribute
     )
 
-    $v3Token = Get-IdentityNowAuth
+    $v3Token = Get-IdentityNowAuth -return V3JWT
 
     if ($v3Token.access_token) {
         try {
             $identityAttr = Get-IdentityNowIdentityAttribute -attribute $attribute
             # Update an Attribute to be searchable 
+            # Ref https://community.sailpoint.com/t5/IdentityNow-Wiki/API-to-Extend-Customizable-Correlation-Attributes/ta-p/77642 
+
             $identityAttr.searchable = $true 
-            $identityAttrSources = $identityAttr.sources | convertto-json 
-            $identityAttr.sources = $null 
-            $identityAttr.targets = $null 
-            $identityAttrUpdate = $identityAttr | convertTo-json
 
-            $identityAttrSources = '"sources": [' + $identityAttrSources + ']' 
+            if (!$identityAttr.extendedNumber) {
+                $identityAttr.extendedNumber = (Get-Random -Minimum 123456 -Maximum 999999)
+            } 
 
-            $identityAttrBody = $identityAttrUpdate.Replace("`"sources`":  null", $identityAttrSources)
-            $identityAttrBody = $identityAttrBody.Replace("`"extendedNumber`":  null,", "" )
-            $identityAttrBody = $identityAttrBody.Replace("`"targets`":  null,", "" )
-
+            $identityAttrBody = $identityAttr | convertto-json -Depth 4
+            $identityAttrBody = $identityAttrBody.Replace('"targets": [],',"")
             $updateAttribute = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/identityAttribute/update?name=$($attribute)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" ; "content-type" = "application/json"} -Body $identityAttrBody
-#            $updateAttribute = Invoke-RestMethod -Method Post -Uri "https://$($orgName).api.identitynow.com/cc/api/identityAttribute/update?name=$($attrToIndex.name)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "content-type" = "application/json"} -Body $identityAttrBody 
             return $updateAttribute
         }
         catch {

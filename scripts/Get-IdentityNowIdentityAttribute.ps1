@@ -26,7 +26,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         [string]$attribute
     )
 
-    $v3Token = Get-IdentityNowAuth
+    $v3Token = Get-IdentityNowAuth -return V3JWT
     
     if ($v3Token.access_token) {
         try {

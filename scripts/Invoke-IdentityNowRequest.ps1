@@ -89,7 +89,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
             Write-Verbose "$requestheaders"
         }
         HeadersV3 { 
-            $v3Token = Get-IdentityNowAuth 
+            $v3Token = Get-IdentityNowAuth -return V3JWT
             $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)" }
             Write-Verbose "Authorization = Bearer $($v3Token.access_token)"
         }
@@ -99,13 +99,13 @@ http://darrenjrobinson.com/sailpoint-identitynow
             Write-Verbose "Authorization = 'Basic $($encodedAuth)' ; 'Content-Type' = 'application/json' "
         }
         Headersv3_JSON { 
-            $v3Token = Get-IdentityNowAuth 
+            $v3Token = Get-IdentityNowAuth  -return V3JWT
             $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json" }
             Write-Verbose "Authorization = 'Bearer $($v3Token.access_token)' ; 'Content-Type' = 'application/json'"
             Write-verbose ($v3Token | convertTo-json)
         }
         Headersv3_JSON-Patch { 
-            $v3Token = Get-IdentityNowAuth 
+            $v3Token = Get-IdentityNowAuth -return V3JWT
             $requestHeaders = @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json-patch+json" }
             Write-Verbose "Authorization = 'Bearer $($v3Token.access_token)'; 'Content-Type' = 'application/json-patch+json'"
             Write-verbose ($v3Token | convertTo-json)

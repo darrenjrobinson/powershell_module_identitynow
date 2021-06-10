@@ -509,6 +509,29 @@ $myAP = $ExistingAPs | Select-Object | Where-Object {$_.name -like "*My Access P
 Remove-IdentityNowAccessProfile -profileID $myAP.id
 ```
 
+### Update IdentityNow Identity Profile Mapping
+Update IdentityNow Profile Attribute Mapping.
+
+Example 1 - Map SamAccountName from the AD Source to Identity Attribute UID on Identity Profile ID 1285
+```
+Update-IdentityNowProfileMapping -id 1285 -IdentityAttribute uid -sourceType Standard -source 'AD:SamAccountName'
+```
+
+Example 2 - Map SamAccountName from the AD Source to Identity Attribute UID using Transform 'transform-UID' on Identity Profile ID 1285
+```
+Update-IdentityNowProfileMapping -id 1285 -IdentityAttribute uid -sourceType Standard -source @('AD','SamAccountName','transform-UID')
+```
+
+Example 3 - Clear the mapping for UID on Identity Profile ID 1285
+```
+Update-IdentityNowProfileMapping -id 1285 -IdentityAttribute uid -sourceType Null 
+```
+
+Example 4 - Map managerDN to the returned value from the 'Rule - IdentityAttribute - Get Manager' rule on Identity Profile ID 1285
+```
+Update-IdentityNowProfileMapping -id 1285 -IdentityAttribute managerDn -sourceType Complex -source 'Rule - IdentityAttribute - Get Manager'
+```
+
 ### Create / Get / Start IdentityNow Certification Campaigns ###
 
 Get all (active and completed) IdentityNow Certification Campaigns

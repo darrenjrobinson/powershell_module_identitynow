@@ -20,22 +20,25 @@ function Test-IdentityNowCredentials {
     [cmdletbinding()]
     param ( )
    
-    try {
-        if ($IdentityNowConfiguration.v2) {            
-            $profileList = Invoke-IdentityNowRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/list" -headers Headersv2_JSON  
-            "Validated APIv2 credentials."
-        }
-        else {
-            "APIv2 credentials not stored in IdentityNow Configuration."
-        }
-    }
-    catch {
-        write-warning "Testing APIv2 credentials failed for $($IdentityNowConfiguration.orgName)."
-    }
+    # try {
+    #     if ($IdentityNowConfiguration.v2) {            
+    #         $profileList = Invoke-IdentityNowRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/list" -headers Headersv2_JSON 
+    #         Write-Verbose "v2 Output: $($profileList)"
+    #         "Validated APIv2 credentials."
+    #     }
+    #     else {
+    #         "APIv2 credentials not stored in IdentityNow Configuration."
+    #     }
+    # }
+    # catch {
+    #     write-warning "Testing APIv2 credentials failed for $($IdentityNowConfiguration.orgName)."
+    #     Write-Warning $_
+    # }
 
     try {    
         if ($IdentityNowConfiguration.v3) { 
             $lowusersource = (Get-IdentityNowSource | Where-Object { $_.usercount -ne 0 } | Sort-Object usercount)[0]
+            Write-Verbose "v3 Output: $($lowusersource)"
             "Validated APIv3 credentials."
         }
         else {
@@ -44,13 +47,14 @@ function Test-IdentityNowCredentials {
     }
     catch {
         write-warning "Testing APIv3 credentials failed for $($IdentityNowConfiguration.orgName). Unable to continue."
+        Write-Warning $_
     }
     
     try {    
         if ($IdentityNowConfiguration.PAT) { 
             try {
                 # oAuth URI
-                $oAuthURI = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/oauth/token"
+                $oAuthURI = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/oauth/token" 
 
                 $oAuthTokenBody = @{
                     grant_type    = "client_credentials"
@@ -58,13 +62,13 @@ function Test-IdentityNowCredentials {
                     client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
                 }
             
-                $v3PAT = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody
+                $v3PAT = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody 
                 if ($v3PAT) {
                     $requestHeaders = @{Authorization = "Bearer $($v3PAT.access_token)" }
                     $idnProfiles = $null 
                     $idnProfiles = Invoke-RestMethod -Method Get `
                         -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/list" `
-                        -Headers $requestHeaders
+                        -Headers $requestHeaders  
                     if ($idnProfiles) {
                         "Validated Personal Access Token."
                     }
@@ -83,6 +87,7 @@ function Test-IdentityNowCredentials {
     }
     catch {
         write-warning "Testing Personal Access Token credential failed for $($IdentityNowConfiguration.orgName). Unable to continue."
+        Write-Warning $_
     }
 }
 

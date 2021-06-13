@@ -39,6 +39,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
     $queryFilter = "{`"query`":{`"query`":`"$uid`"},`"includeNested`":false}"
 
     try { 
+        $user = $null 
         $user = Search-IdentityNowIdentities $queryFilter 
         if (!$user) {
             Write-Error "'$($uid)' not found. Identity Attribute Preview cannot be performed."
@@ -50,7 +51,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
     }
 
     $Uri = "$((Get-IdentityNowOrg).'Private Base API URI')/user/preview/$($user[0].id)"
-    $a = Get-IdentityNowProfile | Select-Object | Where-Object {$_.name -eq $IDP -or $_.id -eq $IDP}
+    $a = $null 
+    $a = Get-IdentityNowProfile | Where-Object {$_.name -eq $IDP -or $_.id -eq $IDP} | Select-Object
     Write-Verbose "IDP: $($a.name) found"
 
     if (!$a) {
@@ -82,8 +84,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUpCoEIRNCA2N17F4MoYfWclYV
-# xrigggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQU1KMlr9dhWzvyp3yNqTcO468i
+# DFagggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -144,11 +146,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFOJk3XYMwfWB
-# NC0xHbTV0rsxTyQgMA0GCSqGSIb3DQEBAQUABIIBAGTsJyNOF6zfJfLhX4KiDKaP
-# 7INoMESx3ntezRd8srfTrJlVGYxdpsD4jg9Bb6vYxkvstSF+bIykPLAu+LTmzT/8
-# snbHJwMRvET5Z+r+cgRaQuFvwSryLxTHREvfEeSC6Wwq4yeFNG/nTSxhFS1TfKS3
-# /hjBsd5MtMi7DQjlteOiroW/zK7/gT5dVMzvYJeW1Ui+sxttFcS1KD3qOIV3oTMN
-# dWwxBxML5CyK9Y9hioEkvQ6Sq2YkHQ0IanU4hMf8ttla6oI55DtaFzgd20Ny2rYI
-# kZkPF8pxHm5RLQyiuQQ0JtlEdURurW5kbcKTlwwTdTJFLS3mdILUVA/8zmBGbVw=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFLs/H18vtB3y
+# B0jG8QM2G8nykSA3MA0GCSqGSIb3DQEBAQUABIIBAJenQeLdA3E4eiHnUEA92XLE
+# 5xKj50my5qBlgTULQMeXNvIiP2BjQxteDWdDfE0aZZA7RS3qkySwxAGHVEe4Sw25
+# 8Q0SEnUE3um+X/UIYrFHyq8bov0Vzv18e+wXoyV33jx7adeyvQe8mNMBJQ47NxVn
+# 8kYKNPQT327z0+1SxB/FXEzoTfRnIVbRmWn1ww2Z0gAW/aI1DURzwV59s/6ehcYz
+# NKjuLMqZjgNiPCLmFe+fLDrAYHLKCHWM0KdLwoV4I8amPntQTNDUDCUf2jQNCpJp
+# 740bKWOx+/HKvF1AZXz+FNzP7crGKddvI58a+zkbtCOUKm2ScyEEmwDgg81oG/g=
 # SIG # End signature block

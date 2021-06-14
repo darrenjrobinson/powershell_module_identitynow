@@ -29,7 +29,7 @@ function Invoke-IdentityNowSourceReset {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$sourceID,
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [ValidateSet("accounts", "entitlements")]
+        [ValidateSet("accounts", "entitlements", IgnoreCase = $true)]
         [string]$skip        
     )
 
@@ -59,8 +59,8 @@ function Invoke-IdentityNowSourceReset {
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUSmciNPf9wS5jNmoonRXIq0s1
-# G9KgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUk+MK/PKsMKCgfUFuI6SWFr+z
+# 2OigggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -121,11 +121,11 @@ function Invoke-IdentityNowSourceReset {
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFEkbSHkN7wAq
-# JdNjEqkkpJVMXCY+MA0GCSqGSIb3DQEBAQUABIIBAD4Zc00tCExmEZLwpy/62XXN
-# vk7KmlMEt2LmFclaVOawlHqBuNzXzyBd5v4SZJHRPeCHiL1T0Qstj+HZrmvTUSSS
-# VRrY8FGt5NshHFO/S3JqEIB6/UHBZrDGqs6vILnhKAJbaSsKZrU953OR1cK+llTk
-# dCn2cQFakNJSU+eaTxvrRXwvzVLexmye4W635N1F7a8pqMyuB2kkBaLorgEtbXa8
-# MFZOBC5hRqnjw/ub0UaYJZNt4UQ+LJ1U3el6kZcH+asOIa9AudlyxLAALJPejVh0
-# CNGoPZ6TYRg/nSxNoOTKHWMitJsCp9+k0pjON5/R/vsv8tyminiJ8cNuLZLBOJU=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFHaZ/MVb8O28
+# o9F8CAKNM1u28ezMMA0GCSqGSIb3DQEBAQUABIIBAKU8yuc0PxHoNsBsp5miZjTO
+# KFOcxLc8y4ndPlRSjlPs6ca0jm9WIr6XhPRS69qPYZmpHHxAZckME5ZFpGuekDJY
+# ct4GHPBQG4eSbJ0Le+HVxlSOF4v8EePY5LW5UZOp79nieqUI9POdL6EdHSJTrQFK
+# p0B1v0XS3wj177ndWyEV8wHmSL/sTg8rJJy3+9769fjfnjTAAtbUUdJxH2gTwJdB
+# KvUA6SUnyvksMXvvCaRvGM/rRJ2SmAG1zUNoOqkZNXx8Z5cdTbGXGZ/7sGMrTC5P
+# v51m0KEe3QJF4mchESZw9mVUJ/cnt1M6NVyKYs1QjJ0fz83dh2XepoE6MBY59uU=
 # SIG # End signature block

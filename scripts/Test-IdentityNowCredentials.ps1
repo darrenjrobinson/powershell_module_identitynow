@@ -19,36 +19,41 @@ function Test-IdentityNowCredentials {
 
     [cmdletbinding()]
     param ( )
-   
-    # try {
-    #     if ($IdentityNowConfiguration.v2) {            
-    #         $profileList = Invoke-IdentityNowRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/list" -headers Headersv2_JSON 
-    #         Write-Verbose "v2 Output: $($profileList)"
-    #         "Validated APIv2 credentials."
-    #     }
-    #     else {
-    #         "APIv2 credentials not stored in IdentityNow Configuration."
-    #     }
-    # }
-    # catch {
-    #     write-warning "Testing APIv2 credentials failed for $($IdentityNowConfiguration.orgName)."
-    #     Write-Warning $_
-    # }
 
-    try {    
-        if ($IdentityNowConfiguration.v3) { 
+    if ($IdentityNowConfiguration.v2) {
+        try {
+            $IDNCluster = $null 
+            $IDNCluster = Invoke-IdentityNowRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/cluster/list" -headers Headersv2_JSON
+            if ($IDNCluster) {
+                Write-Verbose "v2 Output: $($IDNCluster)"
+                "Validated APIv2 credentials."
+            } else {
+                write-warning "Testing APIv2 credentials failed for $($IdentityNowConfiguration.orgName)."
+            }
+        } catch {
+            write-warning "Testing APIv2 credentials failed for $($IdentityNowConfiguration.orgName)."
+            Write-Warning $_
+        }  
+    }
+    else {
+        "APIv2 credentials not stored in IdentityNow Configuration."
+    }
+
+    if ($IdentityNowConfiguration.v3) {
+        try {    
             $lowusersource = (Get-IdentityNowSource | Where-Object { $_.usercount -ne 0 } | Sort-Object usercount)[0]
             Write-Verbose "v3 Output: $($lowusersource)"
             "Validated APIv3 credentials."
         }
-        else {
-            "APIv3 credentials not stored in IdentityNow Configuration."
-        }
+        catch {
+            write-warning "Testing APIv3 credentials failed for $($IdentityNowConfiguration.orgName). Unable to continue."
+            Write-Warning $_
+        } 
     }
-    catch {
-        write-warning "Testing APIv3 credentials failed for $($IdentityNowConfiguration.orgName). Unable to continue."
-        Write-Warning $_
+    else {
+        "APIv3 credentials not stored in IdentityNow Configuration."
     }
+    
     
     try {    
         if ($IdentityNowConfiguration.PAT) { 
@@ -94,8 +99,8 @@ function Test-IdentityNowCredentials {
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUTcehXSbNY7fdYP1Z8vMQrzGm
-# +SGgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUxNRin5COWmb8Mn70RjK0ZKvv
+# YPmgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -156,11 +161,11 @@ function Test-IdentityNowCredentials {
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFF2s7mrynZ2A
-# W6zz16mNNb8c8dboMA0GCSqGSIb3DQEBAQUABIIBAJWmQRdHdqXq9XGAjPJCz+gT
-# E43mXZfw7GGqxAC2w3pcuiRhiSUHkdbLPkEhgMrjwMKR3uDZDyYIR/f04sVGNfFi
-# YX+NyMCr/VxpgDhtT9epnqOqv5pV/8VQfgGXDftWEQPhGOxZj0V/OHRsJ3Cz5V7I
-# s8PBu5hyqx6vUOmD9inr5QecEp3PUuY3Pm8uqfWgriSRyVhHbaXcb5/gYY3MxLEV
-# A31O3E76tV0shTywyLm+fpNU2QYTsm0jRPTgSb9YCUCMGAVZm0BXYgL2FU4VdtIl
-# r9ekGmTVIzau0/Fm/N7n08X7pAKv9MZoWys9BfiR6+P8eXiZYow+IYvn//EqlB4=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFMmI88FH+zQl
+# /pPkXUHpt3PkWv8YMA0GCSqGSIb3DQEBAQUABIIBACAA/HgHQlRi801491KAT2R5
+# YZmjcb7XV0f9t9WT4vJj1aZjBad1xLp7eK5OAwXu6OpgEbT0znaCuG93aDsss4sk
+# DxknNzf1LhoYas4uQsMqkCEquoTWPlAM39Oz+iUS7H1xiIsjMZR9kgGiygSvNx7X
+# EpFvAH820GkOueuL9AUXGMcSRjqupeTp2M+kFnJHHgSB/RtStRwvTbvo6E9R5+kw
+# ib89lEkyig5MCj3icMi+NM7B1TlP9DAzGH8/PRxnGBLb23D5Tet87vVhaLvbDvsE
+# Vueog0D5vx1Xut2vjJPS8wDC5xbJs+CnA6VSptxjqh0eSJMQ2rGNTRD82sI3YOk=
 # SIG # End signature block

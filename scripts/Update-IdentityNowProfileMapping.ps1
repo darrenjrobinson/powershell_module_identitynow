@@ -87,7 +87,9 @@ http://darrenjrobinson.com/sailpoint-identitynow
                             $mapping.type = 'reference'
                             $mapping.attributes = [pscustomobject]@{
                                 id    = $source[2]
-                                input = $attributes
+                                input = [pscustomobject]@{
+                                    attributes = $attributes
+                                }
                             }
                         }
                         default {

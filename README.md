@@ -37,6 +37,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Generate IdentityNow Identity Profiles Configuration Report
 * Get Accounts from an IdentityNow Source
 * Create / Update / Remove IdentityNow Source Account (Flat File / Delimited Sources)
+* Create / Update IdentityNow Source Entitlements (Flat File / Delimited Sources)
 * Join IdentityNow Account
 * Get / Complete IdentityNow Tasks
 * Get IdentityNow Virtual Appliance Clusters (and clients (VA's))
@@ -54,7 +55,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Create / Get / Remove oAuth API Clients (v3)
 * Search Events - Elasticsearch
 * List Account Activities
-* Get Account Activity 
+* Get Account Activity
 * Reset an IdentityNow Source
 * .... and if they don't fit <b>Invoke-IdentityNowRequest</b> to make any other API call (examples for Get Source Schema, Get IdentityNow Identity Profiles, Get IdentityNow Identity Attributes)
 
@@ -983,6 +984,45 @@ $userIndirectAccounts = $user.accounts | select-object | where-object { ($_.sour
 $account = $userIndirectAccounts.id 
 
 Remove-IdentityNowUserSourceAccount -account $account 
+```
+
+### Create / Update IdentityNow Source Entitlements (Flat File / Delimited Sources)  ###
+Create / Update IdentityNow Source Entitlements on Flat File Sources
+
+<b>IMPORTANT: If you are looking to just update an Entitlement you must upload all Entitlements including the changed entitlment. Otherwise only the entitlements you upload will be present and any others will be removed.</b>
+
+The input is PSObject of all the Entitlements for the Source. 
+
+```
+    $sourceEntitlements
+
+    id           : 43367
+    name         : Finance
+    displayName  : Finance Data
+    created      :
+    description  : Access to Finance Group data
+    modified     :
+    entitlements : Finance
+    groups       : Finance
+    permissions  : Read
+
+    ......
+
+    id           : 45318
+    name         : Marketing
+    displayName  : Marketing Data
+    created      :
+    description  : Access to Marketing Group data
+    modified     :
+    entitlements : Marketing
+    groups       : Marketing
+    permissions  : Read
+```
+
+Example: Create / Update Entitlements on a Flat File Source
+
+```
+New-IdentityNowSourceEntitlements -source 12345 -entitlements $sourceEntitlements
 ```
 
 ### Join IdentityNow Account ###

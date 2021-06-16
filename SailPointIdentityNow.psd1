@@ -58,6 +58,7 @@
         'New-IdentityNowSourceAccountSchemaAttribute',
         'New-IdentityNowSourceConfigReport',
         'New-IdentityNowUserSourceAccount',
+        'New-IdentityNowSourceEntitlements',
         'New-IdentityNowTransform',
         'Remove-IdentityNowAccessProfile',
         'Remove-IdentityNowAPIClient',

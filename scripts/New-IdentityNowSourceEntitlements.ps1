@@ -1,29 +1,43 @@
-function New-IdentityNowUserSourceAccount {
+function New-IdentityNowSourceEntitlements {
     <#
 .SYNOPSIS
-    Create an IdentityNow User Account on a Flat File Source.
+    Create/Update IdentityNow Entitlements on a Flat File Source.
 
 .DESCRIPTION
-    Create an IdentityNow User Account on a Flat File Source
+    Create/Update IdentityNow Entitlements on a Flat File Source
 
 .PARAMETER sourceID
     SailPoint IdentityNow Source ID
     e.g 12345
 
-.PARAMETER account
-    (required - JSON) Account details
-    e.g
-    {
-        "id":  "darrenjrobinson",
-        "name":  "darrenjrobinson",
-        "displayName":  "Darren Robinson",
-        "email":  "darren.robinson@customer.com.au",
-        "familyName":  "Robinson",
-        "givenName":  "Darren"
-    }
+.PARAMETER entitlements
+    (required - PSObject) Entitlement details
+    *** IMPORTANT: If you are looking to just update an Entitlement you must upload all Entitlements including the changed entitlment. 
+    otherwise only the entitlements you upload will be present and any others will be removed. 
+    
+    id           : 43367
+    name         : Finance
+    displayName  : Finance Data
+    created      :
+    description  : Access to Finance Group data
+    modified     :
+    entitlements : Finance
+    groups       : Finance
+    permissions  : Read
+
+    id           : 43368
+    name         : Marketing
+    displayName  : Marketing Data
+    created      :
+    description  : Access to Marketing Group data
+    modified     :
+    entitlements : Marketing
+    groups       : Marketing
+    permissions  : Read
+
 
 .EXAMPLE
-    New-IdentityNowUserSourceAccount -source 12345 -account "{"id":  "darrenjrobinson","name":  "darrenjrobinson","displayName":  "Darren Robinson","email":  "darren.robinson@customer.com.au","familyName":  "Robinson","givenName":  "Darren"}"
+    New-IdentityNowSourceEntitlements -source 12345 -entitlements $sourceEntitlements
 
 .LINK
     http://darrenjrobinson.com/sailpoint-identitynow
@@ -33,7 +47,7 @@ function New-IdentityNowUserSourceAccount {
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$account,
+        [PSCustomObject[]]$entitlements,
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$sourceID
     )
@@ -42,11 +56,21 @@ function New-IdentityNowUserSourceAccount {
 
     if ($v3Token.access_token) {
         try {                         
-            $createAccount = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/accounts?sourceId=$($sourceId)&org=$($IdentityNowConfiguration.orgName)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Content-Type" = "application/json"} -Body $account 
-            return $createAccount           
+            $csv = $entitlements | ConvertTo-Csv -NoTypeInformation 
+
+            $uploadEntitlements = Invoke-RestMethod -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/source/loadEntitlements/$($sourceID)" `
+            -Method "POST" `
+            -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Accept-Encoding" = "gzip, deflate, br" } `
+            -ContentType "multipart/form-data; boundary=----WebKitFormBoundaryU1hSZTy7cff3WW27" `
+            -Body ([System.Text.Encoding]::UTF8.GetBytes("------WebKitFormBoundaryU1hSZTy7cff3WW27$([char]13)$([char]10)Content-Disposition: form-data; name=`"file`"; filename=`"temp.csv`"$([char]13)$([char]10)Content-Type: application/vnd.ms-excel$([char]13)$([char]10)$([char]13)$([char]10)$($csv | out-string)$([char]13)$([char]10)------WebKitFormBoundaryU1hSZTy7cff3WW27--$([char]13)$([char]10)")) `
+            -UseBasicParsing
+
+
+            return $uploadEntitlements           
         }
         catch {
-            Write-Error "Account couldn't be created. $($_)" 
+            Write-Error "Entitlements couldn't be created." 
+            Write-Error "$($_)"
         }
     }
     else {
@@ -59,8 +83,8 @@ function New-IdentityNowUserSourceAccount {
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUij4nd40mwUgeumBZdgGQz/87
-# T+GgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQURTBQ+7+ogc7gqlpKv52HrVJL
+# PYugggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -121,11 +145,11 @@ function New-IdentityNowUserSourceAccount {
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFGdISPeWDLOf
-# zWkAxeyZmFf45Ax+MA0GCSqGSIb3DQEBAQUABIIBAFvjED5cdqxz8vb7suPW6z98
-# D76z6ZJaQKo6Ukkgir9EtMJL8YK/PbelqLIUCmmvnYAzZJd6pS4Dh91w2XciQXEW
-# M5hLFkG0dqW7uakWZuWXF9ApNa2xBA3iZq8D9zq60ndAuDBpsZzNDz8wUvS2bcOz
-# 8VpVokRPXWet6FbYglv/gowz3pXXMZVZ9N17qYuVLLZeS662bmCNDwoGYeS9TKJg
-# EvOcpE/F6m+TSoZAvOSpS+blh5nONmLxN02V3SYhvdt+VwtG4hzA1rcpazNaGbsk
-# /ZJrqREJDR7YwQ2sxRGWUWR+hMZcuWEH32yS3ZGLWTGE4jLVjBjkvoiyEp43fYI=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFBHAX1JKBfyh
+# ZD0K4clv7U+beyt+MA0GCSqGSIb3DQEBAQUABIIBAKzqfBnVeei4aUYyfYE+oNx0
+# 6pugmajuUvWJSixRSRPB88LW5ZWamZmK+nVZD+qFfxUd7Z9/lgTnmUti+aHcK8m5
+# uz6NHl1LrID39dz3z8AddH/25WPUSKBEXZGNWRufd839xTM0PK9bkhuSCE+KSthy
+# NzylG7g1ueruIQfsRBYIxoCdFPm9A8uRP6DrLOj+dJl9o22MyYv7JEpVubYD8zhW
+# o5uWHHlEG0RlQf3/29JEueGl0I5HMHePz3sEnox7NeISlOoPqss+G1I2GjUa9uV8
+# y+8V3avaQzfbrvOMwhbJaXzctB+mczsTaZVv+MxEPKpXNBIm2CMr/FqdLLmSDrI=
 # SIG # End signature block

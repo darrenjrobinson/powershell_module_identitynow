@@ -234,7 +234,17 @@ http://darrenjrobinson.com/sailpoint-identitynow
             $Headersv3 = $null 
         }
 
-        $v3Token = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody -Headers $Headersv3
+        try{
+            $v3Token = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody -Headers $Headersv3
+        }catch{
+            Write-Error "unable to auth $($oAuthTokenBody.grant_type) grant type
+for $($IdentityNowConfiguration.orgName)
+v2:$($IdentityNowConfiguration.v2 -ne $null)
+v3:$($IdentityNowConfiguration.v3 -ne $null)
+cred:$($IdentityNowConfiguration.AdminCredential -ne $null)
+pat:$($IdentityNowConfiguration.pat -ne $null)
+$_" -ErrorAction 'stop'
+        }
         $IdentityNowConfiguration.JWT = $v3Token
         Write-Verbose "AuthType: v3 JWT Access Token"
     }

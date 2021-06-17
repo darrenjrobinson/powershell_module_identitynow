@@ -24,6 +24,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Search IdentityNow Users Profiles
 * Search IdentityNow Entitlements
 * Search IdentityNow Identities
+* Search IdentityNow Access Profiles, Account Activities, Accounts, Aggregations, Entitlements, Events, Identities, Roles
 * Create / Get / Update / Remove IdentityNow Access Profiles
 * Create / Get / Start IdentityNow Certification Campaigns
 * Get IdentityNow Certification Campaign Reports (output to file or return as PSObject)
@@ -401,6 +402,39 @@ Search for entitlements on a Source. Use Source externalId (rather than Source N
 Example
 ```
 Search-IdentityNowEntitlements -query "source.id:2c918083670df373016835e063ff6b5b"
+```
+
+### Search IdentityNow Access Profiles, Account Activities, Accounts, Aggregations, Entitlements, Events, Identities, Roles ###
+A Search cmdlet that allows you to specify the search indice. 
+
+query
+    Query in Elasticsearch Syntax
+    [Reference Elasticsearch Syntax](https://community.sailpoint.com/t5/Admin-Help/How-do-I-use-Search-in-IdentityNow/ta-p/76960)
+
+limit
+    results to be returned
+
+indice
+    (required) v3 Search Indice to search. 
+    valid indices are "accessprofiles", "accountactivities", "accounts", "aggregations", "entitlements", "events", "identities", "roles"
+
+nested
+    (optional) defaults to True 
+    Indicates if nested objects from returned search results should be included
+
+Example
+```
+Search-IdentityNow -query "source.name:'Active Directory'" -indice "accessprofiles" -nested $false
+```
+
+Example
+```
+Search-IdentityNow -query "source.id:2c918083670df373016835e063ff6b5b" -indice "entitlements" -nested $false
+```
+
+Example
+```
+Search-IdentityNow -query "@accounts.entitlementAttributes.'App_Group_*'" -indice "accounts" -nested $false
 ```
 
 ### Search IdentityNow Identities (Beta - Elasticsearch) ###

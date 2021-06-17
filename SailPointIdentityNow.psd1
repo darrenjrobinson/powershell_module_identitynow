@@ -3,7 +3,7 @@
     ModuleVersion        = '1.1.4'
     GUID                 = 'f82fe16a-7702-46f3-ab86-5de11b7305de'
     Author               = 'Darren J Robinson'
-    Copyright            = '(c) 2020 . All rights reserved.'
+    Copyright            = '(c) 2021 . All rights reserved.'
     Description          = "Orchestration of SailPoint IdentityNow"
     PowerShellVersion    = '5.1'
     CompatiblePSEditions = 'Core', 'Desktop'
@@ -71,6 +71,7 @@
         'Remove-IdentityNowTransform',
         'Remove-IdentityNowUserSourceAccount',
         'Save-IdentityNowConfiguration',
+        'Search-IdentityNow',
         'Search-IdentityNowEntitlements',
         'Search-IdentityNowEvents',
         'Search-IdentityNowIdentities',

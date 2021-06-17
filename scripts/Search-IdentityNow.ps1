@@ -1,25 +1,33 @@
-function Search-IdentityNowEntitlements {
+function Search-IdentityNow {
     <#
 .SYNOPSIS
-    Get IdentityNow Entitlements.
+    Search IdentityNow Access Profiles, Account Activities, Accounts, Aggregations, Entitlements, Events, Identities, Roles.
 
 .DESCRIPTION
-    Gets Entitlements based on query
+    Gets Access Profiles, Account Activities, Accounts, Aggregations, Entitlements, Events, Identities, Roles based on v3 search query
 
 .PARAMETER query
-    (required) Entitlements Search Query. To query source entitlements use the source.internalID.
+    (required) Search Query. 
 
 .PARAMETER limit
     (optional) Search Page Result Size
-    
-.EXAMPLE
-    Search-IdentityNowEntitlements -query "source.name:'Active Directory'" 
+
+.PARAMETER indice
+    (required) v3 Search Indice to search. 
+    valid indices are "accessprofiles", "accountactivities", "accounts", "aggregations", "entitlements", "events", "identities", "roles"
+
+.PARAMETER nested
+    (optional) defaults to True 
+    Indicates if nested objects from returned search results should be included
 
 .EXAMPLE
-    Search-IdentityNowEntitlements -query "source.id:2c918083670df373016835e063ff6b5b" 
+    Search-IdentityNow -query "source.name:'Active Directory'" -indice "accessprofiles" -nested $false
 
 .EXAMPLE
-    Search-IdentityNowEntitlements -query "@accounts.entitlementAttributes.'App_Group_*'"
+    Search-IdentityNow -query "source.id:2c918083670df373016835e063ff6b5b" -indice "entitlements" -nested $false
+
+.EXAMPLE
+    Search-IdentityNow -query "@accounts.entitlementAttributes.'App_Group_*'" -indice "accounts" -nested $false
 
 .LINK
     http://darrenjrobinson.com/sailpoint-identitynow
@@ -31,7 +39,12 @@ function Search-IdentityNowEntitlements {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$query,
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [int]$limit = 2500
+        [int]$limit = 2500,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string][ValidateSet("accessprofiles", "accountactivities", "accounts", "aggregations", "entitlements", "events", "identities", "roles")]$indice,
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [boolean]$nested = $true 
     )
 
     if ($limit -gt 10000) {
@@ -45,7 +58,18 @@ function Search-IdentityNowEntitlements {
         try {                         
             $results = $null 
             $sourceObjects = @() 
-            $body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"entitlements`"],`"includeNested`":false,`"sort`":[`"source.name`"]}"
+            
+            switch ($indice) {
+                "accessprofiles" { $body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"name`"]}"}
+                "accountactivities" { $body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"id`"]}" }
+                "accounts" {$body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"name`"]}"}
+                "aggregations" {$body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested)}"}
+                "entitlements" {$body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"source.name`"]}"}
+                "events" {$body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"-created`"]}"}
+                "identities" {$body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"displayName`"]}"}
+                "roles" {$body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"name`"]}"}
+                Default { $body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"name`"]}" }
+            } 
             
             $results = Invoke-RestMethod -Method Post `
                 -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v3/search?offset=0&limit=$($limit)&count=false" `

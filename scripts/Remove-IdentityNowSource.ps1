@@ -6,7 +6,7 @@ Deletes an IdentityNow Source.
 .DESCRIPTION
 Deletes an IdentityNow Source. This will often fail if tasks are running or the source is in use by a transform or access profile.
 
-.PARAMETER sourceid
+.PARAMETER sourceID
 (Required) The ID of the IdentityNow Source.
 
 .EXAMPLE
@@ -22,7 +22,7 @@ written by Sean McGovern 11/20/2019 (twitter @410sean)
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$sourceid
+        [string]$sourceID
     )
     $v3Token = Get-IdentityNowAuth
 

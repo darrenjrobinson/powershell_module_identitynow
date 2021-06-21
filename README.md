@@ -90,7 +90,9 @@ To get started with Local PowerShell Jupyter Notebook [see this post](https://bl
 
 <b>Update: Aug 2020 - v2 API Clients have been deprecated for API use. They still exist for VA use and can still be generated, but now must reference the VA Cluster. The New-IdentityNowAPIClient now contains the mandatory -clusterId option to acheive this. </b>
 
-```
+**Update: June 2021 - The Password Grant Type has been deprecated. [Reference Post](https://community.sailpoint.com/t5/SaaS-Updates/Introducing-Personal-Access-Tokens/ba-p/172974) Configuring access and credentials for IdentityNow MUST utilise Personal Access Tokens. While logged into the IdentityNow Portal select your Identity Name in the top right corner of the menu, select Preferences => Personal Access Tokens => New Token => Create.**
+
+```powershell
     $orgName = "customername-sb"
     Set-IdentityNowOrg -orgName $orgName
 
@@ -99,17 +101,12 @@ To get started with Local PowerShell Jupyter Notebook [see this post](https://bl
     $adminPWD = 'idnAdminUserPassword'
     $adminCreds = [pscredential]::new($adminUSR, ($adminPWD | ConvertTo-SecureString -AsPlainText -Force))
 
-    # IdentityNow Org v3 API Creds generated from the Security Settings => API Management section of the IdentityNow Admin Portal 
-    $clientIDv3 = "badbeef6-5f24-4448-ac0b-abcdefG"
-    $clientSecretv3 = "770a71abcdef5301848d00000d8760fe0d9f632383775b315aa1234567890"
-    $v3Creds = [pscredential]::new($clientIDv3, ($clientSecretv3 | ConvertTo-SecureString -AsPlainText -Force))
-    Set-IdentityNowCredential -AdminCredential $adminCreds -v3APIKey $v3Creds
+    # IdentityNow Personal Access Token as generated through the IdentityNow Portal and your personal identity profile preferences
+    $patClientID = 'yourClientID'
+    $patClientSecret = 'yourClientSecret'
+    $patCreds = [pscredential]::new("$($patClientID)", ($patClientSecret | ConvertTo-SecureString -AsPlainText -Force))
 
-    # IdentityNow Personal Access Token
-    $personalAccessToken = New-IdentityNowPersonalAccessToken -name "IDN Automation" 
-    $patCreds = [pscredential]::new("$($personalAccessToken.id)", ($personalAccessToken.secret | ConvertTo-SecureString -AsPlainText -Force))
-
-    Set-IdentityNowCredential -AdminCredential $adminCreds -v3APIKey $v3Creds -PersonalAccessToken $patCreds # -v2APIKey $v2Creds
+    Set-IdentityNowCredential -AdminCredential $adminCreds -PersonalAccessToken $patCreds
     Save-IdentityNowConfiguration
 ```
 

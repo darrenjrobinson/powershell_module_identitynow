@@ -234,15 +234,16 @@ http://darrenjrobinson.com/sailpoint-identitynow
             $Headersv3 = $null 
         }
 
-        try{
+        try {
             $v3Token = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody -Headers $Headersv3
-        }catch{
+        }
+        catch {
             Write-Error "unable to auth $($oAuthTokenBody.grant_type) grant type
 for $($IdentityNowConfiguration.orgName)
-v2:$($IdentityNowConfiguration.v2 -ne $null)
-v3:$($IdentityNowConfiguration.v3 -ne $null)
-cred:$($IdentityNowConfiguration.AdminCredential -ne $null)
-pat:$($IdentityNowConfiguration.pat -ne $null)
+v2:$($null -ne $IdentityNowConfiguration.v2)
+v3:$($null -ne $IdentityNowConfiguration.v3)
+cred:$($null -ne $IdentityNowConfiguration.AdminCredential)
+pat:$($null -ne $IdentityNowConfiguration.PAT)
 $_" -ErrorAction 'stop'
         }
         $IdentityNowConfiguration.JWT = $v3Token
@@ -287,8 +288,8 @@ $_" -ErrorAction 'stop'
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUaoqG4c0y0P8WMRuRJA0GBz2x
-# GcagggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUVN7Ub8bcYCOSeEB4xcRQoA4h
+# FvagggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -349,11 +350,11 @@ $_" -ErrorAction 'stop'
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFOa2DWlzxNOi
-# d3c2xDMcl0HrB/XwMA0GCSqGSIb3DQEBAQUABIIBAJ949Xj/305v5AyMoTs+rYnV
-# Slss68h1SHsy2TeLcqf9lZe2UiIH3rDnkoCsrFQaSMrk17bPlKUto4kliq5Npa0C
-# QB2EC79OS1i8DaZbO3Qj6vvIl74xZJvbqkVBBJLB/U1buR4TjqsiKO3VVgR7s9+c
-# ft1NdvGcvZlLblQeihxPf7xXsLg8aOjxBCXSk82vzidoNlCWOfeO5Ukn6QnnZFhn
-# mxaQiNrHzdYm/bROWbkYmWF0VaMiiOR+uP4ZgaqkUOlG5L+MFC9Ry4ttI0dMflAz
-# mxIhDvnz5f4rLqQIetOiC60Q2E9d5ch00dOnspG0+/xy9sZsydADrVDkcj1Opx4=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFDIddXziJdLz
+# Amh5Koxk92odhbU8MA0GCSqGSIb3DQEBAQUABIIBAFoAsqXsry4YigXBc8pRMNOO
+# u5F1SIDaFSHt6IAXXflxTFoXAfNBP+tt/CQLYn/nGYA/OIp1DmuzaGQBBBVTXTHt
+# +GLilg92UR5a/k/YW6N96kyZhZyq9ZrfXVofYCbXxULB7DvEDtutqvEpC21ZnOKS
+# +Y7IZFWefB/bc5Amu5yHaCl2QH1ROqovNFlzwCyrsPeHfO4AMbyO4dUrUnX1htHv
+# XZ1mv+ft6hjl3Gdkr6ctf4/SVQudRJRSnmRlmlNPTylTeY4vBN6pvIgdweur5Tni
+# Mm/JWC2AWyoNIG3LkMhxt/Z3S9uNwR/G4mVj92NiVeQfJjzwy43KWiNose6k3uo=
 # SIG # End signature block

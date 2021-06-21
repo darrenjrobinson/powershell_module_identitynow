@@ -165,6 +165,7 @@ Name                                        Synopsis
 ----                                        --------
 Complete-IdentityNowTask                    Complete an IdentityNow Task.
 Convert-UnixTime                            Convert UnixTime to PowerShell DateTime
+Export-IdentityNowConfig                    Export IdentityNow configuration items
 Get-HashString                              Generate IdentityNow Admin User Password Hash to obtain oAuth Access Token.
 Get-IdentityNowAccessProfile                Get an IdentityNow Access Profile(s).
 Get-IdentityNowAccountActivities            Get IdentityNow Activities.
@@ -201,7 +202,7 @@ Invoke-IdentityNowRequest                   Submit an IdentityNow API Request.
 Invoke-IdentityNowSourceReset               Reset an IdentityNow Source.
 Join-IdentityNowAccount                     Join an IdentityNow User Account to an Identity.
 New-IdentityNowAccessProfile                Create an IdentityNow Access Profile.
-New-IdentityNowAPIClient                    Create an IdentityNow v2 API Client.
+New-IdentityNowAPIClient                    Create an IdentityNow v2 API Client for use with a Virtual Appliance.
 New-IdentityNowCertCampaign                 Create an IdentityNow Certification Campaign.
 New-IdentityNowGovernanceGroup              Create a new IdentityNow Governance Group.
 New-IdentityNowIdentityProfilesReport       Generate a HTML Report of IdentityNow Identity Profiles and export each Identity Profile config.
@@ -212,6 +213,7 @@ New-IdentityNowRole                         Create an IdentityNow Role.
 New-IdentityNowSource                       Create an IdentityNow Source.
 New-IdentityNowSourceAccountSchemaAttribute Discover or add to a sources' account schema.
 New-IdentityNowSourceConfigReport           Generate a HTML Report of IdentityNow Sources configuration and export each Source and Schema config.
+New-IdentityNowSourceEntitlements           Create/Update IdentityNow Entitlements on a Flat File Source.
 New-IdentityNowTransform                    Create an IdentityNow Transform.
 New-IdentityNowUserSourceAccount            Create an IdentityNow User Account on a Flat File Source.
 Remove-IdentityNowAccessProfile             Delete an IdentityNow Access Profile.
@@ -225,6 +227,7 @@ Remove-IdentityNowSource                    Deletes an IdentityNow Source.
 Remove-IdentityNowTransform                 Delete an IdentityNow Transform.
 Remove-IdentityNowUserSourceAccount         Delete an IdentityNow User Account on a Flat File Source.
 Save-IdentityNowConfiguration               Saves default IdentityNow configuration to a file in the current users Profile.
+Search-IdentityNow                          Search IdentityNow Access Profiles, Account Activities, Accounts, Aggregations, Entitlements, Events, Identities, Roles.      
 Search-IdentityNowEntitlements              Get IdentityNow Entitlements.
 Search-IdentityNowEvents                    Search IdentityNow Event(s) using Elasticsearch queries.
 Search-IdentityNowIdentities                Search IdentityNow Identitie(s) using Elasticsearch queries.
@@ -251,7 +254,6 @@ Update-IdentityNowRole                      Update an IdentityNow Role.
 Update-IdentityNowSource                    Update the configuration of an IdentityNow Source.
 Update-IdentityNowTransform                 Update an IdentityNow Transform.
 Update-IdentityNowUserSourceAccount         Update an IdentityNow User Account on a Flat File Source.
-
 ```
 
 ### Get an IdentityNow Organisation and Get / Update an Organisation Configuration ###

@@ -65,18 +65,22 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 
 ## Installation ##
 
-### v1.0.6 and later ##
+### v1.0.6 and later ###
 
 No dependencies. v1.0.6 and later is compatible with PowerShell Desktop 5+ and PowerShell Core 6+ / PowerShell 7
 
-### v1.0.5 and earlier ##
+~~v1.0.5 and earlier~~
 
-The dependencies are PowerShell version 5 and the PowerShell Community eXtension. If for some reason (like you're on an airgapped network), you can get [PSCx it from here](https://github.com/Pscx/Pscx)
+~~The dependencies are PowerShell version 5 and the PowerShell Community eXtension. If for some reason (like you're on an airgapped network), you can get [PSCx it from here](https://github.com/Pscx/Pscx)~~
 
 To install either...
 
-* Download the files
+* Download the module files from the [GitHub Repo](https://github.com/darrenjrobinson/powershell_module_identitynow)
 * As an Administrator execute the script Install-IdentityNowModule.ps1
+
+```powershell
+./Install-IdentityNowModule.ps1 
+```
 
 or
 
@@ -293,15 +297,17 @@ Update an IdentityNow Organisation Setting
 Example
 
 ```powershell
+# Get Current Config
 $orgConfig = Get-IdentityNowOrgConfig
+# Get Fallback Approver User Profile
+$fallbackApprover = (Search-IdentityNowUserProfile -query "darren.robinson").alias
 
 $approvalConfig = $orgConfig.approvalConfig
+
 # global reminders and escalation policies for access request approvals
 $daysBetweenReminders = 3
 $daysTillEscalation = 5
 $maxReminders = 10
-# SailPoint user name of the identity 
-$fallbackApprover = "darren.robinson"
 
 # Set Config options to update
 $approvalConfig.daysBetweenReminders = $daysBetweenReminders

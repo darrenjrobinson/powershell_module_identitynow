@@ -67,7 +67,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 
 ### v1.0.6 and later ##
 
-No dependencies. v1.0.6 and later is compatable with PowerShell Desktop 5+ and PowerShell Core 6+ / PowerShell 7
+No dependencies. v1.0.6 and later is compatible with PowerShell Desktop 5+ and PowerShell Core 6+ / PowerShell 7
 
 ### v1.0.5 and earlier ##
 
@@ -162,7 +162,7 @@ Switch IdentityNow Credentials and make them the default configuration. From v1.
 Example
 
 ```powershell
-Set-identitynoworg 'otherOrg'
+Set-IdentityNowOrg 'otherOrg'
 Save-IdentityNowConfiguration -default
 ```
 
@@ -1722,7 +1722,7 @@ Search-IdentityNowEvents -filter ($queryFilter | convertto-json) -searchLimit 55
 
 Get Account Activities by Type, Requested By and Requested For,
 
-Get Account Activies by Type
+Get Account Activities by Type
 
 Example
 
@@ -1730,7 +1730,7 @@ Example
 Get-IdentityNowAccountActivities -type appRequest -searchLimit 1000
 ```
 
-Get Account Activites request for an Identity
+Get Account Activities request for an Identity
 
 Example
 

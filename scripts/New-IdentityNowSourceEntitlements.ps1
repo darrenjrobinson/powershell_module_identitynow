@@ -1,57 +1,81 @@
-function Invoke-IdentityNowSourceReset {
+function New-IdentityNowSourceEntitlements {
     <#
 .SYNOPSIS
-    Reset an IdentityNow Source.
+    Create/Update IdentityNow Entitlements on a Flat File Source.
 
 .DESCRIPTION
-    Reset an IdentityNow Source.
+    Create/Update IdentityNow Entitlements on a Flat File Source
 
 .PARAMETER sourceID
-    (required) The ID of an IdentityNow Source. eg. 45678
+    SailPoint IdentityNow Source ID
+    e.g 12345
+
+.PARAMETER entitlements
+    (required - PSObject) Entitlement details
+    *** IMPORTANT: If you are looking to just update an Entitlement you must upload all Entitlements including the changed entitlment. 
+    otherwise only the entitlements you upload will be present and any others will be removed. 
+    
+    id           : 43367
+    name         : Finance
+    displayName  : Finance Data
+    created      :
+    description  : Access to Finance Group data
+    modified     :
+    entitlements : Finance
+    groups       : Finance
+    permissions  : Read
+
+    id           : 43368
+    name         : Marketing
+    displayName  : Marketing Data
+    created      :
+    description  : Access to Marketing Group data
+    modified     :
+    entitlements : Marketing
+    groups       : Marketing
+    permissions  : Read
+
 
 .EXAMPLE
-    Invoke-IdentityNowSourceReset -sourceID 12345
-
-.EXAMPLE
-    Reset a Source but leave the entitlements
-    Invoke-IdentityNowSourceReset -sourceID 12345 -skip entitlements
-
-.EXAMPLE
-    Reset a Source but leave the entitlements
-    Invoke-IdentityNowSourceReset -sourceID 12345 -skip accounts
+    New-IdentityNowSourceEntitlements -source 12345 -entitlements $sourceEntitlements
 
 .LINK
     http://darrenjrobinson.com/sailpoint-identitynow
 
 #>
+
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$sourceID,
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [ValidateSet("accounts", "entitlements", IgnoreCase = $true)]
-        [string]$skip        
+        [PSCustomObject[]]$entitlements,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [string]$sourceID
     )
 
-    $token = Get-IdentityNowAuth -return V3JWT
+    $v3Token = Get-IdentityNowAuth
 
-    if ($token) {
-        try {
-            if ($skip) {
-                $reset = Invoke-RestMethod -Method POST -uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/source/reset/$($sourceID)?skip=$($skip)" -Headers @{"Authorization" = "Bearer $($token.access_token)" }
-                return $reset 
-            }
-            else {            
-                $reset = Invoke-RestMethod -Method POST -uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/source/reset/$($sourceID)" -Headers @{"Authorization" = "Bearer $($token.access_token)" }
-                return $reset 
-            }
+    if ($v3Token.access_token) {
+        try {                         
+            $csv = $entitlements | ConvertTo-Csv -NoTypeInformation 
+
+            $uploadEntitlements = Invoke-RestMethod -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/source/loadEntitlements/$($sourceID)" `
+            -Method "POST" `
+            -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Accept-Encoding" = "gzip, deflate, br" } `
+            -ContentType "multipart/form-data; boundary=----WebKitFormBoundaryU1hSZTy7cff3WW27" `
+            -Body ([System.Text.Encoding]::UTF8.GetBytes("------WebKitFormBoundaryU1hSZTy7cff3WW27$([char]13)$([char]10)Content-Disposition: form-data; name=`"file`"; filename=`"temp.csv`"$([char]13)$([char]10)Content-Type: application/vnd.ms-excel$([char]13)$([char]10)$([char]13)$([char]10)$($csv | out-string)$([char]13)$([char]10)------WebKitFormBoundaryU1hSZTy7cff3WW27--$([char]13)$([char]10)")) `
+            -UseBasicParsing
+
+
+            return $uploadEntitlements           
         }
         catch {
-            Write-Error "$($_)" 
+            Write-Error "Entitlements couldn't be created." 
+            Write-Error "$($_)"
         }
     }
     else {
-        Write-Error "Authentication Failed. Check your v2 API credentials. $($_)"
+        Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
+        return $v3Token
     } 
 }
 
@@ -59,8 +83,8 @@ function Invoke-IdentityNowSourceReset {
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUk+MK/PKsMKCgfUFuI6SWFr+z
-# 2OigggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQURTBQ+7+ogc7gqlpKv52HrVJL
+# PYugggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -121,11 +145,11 @@ function Invoke-IdentityNowSourceReset {
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFHaZ/MVb8O28
-# o9F8CAKNM1u28ezMMA0GCSqGSIb3DQEBAQUABIIBAKU8yuc0PxHoNsBsp5miZjTO
-# KFOcxLc8y4ndPlRSjlPs6ca0jm9WIr6XhPRS69qPYZmpHHxAZckME5ZFpGuekDJY
-# ct4GHPBQG4eSbJ0Le+HVxlSOF4v8EePY5LW5UZOp79nieqUI9POdL6EdHSJTrQFK
-# p0B1v0XS3wj177ndWyEV8wHmSL/sTg8rJJy3+9769fjfnjTAAtbUUdJxH2gTwJdB
-# KvUA6SUnyvksMXvvCaRvGM/rRJ2SmAG1zUNoOqkZNXx8Z5cdTbGXGZ/7sGMrTC5P
-# v51m0KEe3QJF4mchESZw9mVUJ/cnt1M6NVyKYs1QjJ0fz83dh2XepoE6MBY59uU=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFBHAX1JKBfyh
+# ZD0K4clv7U+beyt+MA0GCSqGSIb3DQEBAQUABIIBAKzqfBnVeei4aUYyfYE+oNx0
+# 6pugmajuUvWJSixRSRPB88LW5ZWamZmK+nVZD+qFfxUd7Z9/lgTnmUti+aHcK8m5
+# uz6NHl1LrID39dz3z8AddH/25WPUSKBEXZGNWRufd839xTM0PK9bkhuSCE+KSthy
+# NzylG7g1ueruIQfsRBYIxoCdFPm9A8uRP6DrLOj+dJl9o22MyYv7JEpVubYD8zhW
+# o5uWHHlEG0RlQf3/29JEueGl0I5HMHePz3sEnox7NeISlOoPqss+G1I2GjUa9uV8
+# y+8V3avaQzfbrvOMwhbJaXzctB+mczsTaZVv+MxEPKpXNBIm2CMr/FqdLLmSDrI=
 # SIG # End signature block

@@ -32,19 +32,28 @@ function Export-IdentityNowConfig {
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [System.IO.FileInfo]$path,
+        [string]$path,
         [ValidateSet('AccessProfile', 'APIClients', 'Applications', 'CertCampaigns', 'EmailTemplates', 'GovernanceGroups', 'IdentityAttributes', 'IdentityProfiles', 'OAuthAPIClients', 'Roles', 'Rules', 'Sources', 'Transforms', 'VAClusters')]
         [string[]]$Items
     )
-    if ($path.mode -ne 'd----') { Write-Error "provided path is not a directory: $path"; break }
+
+    if ($PSVersionTable.PSVersion.Major -le 5) { 
+        $outputpath = Get-ItemProperty -Path $path 
+        if ($outputpath.mode -ne 'd-----') { Write-Error "provided path is not a directory: $outputpath"; break }
+    }
+    elseif ($PSVersionTable.PSVersion.Major -gt 5) { 
+        [System.IO.FileInfo]$outputpath = $path
+        if ($outputpath.mode -ne 'd----') { Write-Error "provided path is not a directory: $outputpath"; break }
+    }
+    
     if ($null -eq $Items) {
         $Items = @('AccessProfile', 'APIClients', 'Applications', 'CertCampaigns', 'EmailTemplates', 'GovernanceGroups', 'IdentityAttributes', 'IdentityProfiles', 'OAuthAPIClients', 'Roles', 'Rules', 'Sources', 'Transforms', 'VAClusters')
     }
-    if ($path.fullname.lastindexof('\') -eq $path.fullname.length - 1) { [System.IO.FileInfo]$path = $path.FullName.Substring(0, $path.FullName.length - 1) }
+    if ($outputpath.fullname.lastindexof('\') -eq $outputpath.fullname.length - 1) { [System.IO.FileInfo]$outputpath = $outputpath.FullName.Substring(0, $outputpath.FullName.length - 1) }
     if ($Items -contains 'AccessProfile') {
         write-progress -activity 'AccessProfile'
         $AccessProfile = Get-IdentityNowAccessProfile
-        $AccessProfile | convertto-json -depth 10 | Set-Content "$($path.FullName)\AccessProfile.json"
+        $AccessProfile | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\AccessProfile.json"
     }
     if ($Items -contains 'APIClients') {
         write-progress -activity 'APIClients'
@@ -54,7 +63,7 @@ function Export-IdentityNowConfig {
             $client = Get-IdentityNowAPIClient -ID $client.id
             $detailedAPIClients += $client
         }
-        $detailedAPIClients | convertto-json -depth 10 | Set-Content "$($path.FullName)\APIClients.json"
+        $detailedAPIClients | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\APIClients.json"
     }
     if ($Items -contains 'Applications') {
         write-progress -activity 'Applications'
@@ -64,27 +73,27 @@ function Export-IdentityNowConfig {
             $app = Get-IdentityNowApplication -appID $app.id
             $detailedApplications += $app
         }
-        $detailedApplications | convertto-json -depth 10 | Set-Content "$($path.FullName)\Applications.json"
+        $detailedApplications | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\Applications.json"
     }
     if ($Items -contains 'CertCampaigns') {
         write-progress -activity 'CertCampaigns'
         $CertCampaigns = Get-IdentityNowCertCampaign
-        $CertCampaigns | convertto-json -depth 10 | Set-Content "$($path.FullName)\CertCampaigns.json"
+        $CertCampaigns | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\CertCampaigns.json"
     }
     if ($Items -contains 'EmailTemplates') {
         write-progress -activity 'EmailTemplates'
         $EmailTemplates = Get-IdentityNowEmailTemplate
-        $EmailTemplates | convertto-json -depth 10 | Set-Content "$($path.FullName)\EmailTemplates.json"
+        $EmailTemplates | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\EmailTemplates.json"
     }
     if ($Items -contains 'GovernanceGroups') {
         write-progress -activity 'GovernanceGroups'
         $GovernanceGroups = Get-IdentityNowGovernanceGroup
-        $GovernanceGroups | convertto-json -depth 10 | Set-Content "$($path.FullName)\GovernanceGroups.json"
+        $GovernanceGroups | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\GovernanceGroups.json"
     }
     if ($Items -contains 'IdentityAttributes') {
         write-progress -activity 'IdentityAttributes'
         $IdentityAttributes = Get-IdentityNowIdentityAttribute
-        $IdentityAttributes | convertto-json -depth 10 | Set-Content "$($path.FullName)\IdentityAttributes.json"
+        $IdentityAttributes | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\IdentityAttributes.json"
     }
     if ($Items -contains 'IdentityProfiles') {
         write-progress -activity 'IdentityProfiles'
@@ -94,12 +103,12 @@ function Export-IdentityNowConfig {
             $profile = Get-IdentityNowProfile -ID $profile.id
             $detailedIDP += $profile
         }
-        $detailedIDP | convertto-json -depth 10 | Set-Content "$($path.FullName)\IdentityProfiles.json"
+        $detailedIDP | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\IdentityProfiles.json"
     }
     if ($Items -contains 'OauthAPIClients') {
         write-progress -activity 'OauthAPIClients'
         $OauthAPIClients = Get-IdentityNowOAuthAPIClient
-        $OauthAPIClients | convertto-json -depth 10 | Set-Content "$($path.FullName)\OAuthAPIClients.json"
+        $OauthAPIClients | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\OAuthAPIClients.json"
     }
     if ($Items -contains 'Roles') {
         write-progress -activity 'Roles'
@@ -114,12 +123,12 @@ function Export-IdentityNowConfig {
             $role | Add-Member -NotePropertyName revokeRequestApprovalSchemes -NotePropertyValue $temp.revokeRequestApprovalSchemes -Force
             $detailedroles += $role
         }
-        $detailedroles | convertto-json -depth 10 | Set-Content "$($path.FullName)\Roles.json"
+        $detailedroles | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\Roles.json"
     }
     if ($Items -contains 'Rules') {
         write-progress -activity 'Rules'
         $rules = Get-IdentityNowRule
-        $rules | convertto-json -depth 10 | Set-Content "$($path.FullName)\Rules.json"
+        $rules | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\Rules.json"
     }
     if ($Items -contains 'Sources') {
         write-progress -activity 'Sources'
@@ -142,24 +151,24 @@ function Export-IdentityNowConfig {
             $source | Add-Member -NotePropertyName 'Schema' -NotePropertyValue (Get-IdentityNowSourceSchema -sourceID $source.id) -Force
             $detailedsources += $source
         }
-        $detailedsources | convertto-json -depth 10 | Set-Content "$($path.FullName)\Sources.json"
+        $detailedsources | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\Sources.json"
     }    
     if ($Items -contains 'Transforms') {
         write-progress -activity 'Transforms'
         $transforms = Get-IdentityNowTransform
-        $transforms | convertto-json -depth 10 | Set-Content "$($path.FullName)\Transforms.json"
+        $transforms | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\Transforms.json"
     }
     if ($Items -contains 'VAClusters') {
         write-progress -activity 'VAClusters'
         $VAClusters = Get-IdentityNowVACluster
-        $VAClusters | convertto-json -depth 10 | Set-Content "$($path.FullName)\VAClusters.json"
+        $VAClusters | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\VAClusters.json"
     }
 }
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUINjuOCC50KUI9xpwL6PGmCRP
-# ynugggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUA6czXEby9kzQF3TloCytMven
+# qYWgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -220,11 +229,11 @@ function Export-IdentityNowConfig {
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFIaruiLcVO6T
-# 5i//o1EwucN9ie5hMA0GCSqGSIb3DQEBAQUABIIBAJVepjKkW8x2RPtkjtOUbsST
-# SnkrJKousyjPdpHFf8PMxwERpXRLIGXB35JeCiYjtD8LxJN2EzPNDCB1uAv68fF2
-# p6Y+ItS+msv5GauBxOOSQp1btJdF2LG/WKr7aYjp6d0/cmRUrj7eFGMIwUdGRfKo
-# pUV3CvIHAvS+l1qGv8A8C8BtGBs3J0noPsQv4l524ji4aSPl+Yyrqypg0g2QQ/J9
-# RIAhkjmMWQQa+MwQwXkIpcFIhrExvlCQ543RF/kJwusMfr+hYfxYSd4uuEjhZYS+
-# 2UCfgiw0IABWZ19+VnRp3ZwPevwdT+mrV61YnScES21FvbcBIDktc6XUupNwViY=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFOnXWtYMR4Fz
+# ELi/ygUN8viLLkcTMA0GCSqGSIb3DQEBAQUABIIBAKdJnJqXSgvGGggvmaCNsZDX
+# RCQ0F2FkGu9x2tZc9AXt3UIol5I4TasAQ5A2RC55za8hwZ8xaPyld0RpWQI1OzUC
+# PAghgrexfuCW0ZwqrbxUBgVArMkO583AOb4X3GaKr+wtlyB6+qJnTF57gaEmvhF3
+# GlsAPulI8qC9BQilG6IlmVhl+2v0Diy93oa6gYNmcAniw/HAnlGGov7hKRrkEk6b
+# Xt686/hCJlaVrIcY4/Hdv4GAsjDUfQim5z0jIaMfqq+xqIcnyDVPkKwoZVAJhEZt
+# ondtwEp8HF35Mw/auhfmRdueLm9RcrkEr5/Ii6NXyvWn5AGqOlO/mdwE02bKuCM=
 # SIG # End signature block

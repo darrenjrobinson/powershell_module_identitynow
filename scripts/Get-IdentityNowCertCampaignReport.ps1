@@ -17,6 +17,12 @@ function Get-IdentityNowCertCampaignReport {
     If omitted CSV Reports returned as PowerShell Object
 
 .EXAMPLE
+    Get-IdentityNowCertCampaignReport -period 365
+
+.EXAMPLE
+    Get-IdentityNowCertCampaignReport -period 365 -completed $false
+
+.EXAMPLE
     Get-IdentityNowCertCampaignReport -campaignID '2c918085694a507f01694b9fcce6002f' 
 
 .EXAMPLE
@@ -29,10 +35,14 @@ function Get-IdentityNowCertCampaignReport {
 
     [cmdletbinding()]
     param(
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
         [string]$campaignID,
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$outputPath
+        [string]$outputPath,
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [string]$period,
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [boolean]$completed = $true
     )
     
     $v3Token = Get-IdentityNowAuth 
@@ -44,9 +54,15 @@ function Get-IdentityNowCertCampaignReport {
     } 
 
     if ($v3Token.access_token) {
+        # Encoded v3 Auth required to get the Reports
+        $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
+        # Basic Auth
+        $Bytesv3 = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v3.UserName):$($clientSecretv3)")
+        $encodedAuthv3 = [Convert]::ToBase64String($Bytesv3)
+
         try {            
             if (!$campaignID) {           
-                $IDNCertCampaigns = Get-IdentityNowCertCampaign -completed $true 
+                $IDNCertCampaigns = Get-IdentityNowCertCampaign -completed $completed 
                 if ($IDNCertCampaigns) {
                     foreach ($campaign in $IDNCertCampaigns) {
                         # Get time of completion of the Campaign
@@ -54,12 +70,11 @@ function Get-IdentityNowCertCampaignReport {
                         [string]$unixtime = $campaign.deadline
                         $unixtime = $unixtime.Substring(0, 10)        
                         $time = [timezone]::CurrentTimeZone.ToLocalTime(([datetime]'1/1/1970').AddSeconds($unixtime))
-                        $accesst = $IDNv3.Headers.authorization.split(" ")   
-                            
+
                         if ($time -gt (get-date).AddDays( - $($period))) {
                             $utime = [int][double]::Parse((Get-Date -UFormat %s))
                             $campaignReports = $null     
-                            $campaignReports = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/campaign/getReports?_dc=$($utime)&campaignId=$($campaign.id)&page=1&start=0&limit=50&sort=%5B%7B%22property%22%3A%22name%22%2C%22direction%22%3A%22ASC%22%7D%5D" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }       
+                            $campaignReports = Invoke-IdentityNowRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/campaign/getReports?_dc=$($utime)&campaignId=$($campaign.id)&page=1&start=0&limit=50&sort=%5B%7B%22property%22%3A%22name%22%2C%22direction%22%3A%22ASC%22%7D%5D" -Headers HeadersV3
                             $reportsOut = @()
                             foreach ($report in $campaignReports) {                    
                                 if ($outputPath) {
@@ -69,7 +84,7 @@ function Get-IdentityNowCertCampaignReport {
                                     if ($report.name.Equals("Campaign Composition Report")) { $outputFile = "$($outputPath)\$($campaign.description) - CompositionReport.csv" }
                                 }
                                 # Get CSV Report                                
-                                $reportDetails = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/report/get/$($report.taskResultId)?format=csv&name=Export+Campaign+Status+Report&url_signature=$($accesst[1])" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                                    
+                                $reportDetails = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/report/get/$($report.taskResultId)?format=csv&name=Export+Campaign+Status+Report&url_signature=$($encodedAuthv3)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                                    
 
                                 if ($outputPath) {
                                     # Output Report to filesystem
@@ -90,13 +105,12 @@ function Get-IdentityNowCertCampaignReport {
                     write-error "No Certification Campaigns retreived. $($_)"
                 }
             }
-            else {
-                $campaign = Get-IdentityNowCertCampaign -campaignID $campaignID 
-                if ($campaign) {                  
-                    $accesst = $IDNv3.Headers.authorization.split(" ")               
-                    $utime = [int][double]::Parse((Get-Date -UFormat %s))
-                    $campaignReports = $null     
-                    $campaignReports = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/campaign/getReports?_dc=$($utime)&campaignId=$($campaign.campaignId)&page=1&start=0&limit=50&sort=%5B%7B%22property%22%3A%22name%22%2C%22direction%22%3A%22ASC%22%7D%5D" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }       
+            else {           
+                $utime = [int][double]::Parse((Get-Date -UFormat %s))
+                $campaignReports = $null     
+                $campaignReports = Invoke-IdentityNowRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/campaign/getReports?_dc=$($utime)&campaignId=$($campaignID)&page=1&start=0&limit=50&sort=%5B%7B%22property%22%3A%22name%22%2C%22direction%22%3A%22ASC%22%7D%5D" -Headers HeadersV3 
+                    
+                if ($campaignReports.count -gt 0) {
                     $reportsOut = @()
                     foreach ($report in $campaignReports) {                    
                         if ($outputPath) {
@@ -107,7 +121,7 @@ function Get-IdentityNowCertCampaignReport {
                         }
                         
                         # Get CSV Report
-                        $reportDetails = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/report/get/$($report.taskResultId)?format=csv&name=Export+Campaign+Status+Report&url_signature=$($accesst[1])" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                                    
+                        $reportDetails = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/report/get/$($report.taskResultId)?format=csv&name=Export+Campaign+Status+Report&url_signature=$($encodedAuthv3)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                                    
                         if ($outputPath) {
                             # Output Report to filesystem
                             $reportDetails | out-file $outputFile                                    
@@ -122,7 +136,7 @@ function Get-IdentityNowCertCampaignReport {
                     if (-not($outputPath)) { return $reportsOut }
                 }
                 else {
-                    Write-Error "Certification Campaign not found. $($_)"
+                    Write-Error "Certification Campaign with ID '$($campaignID)'not found."
                 }
             }
         }

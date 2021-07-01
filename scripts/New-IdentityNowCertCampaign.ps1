@@ -73,10 +73,10 @@ function New-IdentityNowCertCampaign {
         catch {
             Write-Error "Failed to create Certifcation Campaign. $($_)" 
         }
-        else {
-            Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
-            return $v3Token
-        }
+    }
+    else {
+        Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
+        return $v3Token
     }
 }
 

@@ -338,7 +338,7 @@ Test IdentityNow transforms to detect common problems
 Example
 
 ```powershell
-Test-IdentityNowTransforms -verbose
+Test-IdentityNowTransforms 
 ```
 
 ### Get IdentityNow Queue ###
@@ -758,12 +758,19 @@ Example
 Get-IdentityNowCertCampaignReport -period "365" -outputPath "C:\Reports"
 ```
 
+Get incomplete certification reports from the last 30 days
+
+```powershell
+Get-IdentityNowCertCampaignReport -period "30" -completed $false
+```
+
 Get certification campaign reports for a specific campaign and return as PSObject
 Example
 
 ```powershell
-Get-IdentityNowCertCampaign -campaignID '2c918085694a507f01694b9fcce6002f' 
+Get-IdentityNowCertCampaignReport -campaignID '2c918085694a507f01694b9fcce6002f' 
 ```
+
 
 ### Create / Get / Update / Remove IdentityNow Governance Groups ###
 

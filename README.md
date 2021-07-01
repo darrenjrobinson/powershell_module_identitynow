@@ -771,7 +771,6 @@ Example
 Get-IdentityNowCertCampaignReport -campaignID '2c918085694a507f01694b9fcce6002f' 
 ```
 
-
 ### Create / Get / Update / Remove IdentityNow Governance Groups ###
 
 Get IdentityNow Governance Groups

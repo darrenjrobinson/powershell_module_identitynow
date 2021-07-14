@@ -4,7 +4,7 @@ function Export-IdentityNowConfig {
     Export IdentityNow configuration items
 
 .DESCRIPTION
-    Exports IdentityNow Access Profiles, APIClients, Applications, Cert Campaigns, Email Templates, Governance Groups, Identity Attributes, Identity Profiles, OAuth API Clients, Roles, Rules, Sources, Transforms, VAClusters, to files to make comparions or check into source control
+    Exports IdentityNow Access Profiles, APIClients, Applications, Cert Campaigns, Email Templates, Governance Groups, Identity Attributes, Identity Profiles, OAuth API Clients, Roles, Rules, Sources, Transforms, VAClusters, to files to make comparisons or check into source control
 
 .PARAMETER path
     (Required - string) folder path to export configuration items
@@ -352,8 +352,8 @@ function Export-IdentityNowConfig {
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUd8BKhbTZkGIWZXyoIvQXZTNM
-# noegggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUINjuOCC50KUI9xpwL6PGmCRP
+# ynugggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -414,11 +414,11 @@ function Export-IdentityNowConfig {
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFPG9Zddga1hR
-# W7Ih+m0QIZN8ZhXPMA0GCSqGSIb3DQEBAQUABIIBAC2WNcY0MfDbhfJMhi3/dtSq
-# kyiJAdzd4Oxeq8AeZYM0K6PnveSF02Y83mcu+5Ptm4HCBU1iHs0NVPs0fsrtC3ib
-# 4Qz1k2Y9OSFdZD5dSYe6cs4CwCh/5g73dSytebDSjzKRC3YgkNFbDgndLecSIXYg
-# 1/0MnYEJbIcJXCQpOEdKNZ2Ty/Td3Q9dgNH2EsxVJg5CDrM+a0fzymRUfOdVc1UN
-# HjOfnC8dPMXmCWI3rtrJh3PwCLAt+ljQakHXKGFDui+lOspSLZxHcqynIP3TW577
-# c5Y69PNF0L3NLHEvX8zaTJKmqiKktclSerJT2U23aZp2ogdwpwLzZxdAohxj7so=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFIaruiLcVO6T
+# 5i//o1EwucN9ie5hMA0GCSqGSIb3DQEBAQUABIIBAJVepjKkW8x2RPtkjtOUbsST
+# SnkrJKousyjPdpHFf8PMxwERpXRLIGXB35JeCiYjtD8LxJN2EzPNDCB1uAv68fF2
+# p6Y+ItS+msv5GauBxOOSQp1btJdF2LG/WKr7aYjp6d0/cmRUrj7eFGMIwUdGRfKo
+# pUV3CvIHAvS+l1qGv8A8C8BtGBs3J0noPsQv4l524ji4aSPl+Yyrqypg0g2QQ/J9
+# RIAhkjmMWQQa+MwQwXkIpcFIhrExvlCQ543RF/kJwusMfr+hYfxYSd4uuEjhZYS+
+# 2UCfgiw0IABWZ19+VnRp3ZwPevwdT+mrV61YnScES21FvbcBIDktc6XUupNwViY=
 # SIG # End signature block

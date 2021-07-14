@@ -1,41 +1,76 @@
-function Remove-IdentityNowSource {
+function New-IdentityNowSourceEntitlements {
     <#
 .SYNOPSIS
-Deletes an IdentityNow Source.
+    Create/Update IdentityNow Entitlements on a Flat File Source.
 
 .DESCRIPTION
-Deletes an IdentityNow Source. This will often fail if tasks are running or the source is in use by a transform or access profile.
+    Create/Update IdentityNow Entitlements on a Flat File Source
 
 .PARAMETER sourceID
-(Required) The ID of the IdentityNow Source.
+    SailPoint IdentityNow Source ID
+    e.g 12345
+
+.PARAMETER entitlements
+    (required - PSObject) Entitlement details
+    *** IMPORTANT: If you are looking to just update an Entitlement you must upload all Entitlements including the changed entitlment. 
+    otherwise only the entitlements you upload will be present and any others will be removed. 
+    
+    id           : 43367
+    name         : Finance
+    displayName  : Finance Data
+    created      :
+    description  : Access to Finance Group data
+    modified     :
+    entitlements : Finance
+    groups       : Finance
+    permissions  : Read
+
+    id           : 43368
+    name         : Marketing
+    displayName  : Marketing Data
+    created      :
+    description  : Access to Marketing Group data
+    modified     :
+    entitlements : Marketing
+    groups       : Marketing
+    permissions  : Read
+
 
 .EXAMPLE
-Remove-IdentityNowSource -sourceid 115737
+    New-IdentityNowSourceEntitlements -source 12345 -entitlements $sourceEntitlements
 
 .LINK
-http://darrenjrobinson.com/sailpoint-identitynow
-
-.NOTES
-written by Sean McGovern 11/20/2019 (twitter @410sean)
+    http://darrenjrobinson.com/sailpoint-identitynow
 
 #>
+
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [PSCustomObject[]]$entitlements,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$sourceID
     )
+
     $v3Token = Get-IdentityNowAuth
 
     if ($v3Token.access_token) {
-        try {
-            $privateuribase = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com"
-            $url = "$privateuribase/cc/api/source/delete/$sourceid"
-            $response = Invoke-WebRequest -Uri $url -Method Post -UseBasicParsing -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-            $sourceAccountProfile = $response.Content | ConvertFrom-Json
-            return $sourceAccountProfile
+        try {                         
+            $csv = $entitlements | ConvertTo-Csv -NoTypeInformation 
+
+            $uploadEntitlements = Invoke-RestMethod -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/source/loadEntitlements/$($sourceID)" `
+            -Method "POST" `
+            -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "Accept-Encoding" = "gzip, deflate, br" } `
+            -ContentType "multipart/form-data; boundary=----WebKitFormBoundaryU1hSZTy7cff3WW27" `
+            -Body ([System.Text.Encoding]::UTF8.GetBytes("------WebKitFormBoundaryU1hSZTy7cff3WW27$([char]13)$([char]10)Content-Disposition: form-data; name=`"file`"; filename=`"temp.csv`"$([char]13)$([char]10)Content-Type: application/vnd.ms-excel$([char]13)$([char]10)$([char]13)$([char]10)$($csv | out-string)$([char]13)$([char]10)------WebKitFormBoundaryU1hSZTy7cff3WW27--$([char]13)$([char]10)")) `
+            -UseBasicParsing
+
+
+            return $uploadEntitlements           
         }
         catch {
-            Write-Error "deletion of Source failed. if the following error message states 'currently in use' that could be equivalent to 'tasks are running' $($_)" 
+            Write-Error "Entitlements couldn't be created." 
+            Write-Error "$($_)"
         }
     }
     else {
@@ -43,11 +78,13 @@ written by Sean McGovern 11/20/2019 (twitter @410sean)
         return $v3Token
     } 
 }
+
+
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUiLLwD8Kcl2b7euVlSnffvaoc
-# rNKgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQURTBQ+7+ogc7gqlpKv52HrVJL
+# PYugggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -108,11 +145,11 @@ written by Sean McGovern 11/20/2019 (twitter @410sean)
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFOsUGKWElS0T
-# l0TgFDECdpe37z9FMA0GCSqGSIb3DQEBAQUABIIBAA0kUouBx8mCGQM/ozHCCX/W
-# I0GrBkCnJz5oSgQbgxhTY14lQub/iJto89rhkkLjQ+M22nkkAnwWkqMakv3Li+o7
-# hdUad4qfrT+kdT9xEqM/mETyth+q7Dzhvd+ssYJhbHKnBcuoQ5ioSQY0vik88JNs
-# e2RKCBRAJ2aI71FpYUmlj28o2qNPveT22wFGFs8eLVf4NaoTxOI/LfZDzJgayCLI
-# l38WNP8aAy0ymFxlJqA9SXWFJEbo7h80JJ55S/KmAa4hK024/8NaIM/Bj2PHrNrL
-# GIGHlomFae9zOGXxyr9BdQRw/6hKyYQrTgXk2x38j4mMfn4B9rx0XUmsD4hk0kU=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFBHAX1JKBfyh
+# ZD0K4clv7U+beyt+MA0GCSqGSIb3DQEBAQUABIIBAKzqfBnVeei4aUYyfYE+oNx0
+# 6pugmajuUvWJSixRSRPB88LW5ZWamZmK+nVZD+qFfxUd7Z9/lgTnmUti+aHcK8m5
+# uz6NHl1LrID39dz3z8AddH/25WPUSKBEXZGNWRufd839xTM0PK9bkhuSCE+KSthy
+# NzylG7g1ueruIQfsRBYIxoCdFPm9A8uRP6DrLOj+dJl9o22MyYv7JEpVubYD8zhW
+# o5uWHHlEG0RlQf3/29JEueGl0I5HMHePz3sEnox7NeISlOoPqss+G1I2GjUa9uV8
+# y+8V3avaQzfbrvOMwhbJaXzctB+mczsTaZVv+MxEPKpXNBIm2CMr/FqdLLmSDrI=
 # SIG # End signature block

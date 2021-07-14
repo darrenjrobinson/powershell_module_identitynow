@@ -52,7 +52,6 @@ http://darrenjrobinson.com/sailpoint-identitynow
         [Parameter(Mandatory = $true)]
         [validateset('Null', 'Standard', 'Complex')][string]$sourceType,
         $source
-        
     )
 
     $v3Token = Get-IdentityNowAuth
@@ -151,8 +150,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUfDRwd4UrgIJ5GoFmUWq5C0HF
-# NjigggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQURlBmh6HqklMZnXLhsUaDRn3/
+# qLmgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -213,11 +212,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFFL+I4L2hxzB
-# UDg9aqtEd9/OwhZYMA0GCSqGSIb3DQEBAQUABIIBAIRr5ROaublFNtLRCW1wbxb2
-# 2kKGXSLfH/2BT29/UOiYvv+C2FqQyKT14PUAdXeQUETuZ6PnfNNVo08k9SCH6cvy
-# I8gdjhqQQiN9QSWp07zIHDnhthkV3kh8Mv4D7gIFaQ4RpnuKT+Ura+bv6Wqe5DmV
-# XlBvtwaySk0ynQrPWp/Y6lXUFi0/LzsHAp5hs8lnWj1HP60OrsBgBYzRyfnKfsgo
-# csndLkFKSwynhVBP4gslAWOygB79OGobylUsrz0gB2bpmkvGaQjh4y7TcoVHvg6T
-# 0V4Wqsmz5Z3Eqthj27tMe77WSem9V/RbFOkC6ViejykMEVKLY3cHRTllG+PRtlA=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFE5q2ATiX84D
+# btJTz46dkpHluDKdMA0GCSqGSIb3DQEBAQUABIIBAEtvmjS3+kb0s9zgdPR2QfvO
+# gruqs57CrpldWzSPT1+iSCJ/Tm1e5JJlRrUDskrSi0Fxt44B9Zqwjlb3UkGjEDbp
+# TByJz6NM0B9ad/brOVZ5LkzryF2lp26raUhwJHFAJVKFCN5VZJpr6AKiOGeVi8fx
+# aQKNHLCqZfH+8AEu67RxYkNRh7SNZGSJ9Yb72XxuilzZw3/wgifUYy8y4E0N7KSx
+# iGN1v1gaT6Dls0bh2a8qrpqgzxRZ1laEmql1bARDdTwk34h1evku6uFS8L8spXO3
+# 06nJ2lfHjCs816w5kCvYpZmlPYEGYOikiqXM7HmRjWhu/B/Q6d7ZfzM0p1LxCGg=
 # SIG # End signature block

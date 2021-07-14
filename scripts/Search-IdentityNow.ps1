@@ -1,25 +1,33 @@
-function Search-IdentityNowEntitlements {
+function Search-IdentityNow {
     <#
 .SYNOPSIS
-    Get IdentityNow Entitlements.
+    Search IdentityNow Access Profiles, Account Activities, Accounts, Aggregations, Entitlements, Events, Identities, Roles.
 
 .DESCRIPTION
-    Gets Entitlements based on query
+    Gets Access Profiles, Account Activities, Accounts, Aggregations, Entitlements, Events, Identities, Roles based on v3 search query
 
 .PARAMETER query
-    (required) Entitlements Search Query. To query source entitlements use the source.internalID.
+    (required) Search Query. 
 
 .PARAMETER limit
     (optional) Search Page Result Size
-    
-.EXAMPLE
-    Search-IdentityNowEntitlements -query "source.name:'Active Directory'" 
+
+.PARAMETER indice
+    (required) v3 Search Indice to search. 
+    valid indices are "accessprofiles", "accountactivities", "accounts", "aggregations", "entitlements", "events", "identities", "roles"
+
+.PARAMETER nested
+    (optional) defaults to True 
+    Indicates if nested objects from returned search results should be included
 
 .EXAMPLE
-    Search-IdentityNowEntitlements -query "source.id:2c918083670df373016835e063ff6b5b" 
+    Search-IdentityNow -query "source.name:'Active Directory'" -indice "accessprofiles" -nested $false
 
 .EXAMPLE
-    Search-IdentityNowEntitlements -query "@accounts.entitlementAttributes.'App_Group_*'"
+    Search-IdentityNow -query "source.id:2c918083670df373016835e063ff6b5b" -indice "entitlements" -nested $false
+
+.EXAMPLE
+    Search-IdentityNow -query "@accounts.entitlementAttributes.'App_Group_*'" -indice "accounts" -nested $false
 
 .LINK
     http://darrenjrobinson.com/sailpoint-identitynow
@@ -31,7 +39,12 @@ function Search-IdentityNowEntitlements {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$query,
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [int]$limit = 2500
+        [int]$limit = 2500,
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string][ValidateSet("accessprofiles", "accountactivities", "accounts", "aggregations", "entitlements", "events", "identities", "roles")]$indice,
+        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [boolean]$nested = $true 
     )
 
     if ($limit -gt 10000) {
@@ -45,7 +58,18 @@ function Search-IdentityNowEntitlements {
         try {                         
             $results = $null 
             $sourceObjects = @() 
-            $body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"entitlements`"],`"includeNested`":false,`"sort`":[`"source.name`"]}"
+            
+            switch ($indice) {
+                "accessprofiles" { $body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"name`"]}"}
+                "accountactivities" { $body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"id`"]}" }
+                "accounts" {$body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"name`"]}"}
+                "aggregations" {$body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested)}"}
+                "entitlements" {$body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"source.name`"]}"}
+                "events" {$body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"-created`"]}"}
+                "identities" {$body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"displayName`"]}"}
+                "roles" {$body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"name`"]}"}
+                Default { $body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"$($indice)`"],`"includeNested`":$($nested),`"sort`":[`"name`"]}" }
+            } 
             
             $results = Invoke-RestMethod -Method Post `
                 -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v3/search?offset=0&limit=$($limit)&count=false" `
@@ -98,8 +122,8 @@ function Search-IdentityNowEntitlements {
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzRIub66785T05uuFr7Sje8Lm
-# k4CgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUYOWNMAYIMzlTq4EazFrSqgwJ
+# W8SgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -160,11 +184,11 @@ function Search-IdentityNowEntitlements {
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFPODt7RQhJRt
-# i9VXqNf8w9iDOdFeMA0GCSqGSIb3DQEBAQUABIIBACy72HhtcD3FNFNJQNbd+S6R
-# BLW+TeJzkiAZHSDyyxyBm4vji7c5vlOoymA8b/tU3WIr4KVV3y63c9Y5xEab1cz1
-# LoM45zAlni2uIAHYKRv8VX561DUAX1wX5IdPlHeLZ3DERm3aW6Yyt2gIBH79m0lI
-# KUjliRT4bZ1GbpY74JAt+m9ybmNqbV5Xa8b5HbqgxlOtJmpTZnjeAS1uxzZQny2j
-# uSTP781s3+mhH2I92yNA1LLJvdyAzJ5hdudvCspebXckIKy+JlRpRXDYCJUJwF0j
-# oGEn15v3LH89+UWQmvXh6EhwogIK/yR2+U9hx922nYZxTYS2RZyNXZSXKqtHEOU=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFIezdNK4m3hB
+# IonEk/YKfIWMQEMUMA0GCSqGSIb3DQEBAQUABIIBAKdt4pCir4TNmXPTedSnRvpH
+# hV7WLTeSPvqaN636Bs8GBzggbPjyY+66LYuDcaaMpwL5MlayFi7LntCN6ZFMDT7f
+# VUF3Ql9sfNy8Qi4xy/MLbyvbzL5ua5Qk9T11hUAng7IRnOxdZqoT8sYIhaPaFA0X
+# fLT2LzfI1z1H+gjRzMUduiXMwxcvqtPGuvQriiCnYXXE+oDslPx6gDlS15ve/Wvh
+# +YDpopKdzSBSG2AOWSjRAuuPPYzBA8XVixUpDkR7thEWtbSyBpIacU4tmsHED2uM
+# M9Aqs3EXjrNchVdbyyp2ABaCb41TGG/sgJ8jGF8Iprj1ZeyG7g1AFSa/BjZt4fQ=
 # SIG # End signature block

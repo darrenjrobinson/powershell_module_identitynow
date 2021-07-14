@@ -12,6 +12,11 @@ function Export-IdentityNowConfig {
 .PARAMETER Items
     (optional - custom list array) if not specified, all items will be assumed, if specified you can list all items to be exported
 
+.PARAMETER NullDynamicValues
+    (optional - custom list) if included, will null frequently changing values
+    Full = more thurough in nulling values
+    Minimal = will leave in some values such as VA version, identity count, account count
+    
 .EXAMPLE
     Export-IdentityNowConfig -path 'c:\repos\IDN-Prod'
 
@@ -24,6 +29,19 @@ function Export-IdentityNowConfig {
     Set-IdentityNowOrg myCompanySandbox
     Export-IdentityNowConfig -path "C:\repos\IDNConfig\$((Get-IdentityNowOrg).'Organisation Name')"
 
+.EXAMPLE
+    #check in changes to git repository, change path to fit your local git repo
+    foreach ($org in @('contoso','contosotest')){
+        Set-IdentityNowOrg $org
+        $path="C:\scripts\IdentityNow\IdentityNow\$((Get-IdentityNowOrg).'Organisation Name')"
+        if (-not (test-path $path)){mkdir $path}
+        Remove-Item -Path "$path\*" -Recurse
+        Export-IdentityNowConfig -path $path -NullDynamicValues Full
+    }
+    git add .
+    git commit -m "auto $((get-date).ToString())"
+    git push
+
 .LINK
     http://darrenjrobinson.com/sailpoint-identitynow
 
@@ -33,6 +51,9 @@ function Export-IdentityNowConfig {
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [System.IO.FileInfo]$path,
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Minimal', 'Full')]
+        [string]$NullDynamicValues,
         [ValidateSet('AccessProfile', 'APIClients', 'Applications', 'CertCampaigns', 'EmailTemplates', 'GovernanceGroups', 'IdentityAttributes', 'IdentityProfiles', 'OAuthAPIClients', 'Roles', 'Rules', 'Sources', 'Transforms', 'VAClusters')]
         [string[]]$Items
     )
@@ -44,6 +65,9 @@ function Export-IdentityNowConfig {
     if ($Items -contains 'AccessProfile') {
         write-progress -activity 'AccessProfile'
         $AccessProfile = Get-IdentityNowAccessProfile
+        if ($NullDynamicValues){
+            #no dynamic values in this output
+        }
         $AccessProfile | convertto-json -depth 10 | Set-Content "$($path.FullName)\AccessProfile.json"
     }
     if ($Items -contains 'APIClients') {
@@ -53,6 +77,38 @@ function Export-IdentityNowConfig {
         foreach ($client in $APIClients) {
             $client = Get-IdentityNowAPIClient -ID $client.id
             $detailedAPIClients += $client
+        }
+        if ($NullDynamicValues){
+            foreach ($client in $detailedAPIClients){
+                if ($client.configuration.cookbook){
+                    $client.configuration.cookbook=$null
+                }
+                if ($client.configuration.jobType){
+                    $client.configuration.jobType=$null
+                }
+                if ($client.configuration.va_version){
+                    $client.configuration.va_version=$null
+                }
+                if ($client.lastSeen){
+                    $client.lastSeen=$null
+                }
+                if ($client.maintenance){
+                    $client.maintenance.windowStartTime=$null
+                    $client.maintenance.windowClusterTime=$null
+                    $client.maintenance.windowFinishTime=$null
+                }
+                if ($client.pollingPeriodTimestamp){
+                    $client.pollingPeriodTimestamp=$null
+                }
+                if ($client.sinceLastSeen){
+                    $client.sinceLastSeen=$null
+                }
+                if ($NullDynamicValues -eq 'Full'){
+                    if ($client.va_version){
+                        $client.va_version=$null
+                    }
+                }
+            }
         }
         $detailedAPIClients | convertto-json -depth 10 | Set-Content "$($path.FullName)\APIClients.json"
     }
@@ -64,26 +120,51 @@ function Export-IdentityNowConfig {
             $app = Get-IdentityNowApplication -appID $app.id
             $detailedApplications += $app
         }
+        if ($NullDynamicValues){
+            foreach ($app in $detailedApplications){
+                if ($app.health.lastChanged){
+                    $app.health.lastChanged=$null
+                }
+            }
+        }
         $detailedApplications | convertto-json -depth 10 | Set-Content "$($path.FullName)\Applications.json"
     }
     if ($Items -contains 'CertCampaigns') {
         write-progress -activity 'CertCampaigns'
         $CertCampaigns = Get-IdentityNowCertCampaign
+        if ($NullDynamicValues){
+            #TODO
+        }
         $CertCampaigns | convertto-json -depth 10 | Set-Content "$($path.FullName)\CertCampaigns.json"
     }
     if ($Items -contains 'EmailTemplates') {
         write-progress -activity 'EmailTemplates'
         $EmailTemplates = Get-IdentityNowEmailTemplate
+        if ($NullDynamicValues){
+            foreach ($template in $EmailTemplates){
+                if ($NullDynamicValues -eq 'Full'){
+                    if ($template.meta.modified){
+                        $template.meta.modified=$null
+                    }
+                }                
+            }
+        }
         $EmailTemplates | convertto-json -depth 10 | Set-Content "$($path.FullName)\EmailTemplates.json"
     }
     if ($Items -contains 'GovernanceGroups') {
         write-progress -activity 'GovernanceGroups'
         $GovernanceGroups = Get-IdentityNowGovernanceGroup
+        if ($NullDynamicValues){
+            #TODO
+        }
         $GovernanceGroups | convertto-json -depth 10 | Set-Content "$($path.FullName)\GovernanceGroups.json"
     }
     if ($Items -contains 'IdentityAttributes') {
         write-progress -activity 'IdentityAttributes'
         $IdentityAttributes = Get-IdentityNowIdentityAttribute
+        if ($NullDynamicValues){
+            #TODO
+        }
         $IdentityAttributes | convertto-json -depth 10 | Set-Content "$($path.FullName)\IdentityAttributes.json"
     }
     if ($Items -contains 'IdentityProfiles') {
@@ -94,11 +175,41 @@ function Export-IdentityNowConfig {
             $profile = Get-IdentityNowProfile -ID $profile.id
             $detailedIDP += $profile
         }
+        if ($NullDynamicValues){
+            foreach ($profile in $detailedIDP){
+                if ($profile.source.lastAggregated){
+                    $profile.source.lastAggregated=$null                
+                }
+                if ($profile.source.sinceLastAggregated){
+                    $profile.source.sinceLastAggregated=$null
+                }
+                if ($NullDynamicValues -eq 'Full'){
+                    if ($profile.identityCount){
+                        $profile.identityCount=$null
+                    }
+                    foreach ($state in $profile.configuredStates){
+                        if ($state.identitycount){
+                            $state.identitycount=$null
+                        }
+                    }
+                }
+            }
+        }
         $detailedIDP | convertto-json -depth 10 | Set-Content "$($path.FullName)\IdentityProfiles.json"
     }
     if ($Items -contains 'OauthAPIClients') {
         write-progress -activity 'OauthAPIClients'
         $OauthAPIClients = Get-IdentityNowOAuthAPIClient
+        if ($NullDynamicValues){
+            #need to sort properties
+            $proporder=('id','name','description','enabled','type')
+            $sortedOauthAPIClients=@()
+            foreach ($oauthapi in $OauthAPIClients){
+                $sortedOauthAPIClients+=$oauthapi | Select-Object -Property ($proporder + ($oauthapi| Get-Member -MemberType NoteProperty).name.where{$_ -notin $proporder}  )
+                
+            }
+            $OauthAPIClients=$SortedOauthAPIClients
+        }
         $OauthAPIClients | convertto-json -depth 10 | Set-Content "$($path.FullName)\OAuthAPIClients.json"
     }
     if ($Items -contains 'Roles') {
@@ -114,11 +225,24 @@ function Export-IdentityNowConfig {
             $role | Add-Member -NotePropertyName revokeRequestApprovalSchemes -NotePropertyValue $temp.revokeRequestApprovalSchemes -Force
             $detailedroles += $role
         }
+        if ($NullDynamicValues){
+            #need to sort roles
+            $sortedRoles=$detailedroles | Sort-Object -prop id
+            $detailedroles=$sortedRoles
+            foreach ($role in $detailedroles){
+                if ($role.synced){
+                    $role.synced=$null
+                }
+            }
+        }
         $detailedroles | convertto-json -depth 10 | Set-Content "$($path.FullName)\Roles.json"
     }
     if ($Items -contains 'Rules') {
         write-progress -activity 'Rules'
         $rules = Get-IdentityNowRule
+        if ($NullDynamicValues){
+            #TODO
+        }
         $rules | convertto-json -depth 10 | Set-Content "$($path.FullName)\Rules.json"
     }
     if ($Items -contains 'Sources') {
@@ -142,16 +266,86 @@ function Export-IdentityNowConfig {
             $source | Add-Member -NotePropertyName 'Schema' -NotePropertyValue (Get-IdentityNowSourceSchema -sourceID $source.id) -Force
             $detailedsources += $source
         }
-        $detailedsources | convertto-json -depth 10 | Set-Content "$($path.FullName)\Sources.json"
+        if ($NullDynamicValues){
+            foreach ($source in $detailedsources){
+                if ($source.health.since){
+                    $source.health.since=$null
+                }
+                if ($source.health.lastSeen){
+                    $source.health.lastSeen=$null
+                }
+                if ($source.health.hostname){
+                    $source.health.hostname=$null
+                }
+                if ($source.cloudCacheUpdate){
+                    $source.cloudCacheUpdate=$null
+                }
+                if ($source.groupDeltaLink){
+                    $source.groupDeltaLink=$null
+                }
+                if ($source.acctAggregationStart){
+                    $source.acctAggregationStart=$null
+                }
+                if ($source.acctAggregationEnd){
+                    $source.acctAggregationEnd=$null
+                }
+                if ($NullDynamicValues -eq 'Full'){
+                    if ($source.userCount){
+                        $source.userCount=$null
+                    }
+                    if ($source.accountsCount){
+                        $source.accountsCount=$null
+                    }
+                }
+            }
+        }
+        $detailedsources | convertto-json -depth 12 | Set-Content "$($path.FullName)\Sources.json"
     }    
     if ($Items -contains 'Transforms') {
         write-progress -activity 'Transforms'
         $transforms = Get-IdentityNowTransform
+        if ($NullDynamicValues){
+            #TODO
+        }
         $transforms | convertto-json -depth 10 | Set-Content "$($path.FullName)\Transforms.json"
     }
     if ($Items -contains 'VAClusters') {
         write-progress -activity 'VAClusters'
         $VAClusters = Get-IdentityNowVACluster
+        if ($NullDynamicValues){
+            foreach ($vac in $VAClusters){
+                if ($vac.pollingPeriodTimestamp){
+                    $vac.pollingPeriodTimestamp=$null
+                }
+                if ($vac.configuration.va_version){
+                    $vac.configuration.va_version=$null
+                }
+                if ($vac.configuration.jobType){
+                    $vac.configuration.jobType=$null
+                }
+                if ($vac.configuration.cookbook){
+                    $vac.configuration.cookbook=$null
+                }
+                if ($vac.va_version){
+                    $vac.va_version=$null
+                }
+                if ($vac.maintenance.windowStartTime){
+                    $vac.maintenance.windowStartTime=$null
+                }
+                if ($vac.maintenance.windowClusterTime){
+                    $vac.maintenance.windowClusterTime=$null
+                }
+                if ($vac.maintenance.windowFinishTime){
+                    $vac.maintenance.windowFinishTime=$null
+                }
+                if ($vac.jobs){
+                    $vac.jobs=@()
+                }
+                if ($vac.clients){
+                    $vac.clients = $vac.clients | Sort-Object -Property id
+                }
+            }
+        }
         $VAClusters | convertto-json -depth 10 | Set-Content "$($path.FullName)\VAClusters.json"
     }
 }

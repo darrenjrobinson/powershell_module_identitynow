@@ -68,6 +68,7 @@ function Export-IdentityNowConfig {
         if ($NullDynamicValues){
             #no dynamic values in this output
         }
+        #write-host "set-content $($path.FullName)\AccessProfile.json"
         $AccessProfile | convertto-json -depth 10 | Set-Content "$($path.FullName)\AccessProfile.json"
     }
     if ($Items -contains 'APIClients') {
@@ -103,6 +104,12 @@ function Export-IdentityNowConfig {
                 if ($client.sinceLastSeen){
                     $client.sinceLastSeen=$null
                 }
+                if ($client.clusterJobCount -or $client.clusterJobCount -eq 0){
+                    $client.clusterJobCount=$null
+                }
+                if ($client.jobs){
+                    $client.jobs=@()
+                }
                 if ($NullDynamicValues -eq 'Full'){
                     if ($client.va_version){
                         $client.va_version=$null
@@ -110,6 +117,7 @@ function Export-IdentityNowConfig {
                 }
             }
         }
+        #write-host "set-content $($path.FullName)\APIClients.json"
         $detailedAPIClients | convertto-json -depth 10 | Set-Content "$($path.FullName)\APIClients.json"
     }
     if ($Items -contains 'Applications') {
@@ -127,6 +135,7 @@ function Export-IdentityNowConfig {
                 }
             }
         }
+        #write-host "set-content $($path.FullName)\Applications.json"
         $detailedApplications | convertto-json -depth 10 | Set-Content "$($path.FullName)\Applications.json"
     }
     if ($Items -contains 'CertCampaigns') {
@@ -135,6 +144,7 @@ function Export-IdentityNowConfig {
         if ($NullDynamicValues){
             #TODO
         }
+        #write-host "set-content $($path.FullName)\CertCampaigns.json"
         $CertCampaigns | convertto-json -depth 10 | Set-Content "$($path.FullName)\CertCampaigns.json"
     }
     if ($Items -contains 'EmailTemplates') {
@@ -149,6 +159,7 @@ function Export-IdentityNowConfig {
                 }                
             }
         }
+        #write-host "set-content $($path.FullName)\EmailTemplates.json"
         $EmailTemplates | convertto-json -depth 10 | Set-Content "$($path.FullName)\EmailTemplates.json"
     }
     if ($Items -contains 'GovernanceGroups') {
@@ -157,6 +168,7 @@ function Export-IdentityNowConfig {
         if ($NullDynamicValues){
             #TODO
         }
+        #write-host "set-content $($path.FullName)\GovernanceGroups.json"
         $GovernanceGroups | convertto-json -depth 10 | Set-Content "$($path.FullName)\GovernanceGroups.json"
     }
     if ($Items -contains 'IdentityAttributes') {
@@ -165,29 +177,42 @@ function Export-IdentityNowConfig {
         if ($NullDynamicValues){
             #TODO
         }
+        #write-host "set-content $($path.FullName)\IdentityAttributes.json"
         $IdentityAttributes | convertto-json -depth 10 | Set-Content "$($path.FullName)\IdentityAttributes.json"
     }
     if ($Items -contains 'IdentityProfiles') {
         write-progress -activity 'IdentityProfiles'
         $idp = Get-IdentityNowProfile
         $detailedIDP = @()
-        foreach ($profile in $idp) {
-            $profile = Get-IdentityNowProfile -ID $profile.id
-            $detailedIDP += $profile
+        foreach ($singleidp in $idp) {
+            $singleidp = Get-IdentityNowProfile -ID $singleidp.id
+            $detailedIDP += $singleidp
         }
         if ($NullDynamicValues){
-            foreach ($profile in $detailedIDP){
-                if ($profile.source.lastAggregated){
-                    $profile.source.lastAggregated=$null                
+            foreach ($singleidp in $detailedIDP){
+                if ($singleidp.source.lastAggregated){
+                    $singleidp.source.lastAggregated=$null                
                 }
-                if ($profile.source.sinceLastAggregated){
-                    $profile.source.sinceLastAggregated=$null
+                if ($singleidp.source.sinceLastAggregated){
+                    $singleidp.source.sinceLastAggregated=$null
+                }
+                if ($singleidp.report.date){
+                    $singleidp.report.date=$null
+                }
+                if ($singleidp.report.duration){
+                    $singleidp.report.duration=$null
+                }
+                if ($singleidp.report.id){
+                    $singleidp.report.id=$null
                 }
                 if ($NullDynamicValues -eq 'Full'){
-                    if ($profile.identityCount){
-                        $profile.identityCount=$null
+                    if ($singleidp.identityCount -or $singleidp.identityCount -eq 0){
+                        $singleidp.identityCount=$null
                     }
-                    foreach ($state in $profile.configuredStates){
+                    if ($singleidp.report){
+                        $singleidp.report=$null
+                    }
+                    foreach ($state in $singleidp.configuredStates){
                         if ($state.identitycount){
                             $state.identitycount=$null
                         }
@@ -195,6 +220,7 @@ function Export-IdentityNowConfig {
                 }
             }
         }
+        #write-host "set-content $($path.FullName)\IdentityProfiles.json"
         $detailedIDP | convertto-json -depth 10 | Set-Content "$($path.FullName)\IdentityProfiles.json"
     }
     if ($Items -contains 'OauthAPIClients') {
@@ -210,6 +236,7 @@ function Export-IdentityNowConfig {
             }
             $OauthAPIClients=$SortedOauthAPIClients
         }
+        #write-host "set-content $($path.FullName)\OAuthAPIClients.json"
         $OauthAPIClients | convertto-json -depth 10 | Set-Content "$($path.FullName)\OAuthAPIClients.json"
     }
     if ($Items -contains 'Roles') {
@@ -233,8 +260,17 @@ function Export-IdentityNowConfig {
                 if ($role.synced){
                     $role.synced=$null
                 }
+                if ($NullDynamicValues -eq 'Full'){
+                    if($role.modified){
+                        $role.modified=$null
+                    }
+                    if ($role.identityCount -or $role.identityCount -eq 0){
+                        $role.identityCount=$null
+                    }
+                }
             }
         }
+        #write-host "set-content $($path.FullName)\Roles.json"
         $detailedroles | convertto-json -depth 10 | Set-Content "$($path.FullName)\Roles.json"
     }
     if ($Items -contains 'Rules') {
@@ -243,6 +279,7 @@ function Export-IdentityNowConfig {
         if ($NullDynamicValues){
             #TODO
         }
+        #write-host "set-content $($path.FullName)\Rules.json"
         $rules | convertto-json -depth 10 | Set-Content "$($path.FullName)\Rules.json"
     }
     if ($Items -contains 'Sources') {
@@ -277,11 +314,17 @@ function Export-IdentityNowConfig {
                 if ($source.health.hostname){
                     $source.health.hostname=$null
                 }
+                if ($source.health.lastChanged){
+                    $source.health.lastChanged=$null
+                }
                 if ($source.cloudCacheUpdate){
                     $source.cloudCacheUpdate=$null
                 }
                 if ($source.groupDeltaLink){
                     $source.groupDeltaLink=$null
+                }
+                if ($source.accountDeltaLink){
+                    $source.accountDeltaLink=$null
                 }
                 if ($source.acctAggregationStart){
                     $source.acctAggregationStart=$null
@@ -289,16 +332,48 @@ function Export-IdentityNowConfig {
                 if ($source.acctAggregationEnd){
                     $source.acctAggregationEnd=$null
                 }
+                if ($source.lastAggrgationDateTime){
+                    $source.lastAggrgationDateTime=$null
+                }
+                if ($source.access_token){
+                    $source.access_token=$null
+                }
+                if ($source.access_token_create_time){
+                    $source.access_token_create_time=$null
+                }
+                if ($source.entitlementsCount -or $source.entitlementsCount -eq 0){
+                    $source.entitlementsCount=$null
+                }
+                foreach ($sku in $source.subscribedSkus){
+                    if ($sku.consumedUnits -or $sku.consumedUnits -eq 0){
+                        $sku.consumedUnits=$null
+                    }
+                    if ($NullDynamicValues -eq 'Full'){
+                        if ($sku.prepaidUnits.enabled -or $sku.prepaidUnits.enabled -eq 0){
+                            $sku.prepaidUnits.enabled=$null
+                        }
+                        if ($sku.prepaidUnits.suspended -or $sku.prepaidUnits.suspended -eq 0){
+                            $sku.prepaidUnits.suspended=$null
+                        }
+                        if ($sku.prepaidUnits.warning -or $sku.prepaidUnits.warning -eq 0){
+                            $sku.prepaidUnits.warning=$null
+                        }
+                    }
+                }
                 if ($NullDynamicValues -eq 'Full'){
-                    if ($source.userCount){
+                    if ($source.userCount -or $source.userCount -eq 0){
                         $source.userCount=$null
                     }
-                    if ($source.accountsCount){
+                    if ($source.accountsCount -or $source.accountsCount -eq 0){
                         $source.accountsCount=$null
+                    }
+                    if ($source.uncorrelatedAccountsFileFeedHistory){
+                        $source.uncorrelatedAccountsFileFeedHistory=@()
                     }
                 }
             }
         }
+        #write-host "set-content $($path.FullName)\Sources.json"
         $detailedsources | convertto-json -depth 12 | Set-Content "$($path.FullName)\Sources.json"
     }    
     if ($Items -contains 'Transforms') {
@@ -307,7 +382,8 @@ function Export-IdentityNowConfig {
         if ($NullDynamicValues){
             #TODO
         }
-        $transforms | convertto-json -depth 10 | Set-Content "$($path.FullName)\Transforms.json"
+        #write-host "set-content $($path.FullName)\Transforms.json"
+        $transforms | convertto-json -depth 12 | Set-Content "$($path.FullName)\Transforms.json"
     }
     if ($Items -contains 'VAClusters') {
         write-progress -activity 'VAClusters'
@@ -346,6 +422,7 @@ function Export-IdentityNowConfig {
                 }
             }
         }
+        #write-host "set-content $($path.FullName)\VAClusters.json"
         $VAClusters | convertto-json -depth 10 | Set-Content "$($path.FullName)\VAClusters.json"
     }
 }

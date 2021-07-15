@@ -107,9 +107,14 @@ http://darrenjrobinson.com/sailpoint-identitynow
         $ProfileTemplate = [pscustomobject][ordered]@{ 
             'Identity Attribute' = $null 
             Source               = $null 
-            'Source Attribute'   = $null                       
+            'Source Attribute'   = $null  
+            Transform            = $null  
+            Type                 = $null                     
         } 
-                            
+        
+        $transforms = $null 
+        $transforms = $profile.attributeConfig.attributeTransforms | where-object { $null -eq $_.attributes.applicationId } | select-object 
+
         foreach ($attr in $profile.attributeConfig.attributeTransforms.attributeName) {
             $attributes = $profile.attributeConfig.attributeTransforms | Select-Object | Where-Object { $_.attributeName -eq $attr }
             foreach ($mappingAttr in $attributes.attributes) {
@@ -117,7 +122,16 @@ http://darrenjrobinson.com/sailpoint-identitynow
                 $profileMapping = $ProfileTemplate.PsObject.Copy()
                 $profileMapping.'Identity Attribute' = $attr
                 $profileMapping.Source = $mappingAttr.sourceName
-                $profileMapping.'Source Attribute' = $mappingAttr.attributeName                        
+                $profileMapping.'Source Attribute' = $mappingAttr.attributeName  
+                
+                if ($transforms) {
+                    if ($transforms.attributeName.Contains($attr)) { 
+                        $details = $null 
+                        $details = $transforms | where-object { $_.attributeName -eq $attr } | Select-Object -Property attributes, type
+                        $profileMapping.Transform = $details.attributes.id
+                        $profileMapping.Type = $details.type
+                    } 
+                }
             }
             $profileDetails += $profileMapping
         }
@@ -183,8 +197,8 @@ var div = divs[i];
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQURHtY2DIH9PPLbtcEAtfntrHH
-# c6igggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUk8wKIBGMmHHSFhKiFTlW3Yv5
+# 6iegggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -245,11 +259,11 @@ var div = divs[i];
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFE1C9qeDThTG
-# iG6HyTm4dkt8dk1HMA0GCSqGSIb3DQEBAQUABIIBACoKTBNgQJIMcFa3sDXEcchW
-# JlGe435SX3Uz6u/4w61zsnmhEj7Ec5n7mA8MDy9LyYrccAsCnjQpXcsyVv+oXsgj
-# M5g1Az44D86wuoB//yX1NJaL2397iKQ2W81cLg0QsIQ7ogy8gb/udiN4xl8rICbG
-# BSVGfvqurbbAh2eOKgjkcGA3peB2FqqibXg3BPAXZ2KuWB9fJPrpiFeD9/VtNvUD
-# 3pnysuomZcn1NHIT5ECyCDW4W/V8q8mauFG64tE/Izsd4ce5m4O866jZOkP+JdJk
-# +ZizjgRdkXw5BYVi/GoOk3jGMQ3f9MDm1yMBtoTLJd+vaJar+shuOCEWyO+zY6s=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFM1rASj7Zk38
+# Fp5VlYpLE0awLEzqMA0GCSqGSIb3DQEBAQUABIIBAA4BjcHOuen7nOTVPxl+w8k6
+# Lt7QRuAkM9CIzzpmhI183GSnTZodpf8NbeNEwgMY+N86ZllWiCxocc+r52+bBYnT
+# 244HJvptPzxUFVIB+kMylZWGCp916SaV8H3O5SOWrUtQvQpOwXL3RRBtJaflJaYP
+# /BFUuEd9NjX2A9BF1ClaK/VeX2rJY6z5o8CwcSubkdOOqx4RYS07sLs/VqXK/Thx
+# 1KKdM6hrtCTBw8dxyxbaLrjdHCNzb9QmqOmyXgrAA/BvSL2LDSA2rYqNR5i4e4qX
+# eT8CTDm1f/1AyDddRaxTRXrMTZ79l+oeStSrlH4LIyvOhk+HDu2V1TGKrjOl7cE=
 # SIG # End signature block

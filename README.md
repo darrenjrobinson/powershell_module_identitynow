@@ -101,7 +101,7 @@ To get started with Local PowerShell Jupyter Notebook [see this post](https://bl
 [Reference Post](https://blog.darrenjrobinson.com/generate-sailpoint-identitynow-v2-v3-api-credentials/)
 **Note: You can configure oAuth Client Authentication configuration and then use the New-IdentityNowAPIClient cmdlet to generate the v2 API Client.**
 
-**Update: Aug 2020 - v2 API Clients have been deprecated for API use. They still exist for VA use and can still be generated, but now must reference the VA Cluster. The New-IdentityNowAPIClient now contains the mandatory -clusterId option to acheive this.**
+**Update: Aug 2020 - v2 API Clients have been deprecated for API use. They still exist for VA use and can still be generated, but now must reference the VA Cluster. The New-IdentityNowAPIClient now contains the mandatory -clusterId option to achieve this.**
 
 **Update: June 2021 - The Password Grant Type has been deprecated. [Reference Post](https://community.sailpoint.com/t5/SaaS-Updates/Introducing-Personal-Access-Tokens/ba-p/172974) Configuring access and credentials for IdentityNow MUST utilise Personal Access Tokens. While logged into the IdentityNow Portal select your Identity Name in the top right corner of the menu, select Preferences => Personal Access Tokens => New Token => Create.**
 
@@ -124,7 +124,7 @@ To get started with Local PowerShell Jupyter Notebook [see this post](https://bl
 ```
 
 _Optional_ v2 Credentials are now only used for VA's.
-If you have perviously generated v2 creds and wish to utilise them with Invoke-IdentityNowRequest, they can be saved to your profile.
+If you have previously generated v2 creds and wish to utilise them with Invoke-IdentityNowRequest, they can be saved to your profile.
 
 Example
 
@@ -338,7 +338,7 @@ Test IdentityNow transforms to detect common problems
 Example
 
 ```powershell
-Test-IdentityNowTransforms -verbose
+Test-IdentityNowTransforms 
 ```
 
 ### Get IdentityNow Queue ###
@@ -758,11 +758,17 @@ Example
 Get-IdentityNowCertCampaignReport -period "365" -outputPath "C:\Reports"
 ```
 
+Get incomplete certification reports from the last 30 days
+
+```powershell
+Get-IdentityNowCertCampaignReport -period "30" -completed $false
+```
+
 Get certification campaign reports for a specific campaign and return as PSObject
 Example
 
 ```powershell
-Get-IdentityNowCertCampaign -campaignID '2c918085694a507f01694b9fcce6002f' 
+Get-IdentityNowCertCampaignReport -campaignID '2c918085694a507f01694b9fcce6002f' 
 ```
 
 ### Create / Get / Update / Remove IdentityNow Governance Groups ###
@@ -932,7 +938,7 @@ Example
 Update-IdentityNowSource -sourceID 12345 -update 'description=Attributes that drive Lifecycle and Certification Logic'
 ```
 
-Update a Workday Source Reponse Groups to include Background Check and Account Provisioning data
+Update a Workday Source Response Groups to include Background Check and Account Provisioning data
 
 Example
 
@@ -1037,7 +1043,7 @@ Example
 New-IdentityNowSourceConfigReport -reportPath 'C:\Reports'
 ```
 
-Generate a Source Configuration Report tot he C:\Reports directory and use a custom image from C:\Images\myCompanyLogo-240px.png
+Generate a Source Configuration Report to the C:\Reports directory and use a custom image from C:\Images\myCompanyLogo-240px.png
 Image size must be 240px x 82px or close to it.
 
 Example
@@ -1083,7 +1089,7 @@ Get-IdentityNowSourceAccounts -sourceID 40113
 ```
 
 Get Source Accounts with all their attributes. Defaults to False. Using the switch -attributes sets return all attributes to True.
-**Note:** Each account is a sepearte API call. Large sources will take time to return all accounts with attributes.
+**Note:** Each account is a separate API call. Large sources will take time to return all accounts with attributes.
 
 Example
 
@@ -1141,7 +1147,7 @@ Remove-IdentityNowUserSourceAccount -account $account
 
 Create / Update IdentityNow Source Entitlements on Flat File Sources
 
-**IMPORTANT: If you are looking to just update an Entitlement you must upload all Entitlements including the changed entitlment. Otherwise only the entitlements you upload will be present and any others will be removed.**
+**IMPORTANT: If you are looking to just update an Entitlement you must upload all Entitlements including the changed entitlement. Otherwise only the entitlements you upload will be present and any others will be removed.**
 
 The input is PSObject of all the Entitlements for the Source.
 
@@ -1600,7 +1606,7 @@ Get-IdentityNowIdentityAttribute -attribute firstname
 ```
 
 Add an attribute into the Identity Attributes List that can be used in Correlation Rules
-This makes the attribute searchable and avaialble for correlation rules.
+This makes the attribute searchable and available for correlation rules.
 This requires the attribute has first been added to an Identity Profile (under Mapping => Add Attribute)
 **NOTE:** the attribute name is case sensitive. It must match what is in IdentityNow.  
 
@@ -1898,7 +1904,7 @@ I am not a SailPoint employee. I wrote this for our needs and am sharing it with
 
 ## More information on managing SailPoint IdentityNow via API ##
 
-I've wrirten extensive posts on many of these functions. Details are in this section [on my blog](https://blog.darrenjrobinson.com/sailpoint-identitynow/)
+I've written extensive posts on many of these functions. Details are in this section [on my blog](https://blog.darrenjrobinson.com/sailpoint-identitynow/)
 
 ## Keep up to date ##
 

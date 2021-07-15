@@ -353,6 +353,12 @@ function Export-IdentityNowConfig {
                 if ($source.entitlementsCount -or $source.entitlementsCount -eq 0){
                     $source.entitlementsCount=$null
                 }
+                if ($source.deltaAggregation){
+                    $source.deltaAggregation=$null
+                }
+                if ($source.expires_in){
+                    $source.expires_in=$null
+                }
                 foreach ($sku in $source.subscribedSkus){
                     if ($sku.consumedUnits -or $sku.consumedUnits -eq 0){
                         $sku.consumedUnits=$null

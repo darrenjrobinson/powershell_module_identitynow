@@ -57,7 +57,7 @@ function Export-IdentityNowConfig {
         [ValidateSet('AccessProfile', 'APIClients', 'Applications', 'CertCampaigns', 'EmailTemplates', 'GovernanceGroups', 'IdentityAttributes', 'IdentityProfiles', 'OAuthAPIClients', 'Roles', 'Rules', 'Sources', 'Transforms', 'VAClusters')]
         [string[]]$Items
     )
-
+    
     if ($PSVersionTable.PSVersion.Major -le 5) { 
         $outputpath = Get-ItemProperty -Path $path 
         if ($outputpath.mode -ne 'd-----') { Write-Error "provided path is not a directory: $outputpath"; break }
@@ -66,7 +66,7 @@ function Export-IdentityNowConfig {
         [System.IO.FileInfo]$outputpath = $path
         if ($outputpath.mode -ne 'd----') { Write-Error "provided path is not a directory: $outputpath"; break }
     }
-    
+
     if ($null -eq $Items) {
         $Items = @('AccessProfile', 'APIClients', 'Applications', 'CertCampaigns', 'EmailTemplates', 'GovernanceGroups', 'IdentityAttributes', 'IdentityProfiles', 'OAuthAPIClients', 'Roles', 'Rules', 'Sources', 'Transforms', 'VAClusters')
     }
@@ -77,7 +77,7 @@ function Export-IdentityNowConfig {
         if ($NullDynamicValues){
             #no dynamic values in this output
         }
-        #write-host "set-content $($path.FullName)\AccessProfile.json"
+        #"set-content $($outputpath.FullName)\AccessProfile.json"
         $AccessProfile | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\AccessProfile.json"
     }
     if ($Items -contains 'APIClients') {
@@ -126,7 +126,7 @@ function Export-IdentityNowConfig {
                 }
             }
         }
-        #write-host "set-content $($path.FullName)\APIClients.json"
+        #"set-content $($outputpath.FullName)\APIClients.json"
         $detailedAPIClients | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\APIClients.json"
     }
     if ($Items -contains 'Applications') {
@@ -144,7 +144,7 @@ function Export-IdentityNowConfig {
                 }
             }
         }
-        #write-host "set-content $($path.FullName)\Applications.json"
+        #"set-content $($outputpath.FullName)\Applications.json"
         $detailedApplications | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\Applications.json"
     }
     if ($Items -contains 'CertCampaigns') {
@@ -153,7 +153,7 @@ function Export-IdentityNowConfig {
         if ($NullDynamicValues){
             #TODO
         }
-        #write-host "set-content $($path.FullName)\CertCampaigns.json"
+        #"set-content $($outputpath.FullName)\CertCampaigns.json"
         $CertCampaigns | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\CertCampaigns.json"
     }
     if ($Items -contains 'EmailTemplates') {
@@ -168,7 +168,7 @@ function Export-IdentityNowConfig {
                 }                
             }
         }
-        #write-host "set-content $($path.FullName)\EmailTemplates.json"
+        #"set-content $($outputpath.FullName)\EmailTemplates.json"
         $EmailTemplates | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\EmailTemplates.json"
     }
     if ($Items -contains 'GovernanceGroups') {
@@ -177,7 +177,7 @@ function Export-IdentityNowConfig {
         if ($NullDynamicValues){
             #TODO
         }
-        #write-host "set-content $($path.FullName)\GovernanceGroups.json"
+        #"set-content $($outputpath.FullName)\GovernanceGroups.json"
         $GovernanceGroups | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\GovernanceGroups.json"
     }
     if ($Items -contains 'IdentityAttributes') {
@@ -186,7 +186,7 @@ function Export-IdentityNowConfig {
         if ($NullDynamicValues){
             #no dynamic values in this output
         }
-        #write-host "set-content $($path.FullName)\IdentityAttributes.json"
+        #"set-content $($outputpath.FullName)\IdentityAttributes.json"
         $IdentityAttributes | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\IdentityAttributes.json"
     }
     if ($Items -contains 'IdentityProfiles') {
@@ -229,7 +229,7 @@ function Export-IdentityNowConfig {
                 }
             }
         }
-        #write-host "set-content $($path.FullName)\IdentityProfiles.json"
+        #"set-content $($outputpath.FullName)\IdentityProfiles.json"
         $detailedIDP | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\IdentityProfiles.json"
     }
     if ($Items -contains 'OauthAPIClients') {
@@ -245,7 +245,7 @@ function Export-IdentityNowConfig {
             }
             $OauthAPIClients=$SortedOauthAPIClients
         }
-        #write-host "set-content $($path.FullName)\OAuthAPIClients.json"
+        #"set-content $($outputpath.FullName)\OAuthAPIClients.json"
         $OauthAPIClients | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\OAuthAPIClients.json"
     }
     if ($Items -contains 'Roles') {
@@ -279,7 +279,7 @@ function Export-IdentityNowConfig {
                 }
             }
         }
-        #write-host "set-content $($path.FullName)\Roles.json"
+        #"set-content $($outputpath.FullName)\Roles.json"
         $detailedroles | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\Roles.json"
     }
     if ($Items -contains 'Rules') {
@@ -288,7 +288,7 @@ function Export-IdentityNowConfig {
         if ($NullDynamicValues){
             #no dynamic values in this output
         }
-        #write-host "set-content $($path.FullName)\Rules.json"
+        #"set-content $($outputpath.FullName)\Rules.json"
         $rules | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\Rules.json"
     }
     if ($Items -contains 'Sources') {
@@ -313,6 +313,7 @@ function Export-IdentityNowConfig {
             $detailedsources += $source
         }
         if ($NullDynamicValues){
+            $detailedsources | Add-Member -NotePropertyName hasFullAggregationCompleted -NotePropertyValue $null -Force
             foreach ($source in $detailedsources){
                 if ($source.health.since){
                     $source.health.since=$null
@@ -391,7 +392,7 @@ function Export-IdentityNowConfig {
                 }
             }
         }
-        #write-host "set-content $($path.FullName)\Sources.json"
+        #"set-content $($outputpath.FullName)\Sources.json"
         $detailedsources | convertto-json -depth 12 | Set-Content "$($outputpath.FullName)\Sources.json"
     }    
     if ($Items -contains 'Transforms') {
@@ -400,7 +401,7 @@ function Export-IdentityNowConfig {
         if ($NullDynamicValues){
             #no dynamic values in this output
         }
-        #write-host "set-content $($path.FullName)\Transforms.json"
+        #"set-content $($outputpath.FullName)\Transforms.json"
         $transforms | convertto-json -depth 12 | Set-Content "$($outputpath.FullName)\Transforms.json"
     }
     if ($Items -contains 'VAClusters') {
@@ -440,7 +441,7 @@ function Export-IdentityNowConfig {
                 }
             }
         }
-        #write-host "set-content $($path.FullName)\VAClusters.json"
+        #"set-content $($outputpath.FullName)\VAClusters.json"
         $VAClusters | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\VAClusters.json"
     }
 }

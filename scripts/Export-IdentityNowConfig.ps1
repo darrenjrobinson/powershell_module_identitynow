@@ -359,6 +359,9 @@ function Export-IdentityNowConfig {
                 if ($source.expires_in){
                     $source.expires_in=$null
                 }
+                if ($source.health.type){
+                    $source.health.type=$null
+                }
                 foreach ($sku in $source.subscribedSkus){
                     if ($sku.consumedUnits -or $sku.consumedUnits -eq 0){
                         $sku.consumedUnits=$null

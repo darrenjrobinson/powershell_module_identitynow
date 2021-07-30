@@ -17,6 +17,7 @@
         'Get-IdentityNowActiveJobs',
         'Get-IdentityNowAPIClient',
         'Get-IdentityNowApplication',
+        'Get-IdentityNowApplicationAccessProfile',
         'Get-IdentityNowAuth',
         'Get-IdentityNowCertCampaign',
         'Get-IdentityNowCertCampaignReport',

@@ -231,7 +231,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         Write-Verbose "AuthType: Admin Creds"        
     }
     
-    if (-not $IdentityNowConfiguration.JWT) { 
+    if (-not $IdentityNowConfiguration.JWT -or (-not $IdentityNowConfiguration.JWT.access_token)) { 
         $forcerefresh = $true 
     }
 

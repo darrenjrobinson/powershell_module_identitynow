@@ -156,19 +156,27 @@ http://darrenjrobinson.com/sailpoint-identitynow
         return $decodedToken
     }
 
-    # IdentityNow Admin User
-    $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
-    $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
+    if ($IdentityNowConfiguration.AdminCredential -and $IdentityNowConfiguration.AdminCredential.UserName -and $IdentityNowConfiguration.AdminCredential.Password) {
+        # IdentityNow Admin User
+        $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
+        $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
+        
+        # Generate the account hash
+        $hashUser = Get-HashString $adminUSR.ToLower() 
+        $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
+    } else {
+        Write-verbose "No admin credentials available"
+    }
 
-    # Generate the account hash
-    $hashUser = Get-HashString $adminUSR.ToLower() 
-    $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
-
-    $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
-    # Basic Auth
-    $Bytesv3 = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v3.UserName):$($clientSecretv3)")
-    $encodedAuthv3 = [Convert]::ToBase64String($Bytesv3)
-    $Headersv3 = @{Authorization = "Basic $($encodedAuthv3)" }
+    if ($IdentityNowConfiguration.v3 -and $IdentityNowConfiguration.v3.username -and $IdentityNowConfiguration.v3.Password) {
+        $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
+        # Basic Auth
+        $Bytesv3 = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v3.UserName):$($clientSecretv3)")
+        $encodedAuthv3 = [Convert]::ToBase64String($Bytesv3)
+        $Headersv3 = @{Authorization = "Basic $($encodedAuthv3)" }
+    } else {
+        Write-verbose "No v3 credentials available"
+    }
     
     # Get v3 oAuth Token
     # oAuth URI

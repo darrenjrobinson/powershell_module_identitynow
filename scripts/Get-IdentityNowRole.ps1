@@ -1,10 +1,10 @@
 function Get-IdentityNowRole {
     <#
 .SYNOPSIS
-Get an IdentityNow Role(s).
+Get IdentityNow Role(s).
 
 .DESCRIPTION
-Get an IdentityNow Role(s).
+Get IdentityNow Role(s).
 
 .PARAMETER roleID
 (optional) The ID of an IdentityNow Role.
@@ -20,53 +20,64 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
 #>
 
-    [cmdletbinding()]
+    [cmdletbinding(DefaultParameterSetName= "List")]
     param(
-        [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$roleID
+        [Parameter(Mandatory = $false, ValueFromPipeline, ParameterSetName = "GetById")]
+        [string]$roleID,
+
+        [parameter(Mandatory = $false, ParameterSetName = "List")]
+        [ValidateSet("name", "created", "modified")]
+        [String[]]
+        $sorters = @("name")
     )
 
-    $v3Token = Get-IdentityNowAuth
+    $v3Token = Get-IdentityNowAuth | Test-IdentityNowToken
+    $roleBaseUrl = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/roles"
+    $headers = @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
     
-    if ($v3Token.access_token) {
-        try {
-            if ($roleID) {
-                $utime = [int][double]::Parse((Get-Date -UFormat %s))
-                $IDNRoles = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/role/get?_dc=$($utime)&id=$($roleID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-                return $IDNRoles
-            }
-            else {
-                Write-Verbose "Getting All Roles"
-                # Get Roles Based on Query because the LIST Roles API is just random chaos when returning multiple pages of results
-                $sourceObjects = @() 
-                $limit = "2500"
-                $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/search/roles?offset=0&limit=2500&query=name%20-eq%20*&org=$($IdentityNowConfiguration.orgName)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                
-
-                if ($results) {
-                    $sourceObjects += $results
-                }
-                $offset = 0
-                do { 
-                    if ($results.Count -eq $limit) {
-                        # Get Next Page
-                        [int]$offset = $offset + $limit 
-                        $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/search/roles?offset=$($offset)&limit=$($limit)&query=name%20-eq%20*" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                
-                        if ($results) {
-                            $sourceObjects += $results
-                        }
-                    }
-                } until ($results.Count -lt $limit)
-                return $sourceObjects
-            }
-        }
-        catch {
-            Write-Error "Role doesn't exist. Check Role ID. $($_)" 
+    try {
+        if ($roleID) {
+            $IDNRoles = Invoke-RestMethod -Method Get `
+                -Uri "$roleBaseUrl/$roleID" `
+                -Headers $headers
+            return $IDNRoles
         }
     }
-    else {
-        Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
-        return $v3Token
-    } 
+    catch {
+        Write-Error "Role doesn't exist. Check Role ID. $($_)" 
+    }
+    try {
+        Write-Verbose "Getting All Roles"
+        
+        $roles = @() 
+        $limit = "50"
+        $offset = 0
+        # will populate the X-Total-Count response header with the number of results that would be returned if limit and offset were ignored.
+        $countFlag = $true
+        $totalCount = 0
+
+        do { 
+            $uri = "$($roleBaseUrl)?offset=$offset&limit=$limit&count=$countFlag&sorters=$($sorters -join",")"
+            Write-Verbose "Calling $uri" 
+            $response = Invoke-WebRequest -Method Get `
+                -Uri $uri `
+                -Headers $headers
+            if ($countFlag) {
+                $count = [int] $response.Headers["X-Total-Count"][0]
+                Write-Verbose "Expecting $count result"
+            }
+            $roles += $response.Content | ConvertFrom-Json
+            
+            # Get Next Page
+            $offset += $limit
+            $countFlag = $false
+        } until ($offset -gt $count)
+        return $roles
+    }
+    catch {
+        Write-Error "Could not list roles. $($_)" 
+    }
+   
 }
 
 

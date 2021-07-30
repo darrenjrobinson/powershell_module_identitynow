@@ -33,7 +33,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
         $accessProfiles = Invoke-RestMethod -Method Get `
             -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/app/getAccessProfiles/$($appID)?_dc=$($utime)" `
             -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-        return $accessProfiles
+        # As an array, you always have the "count" property
+        return $accessProfiles.items
     }
     catch {
         Write-Error "Application doesn't exist. Check App ID. $($_)" 

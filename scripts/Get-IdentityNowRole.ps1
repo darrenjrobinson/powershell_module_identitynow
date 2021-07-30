@@ -41,7 +41,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         [string]$roleID,
 
         [parameter(Mandatory = $false, ParameterSetName = "List")]
-        [ValidateSet("name", "created", "modified")]
+        [ValidateSet("name", "created", "modified", "-name", "-created", "-modified")]
         [String[]]
         $sorters = @("name"),
 

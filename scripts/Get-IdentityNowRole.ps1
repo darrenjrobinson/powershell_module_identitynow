@@ -9,11 +9,26 @@ Get IdentityNow Role(s).
 .PARAMETER roleID
 (optional) The ID of an IdentityNow Role.
 
+.PARAMETER filters
+Filter results using the standard syntax described in https://developer.sailpoint.com/docs/standard_collection_parameters.html#filtering-results.
+The following fields and operators are supported:
+- id: eq, in
+- name: eq, sw 
+- created, modified: gt, lt, ge, le
+- owner.id: eq, in
+- requestable: eq
+
 .EXAMPLE
 Get-IdentityNowRole 
 
 .EXAMPLE
 Get-IdentityNowRole -roleID 2c918084691653af01695182a78b05ec
+
+.EXAMPLE
+Get-IdentityNowRole -sorters created
+
+.EXAMPLE
+Get-IdentityNowRole -sorters name -filters "requestable eq `"false`""
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -28,7 +43,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
         [parameter(Mandatory = $false, ParameterSetName = "List")]
         [ValidateSet("name", "created", "modified")]
         [String[]]
-        $sorters = @("name")
+        $sorters = @("name"),
+
+        [parameter(Mandatory = $false, ParameterSetName = "List")]
+        [String]
+        $filters
     )
 
     $v3Token = Get-IdentityNowAuth | Test-IdentityNowToken
@@ -58,6 +77,10 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
         do { 
             $uri = "$($roleBaseUrl)?offset=$offset&limit=$limit&count=$countFlag&sorters=$($sorters -join",")"
+            if ($filters) {
+                $uri += "&filters=" + [System.Web.HTTPUtility]::UrlEncode($filters)
+            }
+
             Write-Verbose "Calling $uri" 
             $response = Invoke-WebRequest -Method Get `
                 -Uri $uri `

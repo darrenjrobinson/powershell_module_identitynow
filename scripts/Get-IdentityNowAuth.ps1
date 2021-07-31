@@ -156,19 +156,29 @@ http://darrenjrobinson.com/sailpoint-identitynow
         return $decodedToken
     }
 
-    # IdentityNow Admin User
-    $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
-    $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
+    if ($IdentityNowConfiguration.AdminCredential -and $IdentityNowConfiguration.AdminCredential.UserName -and $IdentityNowConfiguration.AdminCredential.Password) {
+        # IdentityNow Admin User
+        $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
+        $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
+        
+        # Generate the account hash
+        $hashUser = Get-HashString $adminUSR.ToLower() 
+        $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
+    }
+    else {
+        Write-verbose "No admin credentials available"
+    }
 
-    # Generate the account hash
-    $hashUser = Get-HashString $adminUSR.ToLower() 
-    $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
-
-    $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
-    # Basic Auth
-    $Bytesv3 = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v3.UserName):$($clientSecretv3)")
-    $encodedAuthv3 = [Convert]::ToBase64String($Bytesv3)
-    $Headersv3 = @{Authorization = "Basic $($encodedAuthv3)" }
+    if ($IdentityNowConfiguration.v3 -and $IdentityNowConfiguration.v3.Username -and $IdentityNowConfiguration.v3.Password) {
+        $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
+        # Basic Auth
+        $Bytesv3 = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v3.UserName):$($clientSecretv3)")
+        $encodedAuthv3 = [Convert]::ToBase64String($Bytesv3)
+        $Headersv3 = @{Authorization = "Basic $($encodedAuthv3)" }
+    }
+    else {
+        Write-verbose "No v3 credentials available"
+    }
     
     # Get v3 oAuth Token
     # oAuth URI
@@ -288,8 +298,8 @@ $_" -ErrorAction 'stop'
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUVN7Ub8bcYCOSeEB4xcRQoA4h
-# FvagggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUPzOOu9vhaJcAygk4NJlIqe3F
+# 9nGgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -350,11 +360,11 @@ $_" -ErrorAction 'stop'
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFDIddXziJdLz
-# Amh5Koxk92odhbU8MA0GCSqGSIb3DQEBAQUABIIBAFoAsqXsry4YigXBc8pRMNOO
-# u5F1SIDaFSHt6IAXXflxTFoXAfNBP+tt/CQLYn/nGYA/OIp1DmuzaGQBBBVTXTHt
-# +GLilg92UR5a/k/YW6N96kyZhZyq9ZrfXVofYCbXxULB7DvEDtutqvEpC21ZnOKS
-# +Y7IZFWefB/bc5Amu5yHaCl2QH1ROqovNFlzwCyrsPeHfO4AMbyO4dUrUnX1htHv
-# XZ1mv+ft6hjl3Gdkr6ctf4/SVQudRJRSnmRlmlNPTylTeY4vBN6pvIgdweur5Tni
-# Mm/JWC2AWyoNIG3LkMhxt/Z3S9uNwR/G4mVj92NiVeQfJjzwy43KWiNose6k3uo=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFG/t+ceAilkH
+# 7kYAoRt7L471VUlqMA0GCSqGSIb3DQEBAQUABIIBAChBPU8LPTSK+c2cTngeUec4
+# A1BfjiQmRde0lnmUPbbSDMHL7Oi+gKvbDzi+Xm+kcqi8fsKaLWDRNkAuD7gtyOKC
+# WJMBUpXiPIefVCtT60ky4iRbnWdzN6B9X4O0ybQzOu/m+XchNDqlZLY06dwtVfSX
+# YAbDn/5RFEWqK3oipnfxYnN2A+BuqDoFQacLR8q8gvJzhhEhWkttdSKc0pOT0Knr
+# 57I9h0JLIib4i3Zb7F4ndjs8Gl03IC53Ife4VFtMdurPk52HkvqtGRutVcti/ZhS
+# H6X8/XaKp7ze+NQc/qku59ZQJ1xuTBiFiqWiIzV4zEE8foeHIubJhi1JfWVv6jA=
 # SIG # End signature block

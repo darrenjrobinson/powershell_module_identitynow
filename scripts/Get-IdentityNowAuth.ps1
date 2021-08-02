@@ -164,17 +164,19 @@ http://darrenjrobinson.com/sailpoint-identitynow
         # Generate the account hash
         $hashUser = Get-HashString $adminUSR.ToLower() 
         $adminPWD = Get-HashString "$($adminPWDClear)$($hashUser)"  
-    } else {
+    }
+    else {
         Write-verbose "No admin credentials available"
     }
 
-    if ($IdentityNowConfiguration.v3 -and $IdentityNowConfiguration.v3.username -and $IdentityNowConfiguration.v3.Password) {
+    if ($IdentityNowConfiguration.v3 -and $IdentityNowConfiguration.v3.Username -and $IdentityNowConfiguration.v3.Password) {
         $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
         # Basic Auth
         $Bytesv3 = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v3.UserName):$($clientSecretv3)")
         $encodedAuthv3 = [Convert]::ToBase64String($Bytesv3)
         $Headersv3 = @{Authorization = "Basic $($encodedAuthv3)" }
-    } else {
+    }
+    else {
         Write-verbose "No v3 credentials available"
     }
     
@@ -296,8 +298,8 @@ $_" -ErrorAction 'stop'
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUVN7Ub8bcYCOSeEB4xcRQoA4h
-# FvagggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUl8ApT3FTnY7NNjyzeGtsA9Fu
+# VcOgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -358,11 +360,11 @@ $_" -ErrorAction 'stop'
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFDIddXziJdLz
-# Amh5Koxk92odhbU8MA0GCSqGSIb3DQEBAQUABIIBAFoAsqXsry4YigXBc8pRMNOO
-# u5F1SIDaFSHt6IAXXflxTFoXAfNBP+tt/CQLYn/nGYA/OIp1DmuzaGQBBBVTXTHt
-# +GLilg92UR5a/k/YW6N96kyZhZyq9ZrfXVofYCbXxULB7DvEDtutqvEpC21ZnOKS
-# +Y7IZFWefB/bc5Amu5yHaCl2QH1ROqovNFlzwCyrsPeHfO4AMbyO4dUrUnX1htHv
-# XZ1mv+ft6hjl3Gdkr6ctf4/SVQudRJRSnmRlmlNPTylTeY4vBN6pvIgdweur5Tni
-# Mm/JWC2AWyoNIG3LkMhxt/Z3S9uNwR/G4mVj92NiVeQfJjzwy43KWiNose6k3uo=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFIcm6scAvdsH
+# 3LT/378cs051Q8FWMA0GCSqGSIb3DQEBAQUABIIBAKtxPlLEwojBbsJE11yDVWCg
+# v3Pd4gVHUbc8GofbQt9+4mvqkOYKpy1EnZW3TajsICpdtaVE3/FHdXUHBcBxYo8L
+# yIli7p/msFOHE1Ajb8a8WKX+J1lvK/5uZgMB6QkI/YRk241Nwy2Gnl26g0mwaG6o
+# 4cnvgC3cPgs8Ml4IVe12nERQKFVnH00sN5r477AA/RdA78WGQKPvf4icdt4X7QJX
+# i8+RpARuyHgzzp4Rnq5pF0q4jkx8pE7rMCa9DOuLff89wT0QwA9NVbGltxAhFYqh
+# Cq0EzMyJAyzaikw3OdRiFiZ9lcmgJuAFmz1QdyJLcFj2gDVZfVnQ5P7dvqPqpX8=
 # SIG # End signature block

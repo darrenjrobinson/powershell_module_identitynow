@@ -74,7 +74,7 @@ function Export-IdentityNowConfig {
     if ($Items -contains 'AccessProfile') {
         write-progress -activity 'AccessProfile'
         $AccessProfile = Get-IdentityNowAccessProfile
-        if ($NullDynamicValues){
+        if ($NullDynamicValues) {
             #no dynamic values in this output
         }
         #"set-content $($outputpath.FullName)\AccessProfile.json"
@@ -88,44 +88,56 @@ function Export-IdentityNowConfig {
             $client = Get-IdentityNowAPIClient -ID $client.id
             $detailedAPIClients += $client
         }
-        if ($NullDynamicValues){
-            foreach ($client in $detailedAPIClients){
-                if ($client.configuration.cookbook){
-                    $client.configuration.cookbook=$null
+        if ($NullDynamicValues) {
+            foreach ($client in $detailedAPIClients) {
+                if ($client.configuration.cookbook) {
+                    $client.configuration.cookbook = $null
                 }
-                if ($client.configuration.jobType){
-                    $client.configuration.jobType=$null
+                if ($client.configuration.jobType) {
+                    $client.configuration.jobType = $null
                 }
+<<<<<<< HEAD
                 if ($client.configuration.scheduleUpgrade){
                     $client.configuration.scheduleUpgrade=$null
                 }
                 if ($client.configuration.va_version){
                     $client.configuration.va_version=$null
+=======
+                if ($client.configuration.va_version) {
+                    $client.configuration.va_version = $null
+>>>>>>> 8af438af4efa5f5f009ef976d682cea3bc1a8d80
                 }
-                if ($client.lastSeen){
-                    $client.lastSeen=$null
+                if ($client.lastSeen) {
+                    $client.lastSeen = $null
                 }
+<<<<<<< HEAD
                 if ($client.maintenance){
                     $client.maintenance.windowStartTime=$null
                     $client.maintenance.windowClusterTime=$null
                     $client.maintenance.windowFinishTime=$null
                     $client.maintenance.window=$null
+=======
+                if ($client.maintenance) {
+                    $client.maintenance.windowStartTime = $null
+                    $client.maintenance.windowClusterTime = $null
+                    $client.maintenance.windowFinishTime = $null
+>>>>>>> 8af438af4efa5f5f009ef976d682cea3bc1a8d80
                 }
-                if ($client.pollingPeriodTimestamp){
-                    $client.pollingPeriodTimestamp=$null
+                if ($client.pollingPeriodTimestamp) {
+                    $client.pollingPeriodTimestamp = $null
                 }
-                if ($client.sinceLastSeen){
-                    $client.sinceLastSeen=$null
+                if ($client.sinceLastSeen) {
+                    $client.sinceLastSeen = $null
                 }
-                if ($client.clusterJobCount -or $client.clusterJobCount -eq 0){
-                    $client.clusterJobCount=$null
+                if ($client.clusterJobCount -or $client.clusterJobCount -eq 0) {
+                    $client.clusterJobCount = $null
                 }
-                if ($client.jobs){
-                    $client.jobs=@()
+                if ($client.jobs) {
+                    $client.jobs = @()
                 }
-                if ($NullDynamicValues -eq 'Full'){
-                    if ($client.va_version){
-                        $client.va_version=$null
+                if ($NullDynamicValues -eq 'Full') {
+                    if ($client.va_version) {
+                        $client.va_version = $null
                     }
                 }
             }
@@ -141,10 +153,10 @@ function Export-IdentityNowConfig {
             $app = Get-IdentityNowApplication -appID $app.id
             $detailedApplications += $app
         }
-        if ($NullDynamicValues){
-            foreach ($app in $detailedApplications){
-                if ($app.health.lastChanged){
-                    $app.health.lastChanged=$null
+        if ($NullDynamicValues) {
+            foreach ($app in $detailedApplications) {
+                if ($app.health.lastChanged) {
+                    $app.health.lastChanged = $null
                 }
             }
         }
@@ -153,9 +165,20 @@ function Export-IdentityNowConfig {
     }
     if ($Items -contains 'CertCampaigns') {
         write-progress -activity 'CertCampaigns'
-        $CertCampaigns = Get-IdentityNowCertCampaign
-        if ($NullDynamicValues){
-            #TODO
+        $CertCampaigns = Get-IdentityNowCertCampaign -completed $true
+        $activeCertCampaigns = Get-IdentityNowCertCampaign -completed $false 
+        $CertCampaigns += $activeCertCampaigns
+        if ($NullDynamicValues) {
+            foreach ($campaign in $CertCampaigns) {
+                if ($campaign.completedEntities) { $campaign.completedEntities = $null }
+                if ($campaign.completedItems) { $campaign.completedItems = $null }
+                if ($campaign.finished) { $campaign.finished = $null }
+                if ($campaign.percentComplete) { $campaign.percentComplete = $null }
+                if ($campaign.phase) { $campaign.phase = $null }
+                if ($campaign.status) { $campaign.status = $null }
+                if ($campaign.completedCertifications) { $campaign.completedCertifications = $null }
+                if ($campaign.totalCertifications) { $campaign.totalCertifications = $null }
+            }
         }
         #"set-content $($outputpath.FullName)\CertCampaigns.json"
         $CertCampaigns | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\CertCampaigns.json"
@@ -163,11 +186,11 @@ function Export-IdentityNowConfig {
     if ($Items -contains 'EmailTemplates') {
         write-progress -activity 'EmailTemplates'
         $EmailTemplates = Get-IdentityNowEmailTemplate
-        if ($NullDynamicValues){
-            foreach ($template in $EmailTemplates){
-                if ($NullDynamicValues -eq 'Full'){
-                    if ($template.meta.modified){
-                        $template.meta.modified=$null
+        if ($NullDynamicValues) {
+            foreach ($template in $EmailTemplates) {
+                if ($NullDynamicValues -eq 'Full') {
+                    if ($template.meta.modified) {
+                        $template.meta.modified = $null
                     }
                 }                
             }
@@ -178,8 +201,12 @@ function Export-IdentityNowConfig {
     if ($Items -contains 'GovernanceGroups') {
         write-progress -activity 'GovernanceGroups'
         $GovernanceGroups = Get-IdentityNowGovernanceGroup
-        if ($NullDynamicValues){
-            #TODO
+        if ($NullDynamicValues) {
+            foreach ($gGroup in $GovernanceGroups) {
+                if ($gGroup.modified) {
+                    $gGroup.modified = $null 
+                }
+            }
         }
         #"set-content $($outputpath.FullName)\GovernanceGroups.json"
         $GovernanceGroups | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\GovernanceGroups.json"
@@ -187,7 +214,7 @@ function Export-IdentityNowConfig {
     if ($Items -contains 'IdentityAttributes') {
         write-progress -activity 'IdentityAttributes'
         $IdentityAttributes = Get-IdentityNowIdentityAttribute
-        if ($NullDynamicValues){
+        if ($NullDynamicValues) {
             #no dynamic values in this output
         }
         #"set-content $($outputpath.FullName)\IdentityAttributes.json"
@@ -201,33 +228,39 @@ function Export-IdentityNowConfig {
             $singleidp = Get-IdentityNowProfile -ID $singleidp.id
             $detailedIDP += $singleidp
         }
-        if ($NullDynamicValues){
-            foreach ($singleidp in $detailedIDP){
-                if ($singleidp.source.lastAggregated){
-                    $singleidp.source.lastAggregated=$null                
+        if ($NullDynamicValues) {
+            foreach ($singleidp in $detailedIDP) {
+                if ($singleidp.source.lastAggregated) {
+                    $singleidp.source.lastAggregated = $null                
                 }
-                if ($singleidp.source.sinceLastAggregated){
-                    $singleidp.source.sinceLastAggregated=$null
+                if ($singleidp.source.sinceLastAggregated) {
+                    $singleidp.source.sinceLastAggregated = $null
                 }
-                if ($singleidp.report.date){
-                    $singleidp.report.date=$null
+                if ($singleidp.report.date) {
+                    $singleidp.report.date = $null
                 }
-                if ($singleidp.report.duration){
-                    $singleidp.report.duration=$null
+                if ($singleidp.report.duration) {
+                    $singleidp.report.duration = $null
                 }
-                if ($singleidp.report.id){
-                    $singleidp.report.id=$null
+                if ($singleidp.report.id) {
+                    $singleidp.report.id = $null
                 }
-                if ($NullDynamicValues -eq 'Full'){
-                    if ($singleidp.identityCount -or $singleidp.identityCount -eq 0){
-                        $singleidp.identityCount=$null
+                if ($NullDynamicValues -eq 'Full') {
+                    if ($singleidp.identityCount -or $singleidp.identityCount -eq 0) {
+                        $singleidp.identityCount = $null
                     }
-                    if ($singleidp.report){
-                        $singleidp.report=$null
+                    if ($singleidp.report) {
+                        $singleidp.report = $null
                     }
+<<<<<<< HEAD
                     foreach ($state in $singleidp.configuredStates){
                         if ($state.identitycount -or $state.identityCount -eq 0){
                             $state.identitycount=$null
+=======
+                    foreach ($state in $singleidp.configuredStates) {
+                        if ($state.identitycount) {
+                            $state.identitycount = $null
+>>>>>>> 8af438af4efa5f5f009ef976d682cea3bc1a8d80
                         }
                     }
                 }
@@ -239,15 +272,15 @@ function Export-IdentityNowConfig {
     if ($Items -contains 'OauthAPIClients') {
         write-progress -activity 'OauthAPIClients'
         $OauthAPIClients = Get-IdentityNowOAuthAPIClient
-        if ($NullDynamicValues){
+        if ($NullDynamicValues) {
             #need to sort properties
-            $proporder=('id','name','description','enabled','type')
-            $sortedOauthAPIClients=@()
-            foreach ($oauthapi in $OauthAPIClients){
-                $sortedOauthAPIClients+=$oauthapi | Select-Object -Property ($proporder + ($oauthapi| Get-Member -MemberType NoteProperty).name.where{$_ -notin $proporder}  )
+            $proporder = ('id', 'name', 'description', 'enabled', 'type')
+            $sortedOauthAPIClients = @()
+            foreach ($oauthapi in $OauthAPIClients) {
+                $sortedOauthAPIClients += $oauthapi | Select-Object -Property ($proporder + ($oauthapi | Get-Member -MemberType NoteProperty).name.where{ $_ -notin $proporder }  )
                 
             }
-            $OauthAPIClients=$SortedOauthAPIClients
+            $OauthAPIClients = $SortedOauthAPIClients
         }
         #"set-content $($outputpath.FullName)\OAuthAPIClients.json"
         $OauthAPIClients | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\OAuthAPIClients.json"
@@ -265,20 +298,20 @@ function Export-IdentityNowConfig {
             $role | Add-Member -NotePropertyName revokeRequestApprovalSchemes -NotePropertyValue $temp.revokeRequestApprovalSchemes -Force
             $detailedroles += $role
         }
-        if ($NullDynamicValues){
+        if ($NullDynamicValues) {
             #need to sort roles
-            $sortedRoles=$detailedroles | Sort-Object -prop id
-            $detailedroles=$sortedRoles
-            foreach ($role in $detailedroles){
-                if ($role.synced){
-                    $role.synced=$null
+            $sortedRoles = $detailedroles | Sort-Object -prop id
+            $detailedroles = $sortedRoles
+            foreach ($role in $detailedroles) {
+                if ($role.synced) {
+                    $role.synced = $null
                 }
-                if ($NullDynamicValues -eq 'Full'){
-                    if($role.modified){
-                        $role.modified=$null
+                if ($NullDynamicValues -eq 'Full') {
+                    if ($role.modified) {
+                        $role.modified = $null
                     }
-                    if ($role.identityCount -or $role.identityCount -eq 0){
-                        $role.identityCount=$null
+                    if ($role.identityCount -or $role.identityCount -eq 0) {
+                        $role.identityCount = $null
                     }
                 }
             }
@@ -289,7 +322,7 @@ function Export-IdentityNowConfig {
     if ($Items -contains 'Rules') {
         write-progress -activity 'Rules'
         $rules = Get-IdentityNowRule
-        if ($NullDynamicValues){
+        if ($NullDynamicValues) {
             #no dynamic values in this output
         }
         #"set-content $($outputpath.FullName)\Rules.json"
@@ -316,56 +349,56 @@ function Export-IdentityNowConfig {
             $source | Add-Member -NotePropertyName 'Schema' -NotePropertyValue (Get-IdentityNowSourceSchema -sourceID $source.id) -Force
             $detailedsources += $source
         }
-        if ($NullDynamicValues){
+        if ($NullDynamicValues) {
             $detailedsources | Add-Member -NotePropertyName hasFullAggregationCompleted -NotePropertyValue $null -Force
-            foreach ($source in $detailedsources){
-                if ($source.health.since){
-                    $source.health.since=$null
+            foreach ($source in $detailedsources) {
+                if ($source.health.since) {
+                    $source.health.since = $null
                 }
-                if ($source.health.lastSeen){
-                    $source.health.lastSeen=$null
+                if ($source.health.lastSeen) {
+                    $source.health.lastSeen = $null
                 }
-                if ($source.health.hostname){
-                    $source.health.hostname=$null
+                if ($source.health.hostname) {
+                    $source.health.hostname = $null
                 }
-                if ($source.health.lastChanged){
-                    $source.health.lastChanged=$null
+                if ($source.health.lastChanged) {
+                    $source.health.lastChanged = $null
                 }
-                if ($source.cloudCacheUpdate){
-                    $source.cloudCacheUpdate=$null
+                if ($source.cloudCacheUpdate) {
+                    $source.cloudCacheUpdate = $null
                 }
-                if ($source.groupDeltaLink){
-                    $source.groupDeltaLink=$null
+                if ($source.groupDeltaLink) {
+                    $source.groupDeltaLink = $null
                 }
-                if ($source.accountDeltaLink){
-                    $source.accountDeltaLink=$null
+                if ($source.accountDeltaLink) {
+                    $source.accountDeltaLink = $null
                 }
-                if ($source.acctAggregationStart){
-                    $source.acctAggregationStart=$null
+                if ($source.acctAggregationStart) {
+                    $source.acctAggregationStart = $null
                 }
-                if ($source.acctAggregationEnd){
-                    $source.acctAggregationEnd=$null
+                if ($source.acctAggregationEnd) {
+                    $source.acctAggregationEnd = $null
                 }
-                if ($source.lastAggrgationDateTime){
-                    $source.lastAggrgationDateTime=$null
+                if ($source.lastAggrgationDateTime) {
+                    $source.lastAggrgationDateTime = $null
                 }
-                if ($source.access_token){
-                    $source.access_token=$null
+                if ($source.access_token) {
+                    $source.access_token = $null
                 }
-                if ($source.access_token_create_time){
-                    $source.access_token_create_time=$null
+                if ($source.access_token_create_time) {
+                    $source.access_token_create_time = $null
                 }
-                if ($source.entitlementsCount -or $source.entitlementsCount -eq 0){
-                    $source.entitlementsCount=$null
+                if ($source.entitlementsCount -or $source.entitlementsCount -eq 0) {
+                    $source.entitlementsCount = $null
                 }
-                if ($source.deltaAggregation){
-                    $source.deltaAggregation=$null
+                if ($source.deltaAggregation) {
+                    $source.deltaAggregation = $null
                 }
-                if ($source.expires_in){
-                    $source.expires_in=$null
+                if ($source.expires_in) {
+                    $source.expires_in = $null
                 }
-                if ($source.health.type){
-                    $source.health.type=$null
+                if ($source.health.type) {
+                    $source.health.type = $null
                 }
                 if ($source.health.isAuthoritative){
                     $source.health.isAuthoritative=$null
@@ -383,27 +416,27 @@ function Export-IdentityNowConfig {
                     if ($sku.consumedUnits -or $sku.consumedUnits -eq 0){
                         $sku.consumedUnits=$null
                     }
-                    if ($NullDynamicValues -eq 'Full'){
-                        if ($sku.prepaidUnits.enabled -or $sku.prepaidUnits.enabled -eq 0){
-                            $sku.prepaidUnits.enabled=$null
+                    if ($NullDynamicValues -eq 'Full') {
+                        if ($sku.prepaidUnits.enabled -or $sku.prepaidUnits.enabled -eq 0) {
+                            $sku.prepaidUnits.enabled = $null
                         }
-                        if ($sku.prepaidUnits.suspended -or $sku.prepaidUnits.suspended -eq 0){
-                            $sku.prepaidUnits.suspended=$null
+                        if ($sku.prepaidUnits.suspended -or $sku.prepaidUnits.suspended -eq 0) {
+                            $sku.prepaidUnits.suspended = $null
                         }
-                        if ($sku.prepaidUnits.warning -or $sku.prepaidUnits.warning -eq 0){
-                            $sku.prepaidUnits.warning=$null
+                        if ($sku.prepaidUnits.warning -or $sku.prepaidUnits.warning -eq 0) {
+                            $sku.prepaidUnits.warning = $null
                         }
                     }
                 }
-                if ($NullDynamicValues -eq 'Full'){
-                    if ($source.userCount -or $source.userCount -eq 0){
-                        $source.userCount=$null
+                if ($NullDynamicValues -eq 'Full') {
+                    if ($source.userCount -or $source.userCount -eq 0) {
+                        $source.userCount = $null
                     }
-                    if ($source.accountsCount -or $source.accountsCount -eq 0){
-                        $source.accountsCount=$null
+                    if ($source.accountsCount -or $source.accountsCount -eq 0) {
+                        $source.accountsCount = $null
                     }
-                    if ($source.uncorrelatedAccountsFileFeedHistory){
-                        $source.uncorrelatedAccountsFileFeedHistory=@()
+                    if ($source.uncorrelatedAccountsFileFeedHistory) {
+                        $source.uncorrelatedAccountsFileFeedHistory = @()
                     }
                     if ($null -ne $source.health.healthy){
                         $source.health.healthy=$null
@@ -429,7 +462,7 @@ function Export-IdentityNowConfig {
     if ($Items -contains 'Transforms') {
         write-progress -activity 'Transforms'
         $transforms = Get-IdentityNowTransform
-        if ($NullDynamicValues){
+        if ($NullDynamicValues) {
             #no dynamic values in this output
         }
         #"set-content $($outputpath.FullName)\Transforms.json"
@@ -438,19 +471,19 @@ function Export-IdentityNowConfig {
     if ($Items -contains 'VAClusters') {
         write-progress -activity 'VAClusters'
         $VAClusters = Get-IdentityNowVACluster
-        if ($NullDynamicValues){
-            foreach ($vac in $VAClusters){
-                if ($vac.pollingPeriodTimestamp){
-                    $vac.pollingPeriodTimestamp=$null
+        if ($NullDynamicValues) {
+            foreach ($vac in $VAClusters) {
+                if ($vac.pollingPeriodTimestamp) {
+                    $vac.pollingPeriodTimestamp = $null
                 }
-                if ($vac.configuration.va_version){
-                    $vac.configuration.va_version=$null
+                if ($vac.configuration.va_version) {
+                    $vac.configuration.va_version = $null
                 }
-                if ($vac.configuration.jobType){
-                    $vac.configuration.jobType=$null
+                if ($vac.configuration.jobType) {
+                    $vac.configuration.jobType = $null
                 }
-                if ($vac.configuration.cookbook){
-                    $vac.configuration.cookbook=$null
+                if ($vac.configuration.cookbook) {
+                    $vac.configuration.cookbook = $null
                 }
                 if ($vac.configuration.scheduleUpgrade){
                     $vac.configuration.scheduleUpgrade=$null
@@ -464,10 +497,10 @@ function Export-IdentityNowConfig {
                     $vac.maintenance.windowFinishTime=$null
                     $vac.maintenance.window=$null
                 }
-                if ($vac.jobs){
-                    $vac.jobs=@()
+                if ($vac.jobs) {
+                    $vac.jobs = @()
                 }
-                if ($vac.clients){
+                if ($vac.clients) {
                     $vac.clients = $vac.clients | Sort-Object -Property id
                 }
             }

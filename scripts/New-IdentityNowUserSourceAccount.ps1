@@ -23,7 +23,7 @@ function New-IdentityNowUserSourceAccount {
     }
 
 .EXAMPLE
-    New-IdentityNowUserSourceAccount -source 12345 -account "{"id":  "darrenjrobinson","name":  "darrenjrobinson","displayName":  "Darren Robinson","email":  "darren.robinson@customer.com.au","familyName":  "Robinson","givenName":  "Darren"}"
+    New-IdentityNowUserSourceAccount -sourceID 12345 -account "{"id":  "darrenjrobinson","name":  "darrenjrobinson","displayName":  "Darren Robinson","email":  "darren.robinson@customer.com.au","familyName":  "Robinson","givenName":  "Darren"}"
 
 .LINK
     http://darrenjrobinson.com/sailpoint-identitynow

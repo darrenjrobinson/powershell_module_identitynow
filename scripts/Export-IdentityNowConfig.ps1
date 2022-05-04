@@ -96,32 +96,20 @@ function Export-IdentityNowConfig {
                 if ($client.configuration.jobType) {
                     $client.configuration.jobType = $null
                 }
-<<<<<<< HEAD
                 if ($client.configuration.scheduleUpgrade){
                     $client.configuration.scheduleUpgrade=$null
                 }
                 if ($client.configuration.va_version){
                     $client.configuration.va_version=$null
-=======
-                if ($client.configuration.va_version) {
-                    $client.configuration.va_version = $null
->>>>>>> 8af438af4efa5f5f009ef976d682cea3bc1a8d80
                 }
                 if ($client.lastSeen) {
                     $client.lastSeen = $null
                 }
-<<<<<<< HEAD
                 if ($client.maintenance){
                     $client.maintenance.windowStartTime=$null
                     $client.maintenance.windowClusterTime=$null
                     $client.maintenance.windowFinishTime=$null
                     $client.maintenance.window=$null
-=======
-                if ($client.maintenance) {
-                    $client.maintenance.windowStartTime = $null
-                    $client.maintenance.windowClusterTime = $null
-                    $client.maintenance.windowFinishTime = $null
->>>>>>> 8af438af4efa5f5f009ef976d682cea3bc1a8d80
                 }
                 if ($client.pollingPeriodTimestamp) {
                     $client.pollingPeriodTimestamp = $null
@@ -252,15 +240,9 @@ function Export-IdentityNowConfig {
                     if ($singleidp.report) {
                         $singleidp.report = $null
                     }
-<<<<<<< HEAD
                     foreach ($state in $singleidp.configuredStates){
                         if ($state.identitycount -or $state.identityCount -eq 0){
                             $state.identitycount=$null
-=======
-                    foreach ($state in $singleidp.configuredStates) {
-                        if ($state.identitycount) {
-                            $state.identitycount = $null
->>>>>>> 8af438af4efa5f5f009ef976d682cea3bc1a8d80
                         }
                     }
                 }

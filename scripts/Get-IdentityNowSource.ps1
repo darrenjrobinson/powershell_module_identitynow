@@ -31,7 +31,7 @@ function Get-IdentityNowSource {
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
         [string]$sourceID,
         [switch]$accountProfiles,
-        [string][ValidateSet("Private", "Beta")]$api='Private'
+        [string][ValidateSet("Private","3","Beta")]$api='Private'
     )
     
     if ($accountProfiles -and $null -eq $sourceID) { Write-Warning "exporting the provisionng profiles requires a sourceID"; break }
@@ -43,17 +43,13 @@ function Get-IdentityNowSource {
             if ($sourceID) {
                 if ($accountProfiles) {
                     switch($api){
-                        'Private'{$IDNSources = Invoke-RestMethod -Method Get -Uri "$((Get-IdentityNowOrg).'Private Base API URI')/accountProfile/list/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }}
-                        'Beta'{
-                            write-warning 'this combination of beta api and account profile is not using the beta endpoint'
-                            $IDNSources = Invoke-RestMethod -Method Get -Uri "$((Get-IdentityNowOrg).'Private Base API URI')/accountProfile/list/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
-                        }
+                        'default'{$IDNSources = Invoke-RestMethod -Method Get -Uri "$((Get-IdentityNowOrg).'Private Base API URI')/accountProfile/list/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }}
                     }
                     
                 }
                 else {
                     switch($api){
-                        'Private'{$IDNSources = Invoke-RestMethod -Method Get -Uri "$((Get-IdentityNowOrg).'Private Base API URI')/source/get/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"}}
+                        'default'{$IDNSources = Invoke-RestMethod -Method Get -Uri "$((Get-IdentityNowOrg).'Private Base API URI')/source/get/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"}}
                         'Beta'{$IDNSources = Invoke-RestMethod -Method Get -Uri "$((Get-IdentityNowOrg).beta)/sources/$($sourceID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"}}
                     }
                 }                

@@ -31,7 +31,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
 
     if ($v3Token.access_token) {
         try {    
-            if (!$limit) {$limit = "999"}
+            if (!$limit) {$limit = "250"}
             $IDNGetPAT = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/personal-access-tokens?count=true&offset=0&limit=$($limit)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
             
             if ($IDNGetPAT.count -gt 0) {

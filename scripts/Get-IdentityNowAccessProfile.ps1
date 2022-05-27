@@ -9,6 +9,9 @@ Get an IdentityNow Access Profile(s).
 .PARAMETER profileID
 (optional) The profile ID of an IdentityNow Access Profile.
 
+.PARAMETER api
+    (optional) specify alternate API version
+
 .EXAMPLE
 Get-IdentityNowAccessProfile 
 

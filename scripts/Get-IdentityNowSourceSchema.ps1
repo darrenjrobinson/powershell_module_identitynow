@@ -9,6 +9,9 @@ function Get-IdentityNowSourceSchema {
 .PARAMETER sourceID
     (required) The ID of an IdentityNow Source. eg. 45678
 
+.PARAMETER api
+    (optional) specify alternate API version
+
 .EXAMPLE
     Get-IdentityNowSourceSchema -sourceID 12345
 
@@ -20,7 +23,8 @@ function Get-IdentityNowSourceSchema {
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$sourceID
+        [string]$sourceID,
+        [string][ValidateSet("Private", "Beta")]$api='Private'
     )
 
     $v3Token = Get-IdentityNowAuth

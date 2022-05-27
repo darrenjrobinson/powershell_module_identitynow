@@ -31,10 +31,10 @@ function Search-IdentityNowEntitlements {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$query,
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [int]$limit = 2500
+        [int]$limit = 250
     )
 
-    if ($limit -gt 10000) {
+    if ($limit -gt 250) {
         Write-Error "Maximum search limit provided by the API is 10,000 results? Reduce your search limit parameter."
         break  
     }

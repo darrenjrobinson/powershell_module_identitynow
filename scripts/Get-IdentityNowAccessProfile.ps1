@@ -63,6 +63,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
                         }
                     }
                     $temp = Invoke-RestMethod -Method Get -Uri $url -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } -Verbose:($PSCmdlet.MyInvocation.BoundParameters["Verbose"].IsPresent -eq $true)
+                    $v3Token = Get-IdentityNowAuth
                     $IDNAccessProfiles+=$temp
                     $offset+=$limit
                 }until($temp.count -lt $limit -or -not $all)

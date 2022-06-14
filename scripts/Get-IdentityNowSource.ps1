@@ -31,7 +31,7 @@ function Get-IdentityNowSource {
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
         [string]$sourceID,
         [switch]$accountProfiles,
-        [string][ValidateSet("Private","3","Beta")]$api='Private'
+        [string][ValidateSet("Private","v3","Beta")]$api='Private'
     )
     
     if ($accountProfiles -and $null -eq $sourceID) { Write-Warning "exporting the provisionng profiles requires a sourceID"; break }

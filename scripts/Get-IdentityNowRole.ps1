@@ -23,7 +23,10 @@ http://darrenjrobinson.com/sailpoint-identitynow
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$roleID
+        [string]$roleID,
+        [validateset('private','v2','beta')]
+        [string]$api='private',
+        [switch]$all
     )
 
     $v3Token = Get-IdentityNowAuth
@@ -32,31 +35,46 @@ http://darrenjrobinson.com/sailpoint-identitynow
         try {
             if ($roleID) {
                 $utime = [int][double]::Parse((Get-Date -UFormat %s))
-                $IDNRoles = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/role/get?_dc=$($utime)&id=$($roleID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+                switch ($api){
+                    'private'{
+                        $url = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/role/get?_dc=$($utime)&id=$($roleID)"
+                    }
+                    'v2'{
+                        $url="https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/search/roles?query=name%20-eq%20*&org=$($IdentityNowConfiguration.orgName)"
+                    }
+                    'beta'{
+                        $url = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/roles/get?id=$($roleID)"
+                    }
+                }
+                $IDNRoles = Invoke-RestMethod -Method Get -Uri $url -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
                 return $IDNRoles
             }
             else {
                 Write-Verbose "Getting All Roles"
                 # Get Roles Based on Query because the LIST Roles API is just random chaos when returning multiple pages of results
-                $sourceObjects = @() 
-                $limit = "2500"
-                $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/search/roles?offset=0&limit=2500&query=name%20-eq%20*&org=$($IdentityNowConfiguration.orgName)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                
-
-                if ($results) {
-                    $sourceObjects += $results
-                }
-                $offset = 0
-                do { 
-                    if ($results.Count -eq $limit) {
-                        # Get Next Page
-                        [int]$offset = $offset + $limit 
-                        $results = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/search/roles?offset=$($offset)&limit=$($limit)&query=name%20-eq%20*" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }                
-                        if ($results) {
-                            $sourceObjects += $results
+                $offset=0
+                $IDNRoles =@()
+                do{
+                    switch ($api){
+                        'private'{
+                            $limit=250
+                            $url="https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/role/list?offset=$offset&limit=$limit&query=name%20-eq%20*&org=$($IdentityNowConfiguration.orgName)"
+                        }
+                        'v2'{
+                            $limit=250
+                            $url="https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/search/roles?offset=$offset&limit=$limit&query=name%20-eq%20*&org=$($IdentityNowConfiguration.orgName)"
+                        }
+                        'beta'{
+                            $limit=50
+                            $url="https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/roles?offset=$offset&limit=$limit"
                         }
                     }
-                } until ($results.Count -lt $limit)
-                return $sourceObjects
+                    $temp = Invoke-RestMethod -Method Get -Uri $url -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } -Verbose:($PSCmdlet.MyInvocation.BoundParameters["Verbose"].IsPresent -eq $true)
+                    $v3Token = Get-IdentityNowAuth
+                    $IDNRoles+=$temp
+                    $offset+=$limit
+                }until($temp.count -lt $limit -or -not $all)
+                return $IDNRoles
             }
         }
         catch {

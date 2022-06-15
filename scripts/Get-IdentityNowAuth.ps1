@@ -230,7 +230,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
             username   = $adminUSR
             password   = $adminPWD
         }
-        Write-Verbose "AuthType: Admin Creds"        
+        Write-Verbose "AuthType: Admin Creds"
     }
     
     if (-not $IdentityNowConfiguration.JWT -or (-not $IdentityNowConfiguration.JWT.access_token)) { 

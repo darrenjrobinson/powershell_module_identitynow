@@ -17,6 +17,7 @@
         'Get-IdentityNowActiveJobs',
         'Get-IdentityNowAPIClient',
         'Get-IdentityNowApplication',
+        'Get-IdentityNowApplicationAccessProfile',
         'Get-IdentityNowAuth',
         'Get-IdentityNowCertCampaign',
         'Get-IdentityNowCertCampaignReport',
@@ -84,6 +85,7 @@
         'Start-IdentityNowCertCampaign',
         'Start-IdentityNowProfileUserRefresh',
         'Test-IdentityNowCredentials',
+        'Test-IdentityNowToken',
         'Test-IdentityNowTransforms',
         'Test-IdentityNowSourceConnection',
         'Test-IdentityNowTransforms',
@@ -109,8 +111,8 @@
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUDkqXnNVWQb9/HlAOS84c6DBS
-# zI6gggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUWA3RbBkIoj1IEh1/8JPdBvl+
+# 0OegggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -171,11 +173,11 @@
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFNFTLwQ1YicM
-# O1FAsv3Vud3fM5YjMA0GCSqGSIb3DQEBAQUABIIBAGynErVfUhGWC83UV2N2S1fo
-# i/UWsycZEaNjnPBQaE02vQHrtkcuHZnLdNXmbDcDzYXvKqm4jBU3z1sv730RuUP6
-# 2zOEeYX4ikgA1GW0yse18PN9zC7voDkoY+HOuaWFxHyU4b7DV9WL2i+EiFjfvABw
-# Ut4sVEFursu2mraHreApYManC/5/5vmwkpFOJ61lw/Gy7e28XnDC3/YgvJAkKBMN
-# GlElTn1+d+H/mk/uWvRR3Ci9qPoYhyP2lAJMbcr2SiNp5Szm4JEedYv+v07lDRWH
-# 2xrLPCdwMD4fKrmAuQwQY1UvC8M14ZalS/uqJ1gt/Qb31jtGOZXHNRRnfl4EwdM=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFLiHp4RDlxlt
+# IqtuNV9BUd28Fq8/MA0GCSqGSIb3DQEBAQUABIIBAAtCK6QgryAIJH6p0+UP7Y3y
+# b9DYEQo5ssiL4sZzcxssPJ23UvY9h2a+zjqIyHZkkMghrFPO3SrgRexgRYgs3u6H
+# byyJu2JXMDE7NCSXeEKnYLJ8CTo/Tiav1llDrGm2AUiU+w0OcNY5WXsu/GkwnQpi
+# 4soRORnu3W4puhvx8J1Ii3aY9MMiEnQZ7VRk8Mm+GhcJojL0ukg8acSDq9ox5UsR
+# XiSEB2E2ac6tTmE6r0lYQQm9JBt603tMtNE57HcdknjqHqWmRyqjIMDb/SfQ4fo+
+# Zu/tZfqb6yk3c78qaUCHbQaHTl2Nl7S5u0RxmZyFzHm/Jo7t5Pw3MsdUF3VjlJI=
 # SIG # End signature block

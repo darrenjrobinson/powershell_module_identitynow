@@ -4,7 +4,7 @@ function Test-IdentityNowCredentials {
     Tests IdentityNow Live credentials.
 
 .DESCRIPTION
-    Test APIv3, APIv2 and Personal Access Token credentials.
+    Test APIv3 and Personal Access Token credentials.
 
 .NOTES
     written by Sean McGovern 11/27/2019 (twitter @410sean)
@@ -20,24 +20,24 @@ function Test-IdentityNowCredentials {
     [cmdletbinding()]
     param ( )
 
-    if ($IdentityNowConfiguration.v2) {
-        try {
-            $IDNCluster = $null 
-            $IDNCluster = Invoke-IdentityNowRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/cluster/list" -headers Headersv2_JSON
-            if ($IDNCluster) {
-                Write-Verbose "v2 Output: $($IDNCluster)"
-                "Validated APIv2 credentials."
-            } else {
-                write-warning "Testing APIv2 credentials failed for $($IdentityNowConfiguration.orgName)."
-            }
-        } catch {
-            write-warning "Testing APIv2 credentials failed for $($IdentityNowConfiguration.orgName)."
-            Write-Warning $_
-        }  
-    }
-    else {
-        "APIv2 credentials not stored in IdentityNow Configuration."
-    }
+    # if ($IdentityNowConfiguration.v2) {
+    #     try {
+    #         $IDNCluster = $null 
+    #         $IDNCluster = Invoke-IdentityNowRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/cluster/list" -headers Headersv2_JSON
+    #         if ($IDNCluster) {
+    #             Write-Verbose "v2 Output: $($IDNCluster)"
+    #             "Validated APIv2 credentials."
+    #         } else {
+    #             write-warning "Testing APIv2 credentials failed for $($IdentityNowConfiguration.orgName)."
+    #         }
+    #     } catch {
+    #         write-warning "Testing APIv2 credentials failed for $($IdentityNowConfiguration.orgName)."
+    #         Write-Warning $_
+    #     }  
+    # }
+    # else {
+    #     "APIv2 credentials not stored in IdentityNow Configuration."
+    # }
 
     if ($IdentityNowConfiguration.v3) {
         try {    

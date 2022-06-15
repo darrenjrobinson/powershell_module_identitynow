@@ -328,7 +328,7 @@ Update-IdentityNowOrgConfig -update ($approvalConfigBody | convertto-json)
 ### Test IdentityNow Credentials ###
 
 Test saved IdentityNow PowerShell Module credentials.
-Validates the saved credentials (v2 and v3) against the configured Org.
+Validates the saved credentials (v3 and PAT) against the configured Org.
 
 Example
 

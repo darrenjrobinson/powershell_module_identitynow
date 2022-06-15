@@ -204,7 +204,7 @@ Get-IdentityNowPersonalAccessToken          List IdentityNow Personal Access Tok
 Get-IdentityNowProfile                      Get IdentityNow Identity Profile(s).
 Get-IdentityNowProfileOrder                 Get IdentityNow Profiles Order.
 Get-IdentityNowQueue                        Get IdentityNow Queues.
-Get-IdentityNowRole                         Get an IdentityNow Role(s).
+Get-IdentityNowRole                         Get IdentityNow Role(s).
 Get-IdentityNowRule                         Get IdentityNow Rule(s).
 Get-IdentityNowSource                       Get IdentityNow Source(s).
 Get-IdentityNowSourceAccounts               Get IdentityNow Accounts on a Source.
@@ -213,6 +213,8 @@ Get-IdentityNowTask                         Get an IdentityNow Task(s).
 Get-IdentityNowTimeZone                     Get IdentityNow Time Zone(s).
 Get-IdentityNowTransform                    Get IdentityNow Transform(s).
 Get-IdentityNowVACluster                    Get IdentityNow Virtual Appliance Cluster(s).
+Invoke-IdentityNowAccountCorrelation        Find uncorrelated accounts that can be joined
+Invoke-IdentityNowAggregateEntitlement      Initiate Entitlement Aggregation of an IdentityNow Source.
 Invoke-IdentityNowAggregateSource           Initiate Aggregation of an IdentityNow Source.
 Invoke-IdentityNowRequest                   Submit an IdentityNow API Request.
 Invoke-IdentityNowSourceReset               Reset an IdentityNow Source.
@@ -243,7 +245,7 @@ Remove-IdentityNowSource                    Deletes an IdentityNow Source.
 Remove-IdentityNowTransform                 Delete an IdentityNow Transform.
 Remove-IdentityNowUserSourceAccount         Delete an IdentityNow User Account on a Flat File Source.
 Save-IdentityNowConfiguration               Saves default IdentityNow configuration to a file in the current users Profile.
-Search-IdentityNow                          Search IdentityNow Access Profiles, Account Activities, Accounts, Aggregations, Entitlements, Events, Identities, Roles.      
+Search-IdentityNow                          Search IdentityNow Access Profiles, Account Activities, Accounts, Aggregations, Entitlements, Events, Identities, Roles.
 Search-IdentityNowEntitlements              Get IdentityNow Entitlements.
 Search-IdentityNowEvents                    Search IdentityNow Event(s) using Elasticsearch queries.
 Search-IdentityNowIdentities                Search IdentityNow Identitie(s) using Elasticsearch queries.
@@ -257,6 +259,7 @@ Start-IdentityNowCertCampaign               Start an IdentityNow Certification C
 Start-IdentityNowProfileUserRefresh         Triggers a user refresh for an IdentityNow Identity Profile(s).
 Test-IdentityNowCredentials                 Tests IdentityNow Live credentials.
 Test-IdentityNowSourceConnection            Tests connection on an IdentityNow Source.
+Test-IdentityNowToken                       Helper function to test valid token.
 Test-IdentityNowTransforms                  Test IdentityNow transforms to detect common problems
 Update-IdentityNowAccessProfile             Update an IdentityNow Access Profile(s).
 Update-IdentityNowApplication               Update an IdentityNow Application.
@@ -1376,6 +1379,15 @@ Example
 
 ```powershell
 Get-IdentityNowAuth -return V3Header
+```
+### Initiate Entitlement Aggregation of an IdentityNow Source ###
+
+Initiate Entitlement Aggregation of an IdentityNow Source.
+
+Example
+
+```powershell
+Invoke-IdentityNowAggregateEntitlement -sourceID 12345
 ```
 
 ### Initiate Aggregation of an IdentityNow Source ###

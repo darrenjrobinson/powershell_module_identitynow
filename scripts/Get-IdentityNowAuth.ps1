@@ -248,13 +248,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
             $v3Token = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody -Headers $Headersv3
         }
         catch {
-            Write-Error "unable to auth $($oAuthTokenBody.grant_type) grant type
-for $($IdentityNowConfiguration.orgName)
-v2:$($null -ne $IdentityNowConfiguration.v2)
-v3:$($null -ne $IdentityNowConfiguration.v3)
-cred:$($null -ne $IdentityNowConfiguration.AdminCredential)
-pat:$($null -ne $IdentityNowConfiguration.PAT)
-$_" -ErrorAction 'stop'
+            Write-Error "Unable to auth $($oAuthTokenBody.grant_type) grant type for $($IdentityNowConfiguration.orgName) v2:$($null -ne $IdentityNowConfiguration.v2) v3:$($null -ne $IdentityNowConfiguration.v3) cred:$($null -ne $IdentityNowConfiguration.AdminCredential) pat:$($null -ne $IdentityNowConfiguration.PAT) $_" -ErrorAction 'stop'
         }
         $IdentityNowConfiguration.JWT = $v3Token
         Write-Verbose "AuthType: v3 JWT Access Token"
@@ -299,6 +293,8 @@ $_" -ErrorAction 'stop'
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUDphm1QAe4Ne8QeakX1atDpAR
+# nuegggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -359,5 +355,11 @@ $_" -ErrorAction 'stop'
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFFQVTpF078On
+# hph60f5/pPhsJedQMA0GCSqGSIb3DQEBAQUABIIBAGcuL+UTe8t/4XSzNC/7M8H3
+# 89wLOXY9GTMSr6C9mbDDNIlh9XidVUGPnpLJsjUM4SImUDOHQQtS6yuZ9Oh6hcPx
+# tFBNGVGb7SsHtBcZoo/qQx2biGuIA7Z/tGzMC9Hthwzl8xIXYH/JmOsfeKtAbdqP
+# d9iP9vQQ1SE2VHTuAcBsCmb7A93a6fAKnbnyVHQ01nfW8R2qPmuorSYUDiqwpVlY
+# jgNe9CPo8Qc8C9O4LQveJpe4fSABQ4SpiXYY3LNBCdWHEqcqJHrP8nUraIx5feP2
+# 4wKQo9BemX2S1O8dhb1n7TaOX1dI/6TACS+p3fljVQmakqZXMtcSKXaqqbbowNQ=
 # SIG # End signature block

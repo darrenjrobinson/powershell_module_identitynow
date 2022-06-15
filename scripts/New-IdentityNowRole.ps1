@@ -20,14 +20,19 @@ http://darrenjrobinson.com/sailpoint-identitynow
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$role
+        [string]$role,
+        [string][ValidateSet("Private","Beta")]$api='Private'
     )
 
     $v3Token = Get-IdentityNowAuth
 
     if ($v3Token.access_token) {
         try {
-            $IDNNewRoles = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/role/create" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "content-type" = "application/json" } -Body $role
+            switch($api){
+                "private"{$url="https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/role/create"}
+                "beta"{$url="https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/roles"}
+            }
+            $IDNNewRoles = Invoke-RestMethod -Method Post -Uri $url -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)"; "content-type" = "application/json" } -Body $role
             return $IDNNewRoles
         }
         catch {

@@ -96,16 +96,20 @@ function Export-IdentityNowConfig {
                 if ($client.configuration.jobType) {
                     $client.configuration.jobType = $null
                 }
-                if ($client.configuration.va_version) {
-                    $client.configuration.va_version = $null
+                if ($client.configuration.scheduleUpgrade){
+                    $client.configuration.scheduleUpgrade=$null
+                }
+                if ($client.configuration.va_version){
+                    $client.configuration.va_version=$null
                 }
                 if ($client.lastSeen) {
                     $client.lastSeen = $null
                 }
-                if ($client.maintenance) {
-                    $client.maintenance.windowStartTime = $null
-                    $client.maintenance.windowClusterTime = $null
-                    $client.maintenance.windowFinishTime = $null
+                if ($client.maintenance){
+                    $client.maintenance.windowStartTime=$null
+                    $client.maintenance.windowClusterTime=$null
+                    $client.maintenance.windowFinishTime=$null
+                    $client.maintenance.window=$null
                 }
                 if ($client.pollingPeriodTimestamp) {
                     $client.pollingPeriodTimestamp = $null
@@ -236,9 +240,9 @@ function Export-IdentityNowConfig {
                     if ($singleidp.report) {
                         $singleidp.report = $null
                     }
-                    foreach ($state in $singleidp.configuredStates) {
-                        if ($state.identitycount) {
-                            $state.identitycount = $null
+                    foreach ($state in $singleidp.configuredStates){
+                        if ($state.identitycount -or $state.identityCount -eq 0){
+                            $state.identitycount=$null
                         }
                     }
                 }
@@ -378,9 +382,21 @@ function Export-IdentityNowConfig {
                 if ($source.health.type) {
                     $source.health.type = $null
                 }
-                foreach ($sku in $source.subscribedSkus) {
-                    if ($sku.consumedUnits -or $sku.consumedUnits -eq 0) {
-                        $sku.consumedUnits = $null
+                if ($source.health.isAuthoritative){
+                    $source.health.isAuthoritative=$null
+                }
+                if ($source.connectorMetadata.supportedUI){
+                    $source.connectorMetadata.supportedUI=$null
+                }
+                if ($source.oauth_token_info){
+                    $source.oauth_token_info=$null
+                }
+                if ($source.connector_refresh_token){
+                    $source.connector_refresh_token=$null
+                }
+                foreach ($sku in $source.subscribedSkus){
+                    if ($sku.consumedUnits -or $sku.consumedUnits -eq 0){
+                        $sku.consumedUnits=$null
                     }
                     if ($NullDynamicValues -eq 'Full') {
                         if ($sku.prepaidUnits.enabled -or $sku.prepaidUnits.enabled -eq 0) {
@@ -403,6 +419,21 @@ function Export-IdentityNowConfig {
                     }
                     if ($source.uncorrelatedAccountsFileFeedHistory) {
                         $source.uncorrelatedAccountsFileFeedHistory = @()
+                    }
+                    if ($null -ne $source.health.healthy){
+                        $source.health.healthy=$null
+                    }
+                    if ($source.health.status){
+                        $source.health.status=$null
+                    }
+                    #temporary to handle tempormental values
+                    if ($source.sourceConnectorName -eq 'Azure Active Directory'){
+                        $source | Add-Member -NotePropertyName 'connector_(boolean)enableAzureManagement' -NotePropertyValue $null -Force
+                        $source | Add-Member -NotePropertyName 'enableAzureManagement' -NotePropertyValue $null -Force
+                    }
+                    if ($source.sourceConnectorName -eq 'SCIM 2.0'){
+                        $source | Add-Member -NotePropertyName 'connector_(boolean)relaxConfiguration' -NotePropertyValue $null -Force
+                        $source | Add-Member -NotePropertyName 'connector_(Map)jsonPathMapping' -NotePropertyValue $null -Force
                     }
                 }
             }
@@ -436,17 +467,17 @@ function Export-IdentityNowConfig {
                 if ($vac.configuration.cookbook) {
                     $vac.configuration.cookbook = $null
                 }
-                if ($vac.va_version) {
-                    $vac.va_version = $null
+                if ($vac.configuration.scheduleUpgrade){
+                    $vac.configuration.scheduleUpgrade=$null
                 }
-                if ($vac.maintenance.windowStartTime) {
-                    $vac.maintenance.windowStartTime = $null
+                if ($vac.va_version){
+                    $vac.va_version=$null
                 }
-                if ($vac.maintenance.windowClusterTime) {
-                    $vac.maintenance.windowClusterTime = $null
-                }
-                if ($vac.maintenance.windowFinishTime) {
-                    $vac.maintenance.windowFinishTime = $null
+                if ($vac.maintenance){
+                    $vac.maintenance.windowStartTime=$null
+                    $vac.maintenance.windowClusterTime=$null
+                    $vac.maintenance.windowFinishTime=$null
+                    $vac.maintenance.window=$null
                 }
                 if ($vac.jobs) {
                     $vac.jobs = @()

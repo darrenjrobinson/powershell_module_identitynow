@@ -20,7 +20,7 @@ function Get-IdentityNowAccountActivities {
     (optional - default 250) number of results to return
 
 .EXAMPLE
-    Get-IdentityNowAccountActivities -type appRequest -searchLimit 1000
+    Get-IdentityNowAccountActivities -type appRequest -searchLimit 50
 
 .EXAMPLE
     $user = Search-IdentityNowUsers -query "@accounts(accountId:darren.robinson)"    

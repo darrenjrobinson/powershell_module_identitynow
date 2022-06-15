@@ -26,7 +26,7 @@ function Get-IdentityNowSourceAccounts {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$sourceID,
         [switch]$attributes,
-        [int]$searchLimit = "2500"
+        [int]$searchLimit = "250"
     )
 
     $v3Token = Get-IdentityNowAuth

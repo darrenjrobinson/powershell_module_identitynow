@@ -34,7 +34,7 @@ function Get-IdentityNowCertCampaign {
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
         [boolean]$completed = $true,
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$limit = '999999'
+        [string]$limit = '250'
     )
     
     $v3Token = Get-IdentityNowAuth

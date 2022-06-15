@@ -9,6 +9,9 @@ Get an IdentityNow Access Profile(s).
 .PARAMETER profileID
 (optional) The profile ID of an IdentityNow Access Profile.
 
+.PARAMETER api
+    (optional) specify alternate API version
+
 .EXAMPLE
 Get-IdentityNowAccessProfile 
 
@@ -23,7 +26,10 @@ http://darrenjrobinson.com/sailpoint-identitynow
     [cmdletbinding()]
     param(
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$profileID
+        [string]$profileID,
+        [validateset('v2','beta')]
+        [string]$api='v2',
+        [switch]$all
     )
 
     $v3Token = Get-IdentityNowAuth
@@ -31,11 +37,37 @@ http://darrenjrobinson.com/sailpoint-identitynow
     if ($v3Token.access_token) {
         try {
             if ($profileID) {
-                $IDNAccessProfiles = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/access-profiles/$($profileID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+                switch ($api){
+                    'v2'{
+                        $IDNAccessProfiles = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/access-profiles/$($profileID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } -Verbose:($PSCmdlet.MyInvocation.BoundParameters["Verbose"].IsPresent -eq $true)
+                    }
+                    'beta'{
+                        $IDNAccessProfiles = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/access-profiles/$($profileID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } -Verbose:($PSCmdlet.MyInvocation.BoundParameters["Verbose"].IsPresent -eq $true)
+                    }
+                }                
                 return $IDNAccessProfiles
             }
             else {
-                $IDNAccessProfiles = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/access-profiles" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+                
+                $offset=0
+                $IDNAccessProfiles =@()
+                do{
+                    switch ($api){
+                        'v2'{
+                            $limit=250
+                            $url="https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v2/access-profiles?offset=$offset&limit=$limit"
+                        }
+                        'beta'{
+                            $limit=50
+                            $url="https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/access-profiles?offset=$offset&limit=$limit"
+                        }
+                    }
+                    $temp = Invoke-RestMethod -Method Get -Uri $url -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" } -Verbose:($PSCmdlet.MyInvocation.BoundParameters["Verbose"].IsPresent -eq $true)
+                    $v3Token = Get-IdentityNowAuth
+                    $IDNAccessProfiles+=$temp
+                    $offset+=$limit
+                }until($temp.count -lt $limit -or -not $all)
+                Write-Verbose "retrieved $($IDNAccessProfiles.count) Access Profiles"
                 return $IDNAccessProfiles
             }
         }

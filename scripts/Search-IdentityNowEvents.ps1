@@ -13,7 +13,7 @@ function Search-IdentityNowEvents {
     See https://community.sailpoint.com/t5/Admin-Help/How-do-I-use-Search-in-IdentityNow/ta-p/76960 
 
 .PARAMETER searchLimit
-    (optional - default 2500) number of results to return
+    (optional - default 250) number of results to return
 
 .EXAMPLE
     $query = @{query = 'technicalName:USER_AUTHENTICATION_STEP_UP_SETUP_*'; type = 'USER_MANAGEMENT'}
@@ -33,7 +33,7 @@ function Search-IdentityNowEvents {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$filter,
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$searchLimit = 2500
+        [string]$searchLimit = 250
     )
 
     $v3Token = Get-IdentityNowAuth
@@ -41,12 +41,12 @@ function Search-IdentityNowEvents {
     if ($v3Token.access_token) {        
         try {             
             $sourceObjects = @()   
-            if ($searchLimit -gt 2500) {
-                $iterations = $searchLimit / 2500
-                $offset = 2500
+            if ($searchLimit -gt 250) {
+                $iterations = $searchLimit / 250
+                $offset = 250
             }                     
 
-            if ($searchLimit -gt 2500) { $limit = 2500 } else { $limit = $searchLimit }
+            if ($searchLimit -gt 250) { $limit = 250 } else { $limit = $searchLimit }
 
             $searchURLBase = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v3/search?limit=$($limit)"
 
@@ -64,7 +64,7 @@ function Search-IdentityNowEvents {
                 }
                 # Get Rest 
                 do {
-                    if (($searchLimit - $offset) -gt 2500) {  
+                    if (($searchLimit - $offset) -gt 250) {  
                         $results = Invoke-RestMethod -Method Post `
                             -Uri "$($searchURLBase)&offset=$($offset)" `
                             -Headers @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json" } `
@@ -81,7 +81,7 @@ function Search-IdentityNowEvents {
                     }
                     else {
                         $limitCount = ($searchLimit - $sourceObjects.count)
-                        $searchURL = $searchURLBase.Replace("limit=2500", "limit=$($limitCount)")
+                        $searchURL = $searchURLBase.Replace("limit=250", "limit=$($limitCount)")
                         $results = Invoke-RestMethod -Method Post `
                             -Uri "$($searchURL)&offset=$($offset)" `
                             -Headers @{Authorization = "Bearer $($v3Token.access_token)"; "Content-Type" = "application/json" } `

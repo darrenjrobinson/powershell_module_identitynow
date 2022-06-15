@@ -31,10 +31,10 @@ function Search-IdentityNowUsers {
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$query,
         [Parameter(Mandatory = $false, ValueFromPipeline = $true)]
-        [string]$limit = 2500
+        [string]$limit = 250
     )
-
-    $v3Token = Get-IdentityNowAuth
+    $Body = "{`"query`":{`"query`":`"$($query)`"},`"indices`":[`"identities`"],`"sort`":[`"displayName`"],`"includeNested`":false}"
+    Search-IdentityNowIdentities -filter $body -
 
     if ($v3Token.access_token) {
         try {                         

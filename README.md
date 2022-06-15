@@ -29,6 +29,7 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Search IdentityNow Identities
 * Search IdentityNow Access Profiles, Account Activities, Accounts, Aggregations, Entitlements, Events, Identities, Roles
 * Create / Get / Update / Remove IdentityNow Access Profiles
+* Get Access Profiles associated with an IdentityNow Application
 * Create / Get / Start IdentityNow Certification Campaigns
 * Get IdentityNow Certification Campaign Reports (output to file or return as PSObject)
 * Create / Get / Update / Remove IdentityNow Governance Groups
@@ -187,6 +188,7 @@ Get-IdentityNowAccountActivity              Get IdentityNow Activity for an acco
 Get-IdentityNowActiveJobs                   Get IdentityNow Active Jobs.
 Get-IdentityNowAPIClient                    Get IdentityNow API Client(s).
 Get-IdentityNowApplication                  Get IdentityNow Application(s).
+Get-IdentityNowApplicationAccessProfile     Get IdentityNow Access Profile(s) of an application.
 Get-IdentityNowAuth                         Get IdentityNow JWT access token or basic auth header.
 Get-IdentityNowCertCampaign                 Get IdentityNow Certification Campaign(s).
 Get-IdentityNowCertCampaignReport           Get IdentityNow Certification Campaign Report(s).
@@ -225,7 +227,7 @@ New-IdentityNowPersonalAccessToken          Create an IdentityNow v3 oAuth Perso
 New-IdentityNowProfile                      Create new IdentityNow Identity Profile(s).
 New-IdentityNowRole                         Create an IdentityNow Role.
 New-IdentityNowSource                       Create an IdentityNow Source.
-New-IdentityNowSourceAccountSchemaAttribute Discover or add to a sources' account schema.
+New-IdentityNowSourceAccountSchemaAttribute Discover or add to a sources account schema.
 New-IdentityNowSourceConfigReport           Generate a HTML Report of IdentityNow Sources configuration and export each Source and Schema config.
 New-IdentityNowSourceEntitlements           Create/Update IdentityNow Entitlements on a Flat File Source.
 New-IdentityNowTransform                    Create an IdentityNow Transform.
@@ -570,6 +572,7 @@ New-IdentityNowAccessProfile -profile ($accessProfile | convertto-json)
 ```
 
 Update an IdentityNow Access Profile
+
 Example 1
 
 ```powershell
@@ -590,6 +593,7 @@ Update-IdentityNowAccessProfile -profileID $accessProfile.id -update ($updateAcc
 ```
 
 Remove an IdentityNow Access Profile
+
 Example 1
 
 ```powershell
@@ -632,6 +636,16 @@ Example 4 - Map managerDN to the returned value from the 'Rule - IdentityAttribu
 Update-IdentityNowProfileMapping -id 1285 -IdentityAttribute managerDn -sourceType Complex -source 'Rule - IdentityAttribute - Get Manager'
 ```
 
+### Get Access Profiles associated with an IdentityNow Application ###
+
+Get the IdentityNow Access Profiles associated with an IdentityNow Application.
+
+Example
+
+```powershell
+Get-IdentityNowApplicationAccessProfile -appID 50608
+```
+
 ### Create / Get / Start IdentityNow Certification Campaigns ###
 
 Get all (active and completed) IdentityNow Certification Campaigns
@@ -644,6 +658,7 @@ Get-IdentityNowCertCampaign -completed $false
 ```
 
 Get a specific IdentityNow Certification Campaign
+
 Example
 
 ```powershell
@@ -765,6 +780,7 @@ Get-IdentityNowCertCampaignReport -period "30" -completed $false
 ```
 
 Get certification campaign reports for a specific campaign and return as PSObject
+
 Example
 
 ```powershell
@@ -783,6 +799,7 @@ Get-IdentityNowGovernanceGroup
 ```
 
 Get a specific IdentityNow Governance Group
+
 Example
 
 ```powershell
@@ -790,6 +807,7 @@ Get-IdentityNowGovernanceGroup -groupID 4fc249bd-46ff-405a-93b9-21372f97c352
 ```
 
 Update an IdentityNow Governance Group to remove one member and add two members
+
 Example
 
 ```powershell
@@ -817,6 +835,7 @@ Update-IdentityNowGovernanceGroup -groupID $myGroup.id -update ($update | conver
 ```
 
 Create an IdentityNow Governance Group and assign an owner
+
 Example
 
 ```powershell
@@ -852,10 +871,37 @@ Get-IdentityNowRole
 ```
 
 Get a specific IdentityNow Role
+
 Example
 
 ```powershell
 Get-IdentityNowRole -roleID 2c918084691653af01695182a78b05ec
+```
+
+Sort the return of IdentityNow Roles
+
+Sorters are: name, created modified
+
+For reverse sort use: -name -modified -created
+
+Multiple sorts are also valid
+
+Example 1
+
+```powershell
+Get-IdentityNowRole -sorters name 
+```
+
+Example 2
+
+```powershell
+Get-IdentityNowRole -sorters modified, name
+```
+
+Example 3
+
+```powershell
+Get-IdentityNowRole -sorters "-modified", created
 ```
 
 Update an IdentityNow Role
@@ -876,6 +922,7 @@ Update-IdentityNowRole -update ($body | convertto-json)
 ```
 
 Create an IdentityNow Role
+
 Example
 
 ```powershell
@@ -891,6 +938,7 @@ New-IdentityNowRole -role ($body | convertto-json)
 ```
 
 Delete an IdentityNow Role
+
 Example
 
 ```powershell
@@ -900,6 +948,7 @@ Remove-IdentityNowRole -roleID 2c9180886cd58059016d1a5a23f609a8
 ### Get / Update / Test / Create / Remove IdentityNow Sources ###
 
 Get all IdentityNow Sources
+
 [Reference post](https://blog.darrenjrobinson.com/managing-sailpoint-identitynow-sources-via-the-api-with-powershell/)
 
 Example
@@ -909,6 +958,7 @@ Get-IdentityNowSource
 ```
 
 Get a specific IdentityNow Source
+
 Example
 
 ```powershell
@@ -917,6 +967,7 @@ Get-IdentityNowSource -sourceID 12345
 
 Get Account Profiles associated with a Source
 **Note:** If there are no Account Profiles associated with the source, nothing is returned.
+
 Example
 
 ```powershell
@@ -1243,6 +1294,7 @@ Get-IdentityNowVACluster
 ```
 
 Get IdentityNow Virtual Appliances from a cluster
+
 Example
 
 ```powershell
@@ -1264,6 +1316,7 @@ Get-IdentityNowApplication
 ```
 
 Get IdentityNow Customer default configured SailPoint Applications
+
 Example
 
 ```powershell
@@ -1271,6 +1324,7 @@ Get-IdentityNowApplication -org $true
 ```
 
 Get a specific IdentityNow Application
+
 Example
 
 ```powershell
@@ -1278,6 +1332,7 @@ Get-IdentityNowApplication -appID 32128
 ```
 
 Update an IdentityNow Application
+
 Example
 
 ```powershell
@@ -1300,6 +1355,7 @@ Parameters: authentication header/token to return (defaults to V3JWT)
 * V3JWT is oAuth JWT Token
 
 Return default JWT
+
 Example
 
 ```powershell
@@ -1307,6 +1363,7 @@ Get-IdentityNowAuth
 ```
 
 Return v2 Digest Auth Header
+
 Example
 
 ```powershell
@@ -1314,6 +1371,7 @@ Get-IdentityNowAuth -return V2Header
 ```
 
 Return v3 oAuth Access Token Bearer Header
+
 Example
 
 ```powershell
@@ -1844,6 +1902,7 @@ Header options are;
 **OPTION:** -json switch to return request result as JSON.
 
 Example 1 - URI
+
 Get the Schema of a Source
 [Reference post](https://blog.darrenjrobinson.com/creating-sailpoint-identitynow-source-configuration-backups-and-html-reports-with-powershell/)
 
@@ -1861,6 +1920,7 @@ Invoke-IdentityNowRequest -API Private -path "source/getAccountSchema/$($sourceI
 ```
 
 Example 2 - URI
+
 List Identity Profiles
 [Reference post](https://blog.darrenjrobinson.com/changing-sailpoint-identitynow-identity-profiles-priorities-using-powershell/)
 
@@ -1876,6 +1936,7 @@ Invoke-IdentityNowRequest -API V1 -Method Get -path "profile/list" -headers Head
 ```
 
 Example 3 - URI
+
 Get IdentityNow Identity Attributes
 [Reference post](https://blog.darrenjrobinson.com/indexing-a-sailpoint-identitynow-attribute-in-an-identity-cube-for-use-in-correlation-rules/)
 

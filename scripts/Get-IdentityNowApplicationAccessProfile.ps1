@@ -1,114 +1,51 @@
-function Get-IdentityNowRole {
+function Get-IdentityNowApplicationAccessProfile {
     <#
 .SYNOPSIS
-Get IdentityNow Role(s).
+Get IdentityNow Access Profile(s) of an application.
 
 .DESCRIPTION
-Get IdentityNow Role(s).
+Get IdentityNow Access Profile(s) of an application.
+If the count is equal to 0, it is not possible to know if the application has no associated access profile 
+or if the application id does not correspond to an existing application.
 
-.PARAMETER roleID
-(optional) The ID of an IdentityNow Role.
-
-.PARAMETER filters
-Filter results using the standard syntax described in https://developer.sailpoint.com/docs/standard_collection_parameters.html#filtering-results.
-The following fields and operators are supported:
-- id: eq, in
-- name: eq, sw 
-- created, modified: gt, lt, ge, le
-- owner.id: eq, in
-- requestable: eq
+.PARAMETER appID
+The Application ID of an IdentityNow Application.
 
 .EXAMPLE
-Get-IdentityNowRole 
-
-.EXAMPLE
-Get-IdentityNowRole -roleID 2c918084691653af01695182a78b05ec
-
-.EXAMPLE
-Get-IdentityNowRole -sorters created
-
-.EXAMPLE
-Get-IdentityNowRole -sorters name -filters "requestable eq `"false`""
+Get-IdentityNowApplicationAccessProfile -appID 24184
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
 
 #>
 
-    [cmdletbinding(DefaultParameterSetName= "List")]
+    [cmdletbinding()]
     param(
-        [Parameter(Mandatory = $false, ValueFromPipeline, ParameterSetName = "GetById")]
-        [string]$roleID,
-
-        [parameter(Mandatory = $false, ParameterSetName = "List")]
-        [ValidateSet("name", "created", "modified", "-name", "-created", "-modified")]
-        [String[]]
-        $sorters = @("name"),
-
-        [parameter(Mandatory = $false, ParameterSetName = "List")]
-        [String]
-        $filters
+        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
+        [ValidateNotNullOrEmpty()]
+        [string]$appID
     )
 
     $v3Token = Get-IdentityNowAuth | Test-IdentityNowToken
-    $roleBaseUrl = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/roles"
-    $headers = @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+
+    try {
+        $utime = [int][double]::Parse((Get-Date -UFormat %s))
+        $accessProfiles = Invoke-RestMethod -Method Get `
+            -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/app/getAccessProfiles/$($appID)?_dc=$($utime)" `
+            -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" }
+        # As an array, you always have the "count" property
+        return $accessProfiles.items
+    }
+    catch {
+        Write-Error "Application doesn't exist. Check App ID. $($_)" 
+    }
     
-    try {
-        if ($roleID) {
-            $IDNRoles = Invoke-RestMethod -Method Get `
-                -Uri "$roleBaseUrl/$roleID" `
-                -Headers $headers
-            return $IDNRoles
-        }
-    }
-    catch {
-        Write-Error "Role doesn't exist. Check Role ID. $($_)" 
-    }
-    try {
-        Write-Verbose "Getting All Roles"
-        
-        $roles = @() 
-        $limit = "50"
-        $offset = 0
-        # will populate the X-Total-Count response header with the number of results that would be returned if limit and offset were ignored.
-        $countFlag = $true
-        $totalCount = 0
-
-        do { 
-            $uri = "$($roleBaseUrl)?offset=$offset&limit=$limit&count=$countFlag&sorters=$($sorters -join",")"
-            if ($filters) {
-                $uri += "&filters=" + [System.Web.HTTPUtility]::UrlEncode($filters)
-            }
-
-            Write-Verbose "Calling $uri" 
-            $response = Invoke-WebRequest -Method Get `
-                -Uri $uri `
-                -Headers $headers
-            if ($countFlag) {
-                $count = [int] $response.Headers["X-Total-Count"][0]
-                Write-Verbose "Expecting $count result"
-            }
-            $roles += $response.Content | ConvertFrom-Json
-            
-            # Get Next Page
-            $offset += $limit
-            $countFlag = $false
-        } until ($offset -gt $count)
-        return $roles
-    }
-    catch {
-        Write-Error "Could not list roles. $($_)" 
-    }
-   
 }
-
-
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUNwbLm/SfF4jEKUICrgxW7bm0
-# fDygggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUP5+eKgUq1iT6i2SR6UUoZ1hO
+# +GmgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -169,11 +106,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFIkNfwTb6ZUL
-# Ebt0VZfDwVPg3lIwMA0GCSqGSIb3DQEBAQUABIIBAB2Cg64LRr5eFLPzukt8GgSQ
-# olrods/Ibds+AlcNowdzuSyFlwEIsu3niKz/Fd9dqB45FWl3kH5P0Pne7gH8vuxr
-# n6kwvFy8Ai95+0hOUVTa5YhHJBME91MDFytaBR8k9A+eNpw6sEeoyht/f29FCU0p
-# ku3/yaU8AaCFjoI0wX9Bw5s4YRWfCQ0PT0vZfkhOhcfM5aGoBrFX0ATQpxlBDfT3
-# QDEFXZSQE2tGW2+0Ig8rrGhQotkyaP9B+m3T1va3uVt0UY/pJJPOQn4F7dqTQ09r
-# 12H8LRdpkgENLs+f0uwf7CVE6+yPpWiMkF79MeddGL7FXiyocMCp6b6JcvZpdQU=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFO0RdWWdokrw
+# UqXSLz4GDs2mFVCIMA0GCSqGSIb3DQEBAQUABIIBAAxzyjJPyQnIpgMGTuJ21FBh
+# M5cNJMfMghpleePxUSXFPPY98Q66u7J97xZ/RMf1M/tfQMgVyHuLTPArtoU7SEPf
+# 4tZJirhyDHT6CMSBOwOn4XweY7H+rN47spIw1VLnbMUfizDpuOFKPCoBIvpZIImH
+# XQXfCwg74c9F0thbBdWAS6GCVHRaX2A6f5raLBonzrgj1MPWHYBkH7PcKa2OU39y
+# Ch9h8QXDu/0jbi85aJ/VwTvvYF9ucTIX6sZtp51MB8IDW8WFqkHvrD+kQMwDy9kD
+# G0BKHzMaBLDRIrR0eo1WBhpGpBCP9juMPUTTo62Kj1k+BXsREUA8w2OnJsJnYXE=
 # SIG # End signature block

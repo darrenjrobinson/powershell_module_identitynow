@@ -12,6 +12,11 @@ function Export-IdentityNowConfig {
 .PARAMETER Items
     (optional - custom list array) if not specified, all items will be assumed, if specified you can list all items to be exported
 
+.PARAMETER NullDynamicValues
+    (optional - custom list) if included, will null frequently changing values
+    Full = more thurough in nulling values
+    Minimal = will leave in some values such as VA version, identity count, account count
+    
 .EXAMPLE
     Export-IdentityNowConfig -path 'c:\repos\IDN-Prod'
 
@@ -24,6 +29,19 @@ function Export-IdentityNowConfig {
     Set-IdentityNowOrg myCompanySandbox
     Export-IdentityNowConfig -path "C:\repos\IDNConfig\$((Get-IdentityNowOrg).'Organisation Name')"
 
+.EXAMPLE
+    #check in changes to git repository, change path to fit your local git repo
+    foreach ($org in @('contoso','contosotest')){
+        Set-IdentityNowOrg $org
+        $path="C:\scripts\IdentityNow\IdentityNow\$((Get-IdentityNowOrg).'Organisation Name')"
+        if (-not (test-path $path)){mkdir $path}
+        Remove-Item -Path "$path\*" -Recurse
+        Export-IdentityNowConfig -path $path -NullDynamicValues Full
+    }
+    git add .
+    git commit -m "auto $((get-date).ToString())"
+    git push
+
 .LINK
     http://darrenjrobinson.com/sailpoint-identitynow
 
@@ -33,10 +51,13 @@ function Export-IdentityNowConfig {
     param(
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
         [string]$path,
+        [Parameter(Mandatory = $false)]
+        [ValidateSet('Minimal', 'Full')]
+        [string]$NullDynamicValues,
         [ValidateSet('AccessProfile', 'APIClients', 'Applications', 'CertCampaigns', 'EmailTemplates', 'GovernanceGroups', 'IdentityAttributes', 'IdentityProfiles', 'OAuthAPIClients', 'Roles', 'Rules', 'Sources', 'Transforms', 'VAClusters')]
         [string[]]$Items
     )
-
+    
     if ($PSVersionTable.PSVersion.Major -le 5) { 
         $outputpath = Get-ItemProperty -Path $path 
         if ($outputpath.mode -ne 'd-----') { Write-Error "provided path is not a directory: $outputpath"; break }
@@ -45,7 +66,7 @@ function Export-IdentityNowConfig {
         [System.IO.FileInfo]$outputpath = $path
         if ($outputpath.mode -ne 'd----') { Write-Error "provided path is not a directory: $outputpath"; break }
     }
-    
+
     if ($null -eq $Items) {
         $Items = @('AccessProfile', 'APIClients', 'Applications', 'CertCampaigns', 'EmailTemplates', 'GovernanceGroups', 'IdentityAttributes', 'IdentityProfiles', 'OAuthAPIClients', 'Roles', 'Rules', 'Sources', 'Transforms', 'VAClusters')
     }
@@ -53,6 +74,10 @@ function Export-IdentityNowConfig {
     if ($Items -contains 'AccessProfile') {
         write-progress -activity 'AccessProfile'
         $AccessProfile = Get-IdentityNowAccessProfile
+        if ($NullDynamicValues) {
+            #no dynamic values in this output
+        }
+        #"set-content $($outputpath.FullName)\AccessProfile.json"
         $AccessProfile | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\AccessProfile.json"
     }
     if ($Items -contains 'APIClients') {
@@ -63,6 +88,45 @@ function Export-IdentityNowConfig {
             $client = Get-IdentityNowAPIClient -ID $client.id
             $detailedAPIClients += $client
         }
+        if ($NullDynamicValues) {
+            foreach ($client in $detailedAPIClients) {
+                if ($client.configuration.cookbook) {
+                    $client.configuration.cookbook = $null
+                }
+                if ($client.configuration.jobType) {
+                    $client.configuration.jobType = $null
+                }
+                if ($client.configuration.va_version) {
+                    $client.configuration.va_version = $null
+                }
+                if ($client.lastSeen) {
+                    $client.lastSeen = $null
+                }
+                if ($client.maintenance) {
+                    $client.maintenance.windowStartTime = $null
+                    $client.maintenance.windowClusterTime = $null
+                    $client.maintenance.windowFinishTime = $null
+                }
+                if ($client.pollingPeriodTimestamp) {
+                    $client.pollingPeriodTimestamp = $null
+                }
+                if ($client.sinceLastSeen) {
+                    $client.sinceLastSeen = $null
+                }
+                if ($client.clusterJobCount -or $client.clusterJobCount -eq 0) {
+                    $client.clusterJobCount = $null
+                }
+                if ($client.jobs) {
+                    $client.jobs = @()
+                }
+                if ($NullDynamicValues -eq 'Full') {
+                    if ($client.va_version) {
+                        $client.va_version = $null
+                    }
+                }
+            }
+        }
+        #"set-content $($outputpath.FullName)\APIClients.json"
         $detailedAPIClients | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\APIClients.json"
     }
     if ($Items -contains 'Applications') {
@@ -73,41 +137,130 @@ function Export-IdentityNowConfig {
             $app = Get-IdentityNowApplication -appID $app.id
             $detailedApplications += $app
         }
+        if ($NullDynamicValues) {
+            foreach ($app in $detailedApplications) {
+                if ($app.health.lastChanged) {
+                    $app.health.lastChanged = $null
+                }
+            }
+        }
+        #"set-content $($outputpath.FullName)\Applications.json"
         $detailedApplications | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\Applications.json"
     }
     if ($Items -contains 'CertCampaigns') {
         write-progress -activity 'CertCampaigns'
-        $CertCampaigns = Get-IdentityNowCertCampaign
+        $CertCampaigns = Get-IdentityNowCertCampaign -completed $true
+        $activeCertCampaigns = Get-IdentityNowCertCampaign -completed $false 
+        $CertCampaigns += $activeCertCampaigns
+        if ($NullDynamicValues) {
+            foreach ($campaign in $CertCampaigns) {
+                if ($campaign.completedEntities) { $campaign.completedEntities = $null }
+                if ($campaign.completedItems) { $campaign.completedItems = $null }
+                if ($campaign.finished) { $campaign.finished = $null }
+                if ($campaign.percentComplete) { $campaign.percentComplete = $null }
+                if ($campaign.phase) { $campaign.phase = $null }
+                if ($campaign.status) { $campaign.status = $null }
+                if ($campaign.completedCertifications) { $campaign.completedCertifications = $null }
+                if ($campaign.totalCertifications) { $campaign.totalCertifications = $null }
+            }
+        }
+        #"set-content $($outputpath.FullName)\CertCampaigns.json"
         $CertCampaigns | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\CertCampaigns.json"
     }
     if ($Items -contains 'EmailTemplates') {
         write-progress -activity 'EmailTemplates'
         $EmailTemplates = Get-IdentityNowEmailTemplate
+        if ($NullDynamicValues) {
+            foreach ($template in $EmailTemplates) {
+                if ($NullDynamicValues -eq 'Full') {
+                    if ($template.meta.modified) {
+                        $template.meta.modified = $null
+                    }
+                }                
+            }
+        }
+        #"set-content $($outputpath.FullName)\EmailTemplates.json"
         $EmailTemplates | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\EmailTemplates.json"
     }
     if ($Items -contains 'GovernanceGroups') {
         write-progress -activity 'GovernanceGroups'
         $GovernanceGroups = Get-IdentityNowGovernanceGroup
+        if ($NullDynamicValues) {
+            foreach ($gGroup in $GovernanceGroups) {
+                if ($gGroup.modified) {
+                    $gGroup.modified = $null 
+                }
+            }
+        }
+        #"set-content $($outputpath.FullName)\GovernanceGroups.json"
         $GovernanceGroups | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\GovernanceGroups.json"
     }
     if ($Items -contains 'IdentityAttributes') {
         write-progress -activity 'IdentityAttributes'
         $IdentityAttributes = Get-IdentityNowIdentityAttribute
+        if ($NullDynamicValues) {
+            #no dynamic values in this output
+        }
+        #"set-content $($outputpath.FullName)\IdentityAttributes.json"
         $IdentityAttributes | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\IdentityAttributes.json"
     }
     if ($Items -contains 'IdentityProfiles') {
         write-progress -activity 'IdentityProfiles'
         $idp = Get-IdentityNowProfile
         $detailedIDP = @()
-        foreach ($profile in $idp) {
-            $profile = Get-IdentityNowProfile -ID $profile.id
-            $detailedIDP += $profile
+        foreach ($singleidp in $idp) {
+            $singleidp = Get-IdentityNowProfile -ID $singleidp.id
+            $detailedIDP += $singleidp
         }
+        if ($NullDynamicValues) {
+            foreach ($singleidp in $detailedIDP) {
+                if ($singleidp.source.lastAggregated) {
+                    $singleidp.source.lastAggregated = $null                
+                }
+                if ($singleidp.source.sinceLastAggregated) {
+                    $singleidp.source.sinceLastAggregated = $null
+                }
+                if ($singleidp.report.date) {
+                    $singleidp.report.date = $null
+                }
+                if ($singleidp.report.duration) {
+                    $singleidp.report.duration = $null
+                }
+                if ($singleidp.report.id) {
+                    $singleidp.report.id = $null
+                }
+                if ($NullDynamicValues -eq 'Full') {
+                    if ($singleidp.identityCount -or $singleidp.identityCount -eq 0) {
+                        $singleidp.identityCount = $null
+                    }
+                    if ($singleidp.report) {
+                        $singleidp.report = $null
+                    }
+                    foreach ($state in $singleidp.configuredStates) {
+                        if ($state.identitycount) {
+                            $state.identitycount = $null
+                        }
+                    }
+                }
+            }
+        }
+        #"set-content $($outputpath.FullName)\IdentityProfiles.json"
         $detailedIDP | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\IdentityProfiles.json"
     }
     if ($Items -contains 'OauthAPIClients') {
         write-progress -activity 'OauthAPIClients'
         $OauthAPIClients = Get-IdentityNowOAuthAPIClient
+        if ($NullDynamicValues) {
+            #need to sort properties
+            $proporder = ('id', 'name', 'description', 'enabled', 'type')
+            $sortedOauthAPIClients = @()
+            foreach ($oauthapi in $OauthAPIClients) {
+                $sortedOauthAPIClients += $oauthapi | Select-Object -Property ($proporder + ($oauthapi | Get-Member -MemberType NoteProperty).name.where{ $_ -notin $proporder }  )
+                
+            }
+            $OauthAPIClients = $SortedOauthAPIClients
+        }
+        #"set-content $($outputpath.FullName)\OAuthAPIClients.json"
         $OauthAPIClients | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\OAuthAPIClients.json"
     }
     if ($Items -contains 'Roles') {
@@ -123,11 +276,34 @@ function Export-IdentityNowConfig {
             $role | Add-Member -NotePropertyName revokeRequestApprovalSchemes -NotePropertyValue $temp.revokeRequestApprovalSchemes -Force
             $detailedroles += $role
         }
+        if ($NullDynamicValues) {
+            #need to sort roles
+            $sortedRoles = $detailedroles | Sort-Object -prop id
+            $detailedroles = $sortedRoles
+            foreach ($role in $detailedroles) {
+                if ($role.synced) {
+                    $role.synced = $null
+                }
+                if ($NullDynamicValues -eq 'Full') {
+                    if ($role.modified) {
+                        $role.modified = $null
+                    }
+                    if ($role.identityCount -or $role.identityCount -eq 0) {
+                        $role.identityCount = $null
+                    }
+                }
+            }
+        }
+        #"set-content $($outputpath.FullName)\Roles.json"
         $detailedroles | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\Roles.json"
     }
     if ($Items -contains 'Rules') {
         write-progress -activity 'Rules'
         $rules = Get-IdentityNowRule
+        if ($NullDynamicValues) {
+            #no dynamic values in this output
+        }
+        #"set-content $($outputpath.FullName)\Rules.json"
         $rules | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\Rules.json"
     }
     if ($Items -contains 'Sources') {
@@ -151,24 +327,144 @@ function Export-IdentityNowConfig {
             $source | Add-Member -NotePropertyName 'Schema' -NotePropertyValue (Get-IdentityNowSourceSchema -sourceID $source.id) -Force
             $detailedsources += $source
         }
-        $detailedsources | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\Sources.json"
+        if ($NullDynamicValues) {
+            $detailedsources | Add-Member -NotePropertyName hasFullAggregationCompleted -NotePropertyValue $null -Force
+            foreach ($source in $detailedsources) {
+                if ($source.health.since) {
+                    $source.health.since = $null
+                }
+                if ($source.health.lastSeen) {
+                    $source.health.lastSeen = $null
+                }
+                if ($source.health.hostname) {
+                    $source.health.hostname = $null
+                }
+                if ($source.health.lastChanged) {
+                    $source.health.lastChanged = $null
+                }
+                if ($source.cloudCacheUpdate) {
+                    $source.cloudCacheUpdate = $null
+                }
+                if ($source.groupDeltaLink) {
+                    $source.groupDeltaLink = $null
+                }
+                if ($source.accountDeltaLink) {
+                    $source.accountDeltaLink = $null
+                }
+                if ($source.acctAggregationStart) {
+                    $source.acctAggregationStart = $null
+                }
+                if ($source.acctAggregationEnd) {
+                    $source.acctAggregationEnd = $null
+                }
+                if ($source.lastAggrgationDateTime) {
+                    $source.lastAggrgationDateTime = $null
+                }
+                if ($source.access_token) {
+                    $source.access_token = $null
+                }
+                if ($source.access_token_create_time) {
+                    $source.access_token_create_time = $null
+                }
+                if ($source.entitlementsCount -or $source.entitlementsCount -eq 0) {
+                    $source.entitlementsCount = $null
+                }
+                if ($source.deltaAggregation) {
+                    $source.deltaAggregation = $null
+                }
+                if ($source.expires_in) {
+                    $source.expires_in = $null
+                }
+                if ($source.health.type) {
+                    $source.health.type = $null
+                }
+                foreach ($sku in $source.subscribedSkus) {
+                    if ($sku.consumedUnits -or $sku.consumedUnits -eq 0) {
+                        $sku.consumedUnits = $null
+                    }
+                    if ($NullDynamicValues -eq 'Full') {
+                        if ($sku.prepaidUnits.enabled -or $sku.prepaidUnits.enabled -eq 0) {
+                            $sku.prepaidUnits.enabled = $null
+                        }
+                        if ($sku.prepaidUnits.suspended -or $sku.prepaidUnits.suspended -eq 0) {
+                            $sku.prepaidUnits.suspended = $null
+                        }
+                        if ($sku.prepaidUnits.warning -or $sku.prepaidUnits.warning -eq 0) {
+                            $sku.prepaidUnits.warning = $null
+                        }
+                    }
+                }
+                if ($NullDynamicValues -eq 'Full') {
+                    if ($source.userCount -or $source.userCount -eq 0) {
+                        $source.userCount = $null
+                    }
+                    if ($source.accountsCount -or $source.accountsCount -eq 0) {
+                        $source.accountsCount = $null
+                    }
+                    if ($source.uncorrelatedAccountsFileFeedHistory) {
+                        $source.uncorrelatedAccountsFileFeedHistory = @()
+                    }
+                }
+            }
+        }
+        #"set-content $($outputpath.FullName)\Sources.json"
+        $detailedsources | convertto-json -depth 12 | Set-Content "$($outputpath.FullName)\Sources.json"
     }    
     if ($Items -contains 'Transforms') {
         write-progress -activity 'Transforms'
         $transforms = Get-IdentityNowTransform
-        $transforms | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\Transforms.json"
+        if ($NullDynamicValues) {
+            #no dynamic values in this output
+        }
+        #"set-content $($outputpath.FullName)\Transforms.json"
+        $transforms | convertto-json -depth 12 | Set-Content "$($outputpath.FullName)\Transforms.json"
     }
     if ($Items -contains 'VAClusters') {
         write-progress -activity 'VAClusters'
         $VAClusters = Get-IdentityNowVACluster
+        if ($NullDynamicValues) {
+            foreach ($vac in $VAClusters) {
+                if ($vac.pollingPeriodTimestamp) {
+                    $vac.pollingPeriodTimestamp = $null
+                }
+                if ($vac.configuration.va_version) {
+                    $vac.configuration.va_version = $null
+                }
+                if ($vac.configuration.jobType) {
+                    $vac.configuration.jobType = $null
+                }
+                if ($vac.configuration.cookbook) {
+                    $vac.configuration.cookbook = $null
+                }
+                if ($vac.va_version) {
+                    $vac.va_version = $null
+                }
+                if ($vac.maintenance.windowStartTime) {
+                    $vac.maintenance.windowStartTime = $null
+                }
+                if ($vac.maintenance.windowClusterTime) {
+                    $vac.maintenance.windowClusterTime = $null
+                }
+                if ($vac.maintenance.windowFinishTime) {
+                    $vac.maintenance.windowFinishTime = $null
+                }
+                if ($vac.jobs) {
+                    $vac.jobs = @()
+                }
+                if ($vac.clients) {
+                    $vac.clients = $vac.clients | Sort-Object -Property id
+                }
+            }
+        }
+        #"set-content $($outputpath.FullName)\VAClusters.json"
         $VAClusters | convertto-json -depth 10 | Set-Content "$($outputpath.FullName)\VAClusters.json"
     }
 }
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUA6czXEby9kzQF3TloCytMven
-# qYWgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUbOBpa+V6veeoZOL+VYItHmQz
+# Oy6gggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -229,11 +525,11 @@ function Export-IdentityNowConfig {
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFOnXWtYMR4Fz
-# ELi/ygUN8viLLkcTMA0GCSqGSIb3DQEBAQUABIIBAKdJnJqXSgvGGggvmaCNsZDX
-# RCQ0F2FkGu9x2tZc9AXt3UIol5I4TasAQ5A2RC55za8hwZ8xaPyld0RpWQI1OzUC
-# PAghgrexfuCW0ZwqrbxUBgVArMkO583AOb4X3GaKr+wtlyB6+qJnTF57gaEmvhF3
-# GlsAPulI8qC9BQilG6IlmVhl+2v0Diy93oa6gYNmcAniw/HAnlGGov7hKRrkEk6b
-# Xt686/hCJlaVrIcY4/Hdv4GAsjDUfQim5z0jIaMfqq+xqIcnyDVPkKwoZVAJhEZt
-# ondtwEp8HF35Mw/auhfmRdueLm9RcrkEr5/Ii6NXyvWn5AGqOlO/mdwE02bKuCM=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFNOmtFU0VUIJ
+# jSzF9yQFnfsennvbMA0GCSqGSIb3DQEBAQUABIIBAGy4Gfd4B3gl6Um9GZsT7hvb
+# HWrSfZQdw/bhBElDk7YVa7LRTSREIL8J8Flz9GmnNuWarINzbwAejHHGODBCFIYr
+# LU5KVHB2FBx3CGGZVaGlmgtY5bMzYHRosT+/4DnNVTjYoHtj80sk3noJNWnJl1By
+# No3+dar8bZTE+V1Q9yWYwWOQemtWk0dT5/a33e2pH54n8KSTT7Z/4LUHTwp/05mV
+# EM/4i8Hd7w+12X8CpakWG9MgG0GQypsKudf57XsB92/S/LicsQFNEPwMMv9nAj5v
+# Pid3R61Miwf4pTsE7h4FVxF8buiaw98khdxe8RClmG8CROgEE7tkf6qA5EtvbLo=
 # SIG # End signature block

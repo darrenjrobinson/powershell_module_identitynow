@@ -233,7 +233,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         Write-Verbose "AuthType: Admin Creds"        
     }
     
-    if (-not $IdentityNowConfiguration.JWT) { 
+    if (-not $IdentityNowConfiguration.JWT -or (-not $IdentityNowConfiguration.JWT.access_token)) { 
         $forcerefresh = $true 
     }
 
@@ -299,8 +299,6 @@ $_" -ErrorAction 'stop'
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUurqpv4+cZKAAcNgciWdaobN+
-# yJOgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -361,11 +359,5 @@ $_" -ErrorAction 'stop'
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFF3BUUSB/KGw
-# Ivjv0tiOxhQ/nv1zMA0GCSqGSIb3DQEBAQUABIIBAK+AQPYNjlxtg7PNqcrkYiTo
-# lSY9qZCmd9qKBMNqOU6pPleuqDLwwy7PsKGDgt0WD2OKxnnwrUj/YCskLJLEN8pn
-# WDyWD+VLbvjg7qx52bILFT0OftFq/3y6Gxmc7fY283UMEawlqWLOHPzRU1a/OWhi
-# lQZssBG8JwInD/VdZu4lLWGYVJP33fa4KUll1R0R4NTghqwkSNSpgLXMejNERSWf
-# 3CP1gb+6CaW+HDfJ2GQV46kUExTOgq1wJp7WSbH0kFPM1EHQJq/gNUAfwdu5B4zJ
-# xahuIr1ZR9e86kHg5ox0b5xVJ52kaKUdXn61LnGSbmm7h6EnqD9HjXbCS37O4YQ=
+
 # SIG # End signature block

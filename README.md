@@ -493,7 +493,7 @@ Search-IdentityNow -query "@accounts.entitlementAttributes.'App_Group_*'" -indic
 Search IdentityNow Identities using the new IdentityNow Search (Elasticsearch).
 Results defaults to 2500. If you want more or less use the -searchLimit option.
 
-[Reference Elasticsearch Syntax](https://community.sailpoint.com/t5/Admin-Help/How-do-I-use-Search-in-IdentityNow/ta-p/76960)
+[Reference Elasticsearch Syntax](https://documentation.sailpoint.com/saas/help/search/searchable-fields.html#first-level-fields-for-identities)
 
 Search for Entitlements that include the name 'File Share' including nested groups.
 

@@ -457,7 +457,7 @@ A Search cmdlet that allows you to specify the search indice.
 
 query
     Query in Elasticsearch Syntax
-    [Reference Elasticsearch Syntax](https://community.sailpoint.com/t5/Admin-Help/How-do-I-use-Search-in-IdentityNow/ta-p/76960)
+    [Reference Elasticsearch Syntax](https://documentation.sailpoint.com/saas/help/search/search_guide.html?h=elasticsearch#about-the-identitynow-search-provider)
 
 limit
     results to be returned

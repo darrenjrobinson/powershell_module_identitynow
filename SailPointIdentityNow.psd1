@@ -1,9 +1,9 @@
 @{
     RootModule           = 'SailPointIdentityNow.psm1'
-    ModuleVersion        = '1.1.5'
+    ModuleVersion        = '1.1.6'
     GUID                 = 'f82fe16a-7702-46f3-ab86-5de11b7305de'
     Author               = 'Darren J Robinson'
-    Copyright            = '(c) 2021. All rights reserved.'
+    Copyright            = '(c) 2022. All rights reserved.'
     Description          = "Orchestration of SailPoint IdentityNow"
     PowerShellVersion    = '5.1'
     CompatiblePSEditions = 'Core', 'Desktop'
@@ -25,6 +25,7 @@
         'Get-IdentityNowGovernanceGroup',
         'Get-IdentityNowIdentityAttribute',
         'Get-IdentityNowIdentityAttributePreview',
+        'Get-IdentityNowManagedCluster',
         'Get-IdentityNowOAuthAPIClient',
         'Get-IdentityNowOrg',
         'Get-IdentityNowOrgConfig',
@@ -42,6 +43,7 @@
         'Get-IdentityNowTimeZone',
         'Get-IdentityNowTransform',
         'Get-IdentityNowVACluster',
+        'Invoke-IdentityNowAggregateEntitlement',
         'Invoke-IdentityNowAggregateSource',
         'Invoke-IdentityNowRequest',
         'Invoke-IdentityNowSourceReset',
@@ -111,8 +113,8 @@
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUWA3RbBkIoj1IEh1/8JPdBvl+
-# 0OegggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUqXdQZelxG17TSpgLBGdV3l9d
+# QxOgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -173,11 +175,11 @@
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFLiHp4RDlxlt
-# IqtuNV9BUd28Fq8/MA0GCSqGSIb3DQEBAQUABIIBAAtCK6QgryAIJH6p0+UP7Y3y
-# b9DYEQo5ssiL4sZzcxssPJ23UvY9h2a+zjqIyHZkkMghrFPO3SrgRexgRYgs3u6H
-# byyJu2JXMDE7NCSXeEKnYLJ8CTo/Tiav1llDrGm2AUiU+w0OcNY5WXsu/GkwnQpi
-# 4soRORnu3W4puhvx8J1Ii3aY9MMiEnQZ7VRk8Mm+GhcJojL0ukg8acSDq9ox5UsR
-# XiSEB2E2ac6tTmE6r0lYQQm9JBt603tMtNE57HcdknjqHqWmRyqjIMDb/SfQ4fo+
-# Zu/tZfqb6yk3c78qaUCHbQaHTl2Nl7S5u0RxmZyFzHm/Jo7t5Pw3MsdUF3VjlJI=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFMHWlQpBimqP
+# hvIm4iEvsJZFQns0MA0GCSqGSIb3DQEBAQUABIIBAJdQvupC/dAtNnNT59CVJaat
+# wciaIcCuVK4OFRh/uToj7EGYK6f5zroaiQWk+bOXsrRTqNDsmuNnBGsR6+ZFSQz4
+# ceO4TlmpH1L9E8YX9A1PnsvneWJjJcoGXR3a1AyZ0dFqp61pPqQCIkF2CKl/sWeU
+# w5BuOBQtdjeUCP3WtxdbTRYMT/rQgjW5f4E7CnU0qqLx2YTJZlQubDnCoV23nuGw
+# EFqz/BICoWBUTuvod6uUKFKEmavHKXGF66YwC15h5zCxFuhd/Kb2BeUOUM5GFfMq
+# vJhHKQSvJ01/LCtkas9d0ax26YiFji8FAcjPYUv33tfGwhrT+zOIfxbT7LsKZ40=
 # SIG # End signature block

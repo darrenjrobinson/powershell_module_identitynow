@@ -1,106 +1,54 @@
-function Test-IdentityNowCredentials {
+function Get-IdentityNowManagedCluster {
     <#
 .SYNOPSIS
-    Tests IdentityNow Live credentials.
+Get IdentityNow Managed Virtual Appliance Cluster(s).
 
 .DESCRIPTION
-    Test APIv3 and Personal Access Token credentials.
-
-.NOTES
-    written by Sean McGovern 11/27/2019 (twitter @410sean)
-    updated by Darren Robinson 6 Aug 2020
+Get IdentityNow Managed Virtual Appliance Cluster(s).
 
 .EXAMPLE
-    Test-IdentityNowCredentials
+Get-IdentityNowManagedCluster 
+
+.PARAMETER ID
+(optional) The SailPoint Cluster ID of an IdentityNow Cluster.
 
 .LINK
-    http://darrenjrobinson.com/sailpoint-identitynow
+http://darrenjrobinson.com/sailpoint-identitynow
+
 #>
 
     [cmdletbinding()]
-    param ( )
+    param([Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [string]$ID)
 
-    # if ($IdentityNowConfiguration.v2) {
-    #     try {
-    #         $IDNCluster = $null 
-    #         $IDNCluster = Invoke-IdentityNowRequest -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/cluster/list" -headers Headersv2_JSON
-    #         if ($IDNCluster) {
-    #             Write-Verbose "v2 Output: $($IDNCluster)"
-    #             "Validated APIv2 credentials."
-    #         } else {
-    #             write-warning "Testing APIv2 credentials failed for $($IdentityNowConfiguration.orgName)."
-    #         }
-    #     } catch {
-    #         write-warning "Testing APIv2 credentials failed for $($IdentityNowConfiguration.orgName)."
-    #         Write-Warning $_
-    #     }  
-    # }
-    # else {
-    #     "APIv2 credentials not stored in IdentityNow Configuration."
-    # }
-
-    if ($IdentityNowConfiguration.v3) {
-        try {    
-            $lowusersource = (Get-IdentityNowSource | Where-Object { $_.usercount -ne 0 } | Sort-Object usercount)[0]
-            Write-Verbose "v3 Output: $($lowusersource)"
-            "Validated APIv3 credentials."
+    $v3Token = Get-IdentityNowAuth
+    
+    if ($v3Token.access_token) {
+        try {
+            if ($ID) {
+                $IDNCluster = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/managed-clusters/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" ; 'Content-Type' = 'application/json' }
+            }
+            else {
+                $IDNCluster = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/managed-clusters" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" ; 'Content-Type' = 'application/json' }
+            }
+            return $IDNCluster
         }
         catch {
-            write-warning "Testing APIv3 credentials failed for $($IdentityNowConfiguration.orgName). Unable to continue."
-            Write-Warning $_
-        } 
+            Write-Error "No Managed VA Clusters found. $($_)" 
+        }
     }
     else {
-        "APIv3 credentials not stored in IdentityNow Configuration."
-    }
-    
-    
-    try {    
-        if ($IdentityNowConfiguration.PAT) { 
-            try {
-                # oAuth URI
-                $oAuthURI = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/oauth/token" 
-
-                $oAuthTokenBody = @{
-                    grant_type    = "client_credentials"
-                    client_id     = $IdentityNowConfiguration.PAT.UserName
-                    client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
-                }
-            
-                $v3PAT = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody 
-                if ($v3PAT) {
-                    $requestHeaders = @{Authorization = "Bearer $($v3PAT.access_token)" }
-                    $idnProfiles = $null 
-                    $idnProfiles = Invoke-RestMethod -Method Get `
-                        -Uri "https://$($IdentityNowConfiguration.orgName).identitynow.com/api/profile/list" `
-                        -Headers $requestHeaders  
-                    if ($idnProfiles) {
-                        "Validated Personal Access Token."
-                    }
-                    else {
-                        "FAILED. Request using IdentityNow Personal Access Token failed."
-                    }
-                }
-            }
-            catch {
-                "Unable to obtain an Access Token using the configured Personal Access Token."
-            }
-        }
-        else {
-            "Personal Access Token not stored in IdentityNow Configuration."
-        }
-    }
-    catch {
-        write-warning "Testing Personal Access Token credential failed for $($IdentityNowConfiguration.orgName). Unable to continue."
-        Write-Warning $_
-    }
+        Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
+        return $v3Token
+    } 
 }
+
 
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUsRkZeiN6gKk+dAMsJqwZaGZH
-# x4WgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUpWs6WOcXAePj4K0NUzNPNKVQ
+# NTSgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -161,11 +109,11 @@ function Test-IdentityNowCredentials {
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFNy/+riE1p30
-# gllZZw2ngDvShRDEMA0GCSqGSIb3DQEBAQUABIIBAIXSSZGJhB7CL/RJlljIJzTU
-# gIlccRKSda/yac+AHKhUE5/r7vI/QKZsxkMBzgEqA/cvJp0MHNnxJycugMr6obL3
-# 5DP8q7PFivyJBv5IlEFySJ0oa10YY0hGp3JilbAmHwn99xEcIZa7xkM3hW6wfDuV
-# 6tq0INB7sTVPQnfQELTeZooM3jVuWsUzSIhLTJvu2m/03Li5Xrek+jbclGzy5+38
-# QqqQchpavyQjZNW8p0mSYQc1A9Uf0dnlni2/r/GysxeLvhGR+pUUlXhwyldedNme
-# fHsfrx0pTlgdxx7Qd9TZWSF/DGrBVEz30pjs6z/nRiCw0NBupVuJZe1JR8cILnw=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFJ0Hwn+Rw2kt
+# mbpvQzF73zYLyxbUMA0GCSqGSIb3DQEBAQUABIIBAACyaxUJFFHacdjZJ0hhxLor
+# H2qhIKalOP71948CWJAI3XGBxMUwvqN4whnYPGf3p6tSkmLc4mLOHajk8ZHZUQb6
+# 55vcdu5Q6nb4Rt6re19WslXHXspUuuI67CAm+9jCrX/59D1ewhPVsG3WLzT+1ybN
+# aWo51qucGUUee7vNBtJiZrlvCNb52t0iP1BP87W+97b828HL30qkgzeoBsQ7RGK/
+# xgzsVACi0u8mWHHFTERO8f+tnQCOj3zHQ/Newq/O/uLddfcqkBj6Xg0owEnxfQNa
+# le0kL+gIw66jY7aKfou3xrJAaftgNBP6X3OInvPIsz7VPnkUF8pnNTXSRzz1w5U=
 # SIG # End signature block

@@ -16,7 +16,7 @@ function Invoke-IdentityNowRoleRefresh {
     [cmdletbinding()]
     param()
 
-    $token = Get-IdentityNowAuth -return V3JWT
+    $token = Get-IdentityNowAuth 
 
     if ($token) {
         try {

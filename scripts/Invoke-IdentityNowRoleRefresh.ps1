@@ -16,11 +16,11 @@ function Invoke-IdentityNowRoleRefresh {
     [cmdletbinding()]
     param()
 
-    $token = Get-IdentityNowAuth 
+    $v3token = Get-IdentityNowAuth -return V3JWT
 
-    if ($token) {
+    if ($v3token) {
         try {
-            $refresh = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/role/refresh" -Headers @{Authorization = "$($token.token_type) $($token.access_token)"; "Content-Type" = "application/json" }
+            $refresh = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/role/refresh" -Headers @{Authorization = "$($v3token.token_type) $($v3token.access_token)"; "Content-Type" = "application/json" }
             return $refresh 
         }
         catch {
@@ -36,8 +36,8 @@ function Invoke-IdentityNowRoleRefresh {
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUpey191XHa1hMajhdLuWN0pZw
-# /+OgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUzHaEYKYqJagxfvJkC6bRBhNy
+# plmgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -98,11 +98,11 @@ function Invoke-IdentityNowRoleRefresh {
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFHsGbFmY2xzz
-# pTMex6fAl1/gdIIrMA0GCSqGSIb3DQEBAQUABIIBABu1yb0ANPbKraJmIoI/aiTC
-# VPAXtzD56ovcGkemE/G4lzNIu5Xz4tazX9XNo2U8Q5FKAKtpO36o1bYzD5A6nlSQ
-# FA2shDijJlR50xKApDGLBj0hMfYri4yJRoYFucegP2qPFnnO9svcKEhQSFuAHNgv
-# bn18b2gMjscYSK9LTjNmpaJnYbDRgJ4eav90fRf3+2nksiQF/t6dUPgFCcCJ9K8A
-# X4ClGKQVEqKytDjI8cJJEKLFSgJ7ACXGaINl8+vX6iEI453EFaJyc548NXFAvIOT
-# WDxKcGAqwdBEl3WmusjUNdZibO5AfOoEk0kGePVlYCrUcxg3aOEYqsxywEp6Kgw=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFElZfpdQ+ney
+# S4oxH+PL85bDsxB4MA0GCSqGSIb3DQEBAQUABIIBAL+JrHY0/wApWKeeXlDutAH+
+# yKEe/C+lHB/QkKG1Ae2C3vMBMKjlblHQPSfpLGi7GFW76Or6oUMvuR3uH8+af/Rg
+# bosKo4sfa+URv6RSPuNDXMNG8j0GtNKwTJUQFo+zMbZxolkG8mR5CDIniHyVAOe/
+# k5nMoPzg/sXiWS42Rh7PGCsvlgKc5LocPucPcdQztrmzJzZUgTSoFmFO8aqJCxtz
+# DOEa8YgU7ou5vkLYjtUYW5e3g6mwchwzuVHQbyVW+y//oP2tVJGj8Ie3QfL+mRm5
+# VNrFrZN8GF2qDRiPwUzz40uDOoTeSeMPsaMUebyadLGW+mRounsxqAzuEggTY3w=
 # SIG # End signature block

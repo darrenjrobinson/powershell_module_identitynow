@@ -10,7 +10,7 @@ Update an IdentityNow Identity Attribute to be listed in Identity Profiles.
 (required) The identity attribue to index.
 
 .EXAMPLE
-Update-IdentityNowGovernanceGroup -attribute adSID
+Update-IdentityNowIdentityAttribute -attribute adSID
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -56,8 +56,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUHxx52eP1iudtGPpqQlHNYQjf
-# Nb2gggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUuG0G38+yBNxeRAzLd3Gwk1ii
+# R9ugggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -118,11 +118,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFEZ2e9OrC9Xz
-# zVXcS1OI/8lDqUYOMA0GCSqGSIb3DQEBAQUABIIBADoKRV22kreu8U91fhTr9/We
-# JRi4VIjTlOGpCX7En316iYkBS6Mt+b6qxsawkcliLFeyS7PBIguvE4jdztk1HnsY
-# vHP0To7uR3Be3txsCUqeig9Yjf4DNsyDcVOb0+YodfgqeCaLpg+yx14Gv4mwQYAU
-# b26nI7VR4uaR61ka3oO0eLH57lAT71Yzoe/XCmGFjfqnk+XBDOGbG5aXHfKpddjJ
-# 80mawrlzixddAv01b4v7J5ucBK+say6xms7K8/FaLz9IgTxfTwR42uysM536m2RP
-# EdxPDB8UCCqOuUFF8H2hCSmdCE/bA2mq/KeX4Q7UW8bqp+ezro8O4Gr9ectArUE=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFJe18miO+JeM
+# R7IAgCGv16227FtxMA0GCSqGSIb3DQEBAQUABIIBACOdJU+ktLB9U1FxtHit7Eqw
+# 7xmfJMBQnjFKqjhupnR+y8CUC4iGpTgIFdn1vhKK/nIqlHWAFUz4HtshHFy/+isS
+# CNcZpdtdii1EHyerXRM2/IWfmCkB/UfiWC8zW5Zejzym36WpC3mByshcajB0PDOi
+# xeFV4H+1apf3/1MXT6kS5QZpbmNdT6Ch3nBYqN/mBuibkK1E/lu/EqcoSUqwX6fE
+# s+k6V/7JHR99zUy6M5BuK4KTPzpg5dmxCMJCmC6Cwdd0qPVdGazJx82iCvjr3lzw
+# UyJpuIEjC3YzePuObQh0N0+8h3zAMEJWdmxbdRxNJMkEvjuiyb4XxY4CSFRrMug=
 # SIG # End signature block

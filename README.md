@@ -516,7 +516,7 @@ $queryFilter = '{"query":{"query":"@access(type:ENTITLEMENT AND name:*File Share
 Search-IdentityNowIdentities -filter $queryFilter -searchLimit 100
 ```
 
-### Get Status of an IdentityNow Aggregation
+### Get Status of an IdentityNow Aggregation ###
 
 Get Status of an IdentityNow Aggregation.
 
@@ -935,6 +935,18 @@ $body = @{
 Update-IdentityNowRole -update ($body | convertto-json)
 ```
 
+Update IdentityNow Role using the v3 Beta API
+
+Update-IdentityNowRole takes the -V3API switch and the format of the input is different than the private API.
+
+[SailPoint Documentation](https://developer.sailpoint.com/idn/api/beta/patch-role)
+
+Example
+
+```powershell
+Update-IdentityNowRole -V3API -id 2c9180886cd58059016d1a4757d709a4 -update '[{"op": "replace","path": "/requestable","value": true}]'
+```
+
 Create an IdentityNow Role
 
 Example
@@ -1026,6 +1038,18 @@ $update = $update.Replace("true","'true'")
 $update = $update.Replace("false","'false'")
 
 Update-IdentityNowSource -sourceID 12345 -update $update 
+```
+
+Update IdentityNow Source using the v3 API
+
+Update-IdentityNowSource takes the -V3API switch and the format of the input is different than the private API.
+
+[SailPoint Documentation](https://developer.sailpoint.com/idn/api/v3/update-source)
+
+Example
+
+```powershell
+Update-IdentityNowSource -V3API -sourceID 2c9180878222e82901822f395b5528c8 -update '[{"op": "replace","path": "/description","value": "new description"}]'
 ```
 
 Test an IdentityNow Source (Health Check)
@@ -1399,6 +1423,7 @@ Example
 ```powershell
 Get-IdentityNowAuth -return V3Header
 ```
+
 ### Initiate Entitlement Aggregation of an IdentityNow Source ###
 
 Initiate Entitlement Aggregation of an IdentityNow Source.
@@ -1573,7 +1598,7 @@ Example
 New-IdentityNowPersonalAccessToken -name "Sean's Sailpoint IdentityNow module"
 ```
 
-*Optional:* If a personal access token needs to be made for an account not saved in this module you can pull the access token from <https://{org}.identitynow.com/ui/session?refresh=true> after pulling up the admin section
+_Optional:_ If a personal access token needs to be made for an account not saved in this module you can pull the access token from <https://{org}.identitynow.com/ui/session?refresh=true> after pulling up the admin section
 [See Compass article:]( https://community.sailpoint.com/t5/IdentityNow-Wiki/IdentityNow-REST-API-Create-Personal-Access-Token/ta-p/150462 )
 
 Example
@@ -1898,7 +1923,7 @@ This cmdlet has options for v2 and v3 authentication and will provide the web re
 or
 (API Version and Path) You supply the API version and the path for the API request along with the method (POST, GET, DELETE, PATCH) and the request will be sent, and the results sent back.
 
-* *Hint* Get-IdentityNowOrg will show you the API Version to Path mappings
+* _Hint_ Get-IdentityNowOrg will show you the API Version to Path mappings
 
 ```powershell
 Get-IdentityNowOrg  

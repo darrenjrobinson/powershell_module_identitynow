@@ -28,12 +28,13 @@ I get a lot of requests for assistance with IdentityNow API integration so here 
 * Search IdentityNow Entitlements
 * Search IdentityNow Identities
 * Search IdentityNow Access Profiles, Account Activities, Accounts, Aggregations, Entitlements, Events, Identities, Roles
+* Get Aggregation Status
 * Create / Get / Update / Remove IdentityNow Access Profiles
 * Get Access Profiles associated with an IdentityNow Application
 * Create / Get / Start IdentityNow Certification Campaigns
 * Get IdentityNow Certification Campaign Reports (output to file or return as PSObject)
 * Create / Get / Update / Remove IdentityNow Governance Groups
-* Create / Get / Update / Remove IdentityNow Roles
+* Create / Get / Update / Remove / Refresh IdentityNow Roles
 * Get / Update / Test / Create / Remove IdentityNow Sources
 * Get IdentityNow Source Schema
 * Create IdentityNow Source Account Schema Attributes
@@ -186,6 +187,7 @@ Get-IdentityNowAccessProfile                Get an IdentityNow Access Profile(s)
 Get-IdentityNowAccountActivities            Get IdentityNow Activities.
 Get-IdentityNowAccountActivity              Get IdentityNow Activity for an account.
 Get-IdentityNowActiveJobs                   Get IdentityNow Active Jobs.
+Get-IdentityNowAggregationStatus            Get Status of an IdentityNow Aggregation.
 Get-IdentityNowAPIClient                    Get IdentityNow API Client(s).
 Get-IdentityNowApplication                  Get IdentityNow Application(s).
 Get-IdentityNowApplicationAccessProfile     Get IdentityNow Access Profile(s) of an application.
@@ -217,6 +219,7 @@ Invoke-IdentityNowAccountCorrelation        Find uncorrelated accounts that can 
 Invoke-IdentityNowAggregateEntitlement      Initiate Entitlement Aggregation of an IdentityNow Source.
 Invoke-IdentityNowAggregateSource           Initiate Aggregation of an IdentityNow Source.
 Invoke-IdentityNowRequest                   Submit an IdentityNow API Request.
+Invoke-IdentityNowRoleRefresh               Refresh all IdentityNow Roles.
 Invoke-IdentityNowSourceReset               Reset an IdentityNow Source.
 Join-IdentityNowAccount                     Join an IdentityNow User Account to an Identity.
 New-IdentityNowAccessProfile                Create an IdentityNow Access Profile.
@@ -511,6 +514,14 @@ Example
 ```powershell
 $queryFilter = '{"query":{"query":"@access(type:ENTITLEMENT AND name:*File Share*)"},"includeNested":true}'
 Search-IdentityNowIdentities -filter $queryFilter -searchLimit 100
+```
+
+### Get Status of an IdentityNow Aggregation
+
+Get Status of an IdentityNow Aggregation.
+
+```powershell
+Get-IdentityNowAggregationStatus -id 2c91808477a6b0c60177a81146b8110b
 ```
 
 ### Create / Get / Update / Remove IdentityNow Access Profiles ###
@@ -946,6 +957,14 @@ Example
 
 ```powershell
 Remove-IdentityNowRole -roleID 2c9180886cd58059016d1a5a23f609a8
+```
+
+Refresh all IdentityNow Roles
+
+Example
+
+```powershell
+Invoke-IdentityNowRoleRefresh  
 ```
 
 ### Get / Update / Test / Create / Remove IdentityNow Sources ###

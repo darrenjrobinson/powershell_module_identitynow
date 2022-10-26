@@ -1,16 +1,16 @@
-function Update-IdentityNowIdentityAttribute {
+function Get-IdentityNowManagedCluster {
     <#
 .SYNOPSIS
-Update an IdentityNow Identity Attribute to be listed in Identity Profiles.
+Get IdentityNow Managed Virtual Appliance Cluster(s).
 
 .DESCRIPTION
-Update an IdentityNow Identity Attribute to be listed in Identity Profiles.
-
-.PARAMETER attribute
-(required) The identity attribue to index.
+Get IdentityNow Managed Virtual Appliance Cluster(s).
 
 .EXAMPLE
-Update-IdentityNowIdentityAttribute -attribute adSID
+Get-IdentityNowManagedCluster 
+
+.PARAMETER ID
+(optional) The SailPoint Cluster ID of an IdentityNow Cluster.
 
 .LINK
 http://darrenjrobinson.com/sailpoint-identitynow
@@ -18,32 +18,23 @@ http://darrenjrobinson.com/sailpoint-identitynow
 #>
 
     [cmdletbinding()]
-    param(
-        [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$attribute
-    )
+    param([Parameter(Mandatory = $false, ValueFromPipeline = $true)]
+        [string]$ID)
 
-    $v3Token = Get-IdentityNowAuth -return V3JWT
-
+    $v3Token = Get-IdentityNowAuth
+    
     if ($v3Token.access_token) {
         try {
-            $identityAttr = Get-IdentityNowIdentityAttribute -attribute $attribute
-            # Update an Attribute to be searchable 
-            # Ref https://community.sailpoint.com/t5/IdentityNow-Wiki/API-to-Extend-Customizable-Correlation-Attributes/ta-p/77642 
-
-            $identityAttr.searchable = $true 
-
-            if (!$identityAttr.extendedNumber) {
-                $identityAttr.extendedNumber = (Get-Random -Minimum 123456 -Maximum 999999)
-            } 
-
-            $identityAttrBody = $identityAttr | convertto-json -Depth 4
-            $identityAttrBody = $identityAttrBody.Replace('"targets": [],',"")
-            $updateAttribute = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/identityAttribute/update?name=$($attribute)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" ; "content-type" = "application/json"} -Body $identityAttrBody
-            return $updateAttribute
+            if ($ID) {
+                $IDNCluster = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/managed-clusters/$($ID)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" ; 'Content-Type' = 'application/json' }
+            }
+            else {
+                $IDNCluster = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/managed-clusters" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" ; 'Content-Type' = 'application/json' }
+            }
+            return $IDNCluster
         }
         catch {
-            Write-Error "Identity Attribute doesn't exist. Check attribue name. $($_)" 
+            Write-Error "No Managed VA Clusters found. $($_)" 
         }
     }
     else {
@@ -56,8 +47,8 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUuG0G38+yBNxeRAzLd3Gwk1ii
-# R9ugggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUpWs6WOcXAePj4K0NUzNPNKVQ
+# NTSgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -118,11 +109,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFJe18miO+JeM
-# R7IAgCGv16227FtxMA0GCSqGSIb3DQEBAQUABIIBACOdJU+ktLB9U1FxtHit7Eqw
-# 7xmfJMBQnjFKqjhupnR+y8CUC4iGpTgIFdn1vhKK/nIqlHWAFUz4HtshHFy/+isS
-# CNcZpdtdii1EHyerXRM2/IWfmCkB/UfiWC8zW5Zejzym36WpC3mByshcajB0PDOi
-# xeFV4H+1apf3/1MXT6kS5QZpbmNdT6Ch3nBYqN/mBuibkK1E/lu/EqcoSUqwX6fE
-# s+k6V/7JHR99zUy6M5BuK4KTPzpg5dmxCMJCmC6Cwdd0qPVdGazJx82iCvjr3lzw
-# UyJpuIEjC3YzePuObQh0N0+8h3zAMEJWdmxbdRxNJMkEvjuiyb4XxY4CSFRrMug=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFJ0Hwn+Rw2kt
+# mbpvQzF73zYLyxbUMA0GCSqGSIb3DQEBAQUABIIBAACyaxUJFFHacdjZJ0hhxLor
+# H2qhIKalOP71948CWJAI3XGBxMUwvqN4whnYPGf3p6tSkmLc4mLOHajk8ZHZUQb6
+# 55vcdu5Q6nb4Rt6re19WslXHXspUuuI67CAm+9jCrX/59D1ewhPVsG3WLzT+1ybN
+# aWo51qucGUUee7vNBtJiZrlvCNb52t0iP1BP87W+97b828HL30qkgzeoBsQ7RGK/
+# xgzsVACi0u8mWHHFTERO8f+tnQCOj3zHQ/Newq/O/uLddfcqkBj6Xg0owEnxfQNa
+# le0kL+gIw66jY7aKfou3xrJAaftgNBP6X3OInvPIsz7VPnkUF8pnNTXSRzz1w5U=
 # SIG # End signature block

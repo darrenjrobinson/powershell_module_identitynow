@@ -1,63 +1,52 @@
-function Update-IdentityNowIdentityAttribute {
+function Get-IdentityNowAggregationStatus {
     <#
-.SYNOPSIS
-Update an IdentityNow Identity Attribute to be listed in Identity Profiles.
-
-.DESCRIPTION
-Update an IdentityNow Identity Attribute to be listed in Identity Profiles.
-
-.PARAMETER attribute
-(required) The identity attribue to index.
-
-.EXAMPLE
-Update-IdentityNowIdentityAttribute -attribute adSID
-
-.LINK
-http://darrenjrobinson.com/sailpoint-identitynow
-
-#>
-
+    .SYNOPSIS
+    Get Status of an IdentityNow Aggregation.
+    
+    .DESCRIPTION
+    Get Status of an IdentityNow Aggregation. 
+    
+    .PARAMETER id
+    (required) ID of the Aggregation to get the status of (e.g. 2c91808477a6b0c60177a81146b8110b)
+    
+    .EXAMPLE
+    Get-IdentityNowAggregationStatus -id 2c91808477a6b0c60177a81146b8110b
+    
+    .LINK
+    http://darrenjrobinson.com/sailpoint-identitynow
+    
+    #>
+    
+    
     [cmdletbinding()]
-    param(
+    param( 
         [Parameter(Mandatory = $true, ValueFromPipeline = $true)]
-        [string]$attribute
+        [string]$id 
     )
-
-    $v3Token = Get-IdentityNowAuth -return V3JWT
-
+    
+    $v3Token = Get-IdentityNowAuth
+    
     if ($v3Token.access_token) {
-        try {
-            $identityAttr = Get-IdentityNowIdentityAttribute -attribute $attribute
-            # Update an Attribute to be searchable 
-            # Ref https://community.sailpoint.com/t5/IdentityNow-Wiki/API-to-Extend-Customizable-Correlation-Attributes/ta-p/77642 
-
-            $identityAttr.searchable = $true 
-
-            if (!$identityAttr.extendedNumber) {
-                $identityAttr.extendedNumber = (Get-Random -Minimum 123456 -Maximum 999999)
-            } 
-
-            $identityAttrBody = $identityAttr | convertto-json -Depth 4
-            $identityAttrBody = $identityAttrBody.Replace('"targets": [],',"")
-            $updateAttribute = Invoke-RestMethod -Method Post -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/cc/api/identityAttribute/update?name=$($attribute)" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" ; "content-type" = "application/json"} -Body $identityAttrBody
-            return $updateAttribute
+        try {    
+            $aggStatus = Invoke-RestMethod -Method Get -Uri "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/beta/account-aggregations/$($id)/status" -Headers @{Authorization = "$($v3Token.token_type) $($v3Token.access_token)" ; "Content-Type" = "application/json" }
+            return $aggStatus
         }
         catch {
-            Write-Error "Identity Attribute doesn't exist. Check attribue name. $($_)" 
+            Write-Error "$($_)"
         }
     }
     else {
-        Write-Error "Authentication Failed. Check your AdminCredential and v3 API ClientID and ClientSecret. $($_)"
-        return $v3Token
+        Write-Error "Authentication Failed. Check your v3/PAT API credentials. $($_)"
+        return $_
     } 
 }
-
-
+    
+    
 # SIG # Begin signature block
 # MIINSwYJKoZIhvcNAQcCoIINPDCCDTgCAQExCzAJBgUrDgMCGgUAMGkGCisGAQQB
 # gjcCAQSgWzBZMDQGCisGAQQBgjcCAR4wJgIDAQAABBAfzDtgWUsITrck0sYpfvNR
-# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUuG0G38+yBNxeRAzLd3Gwk1ii
-# R9ugggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
+# AgEAAgEAAgEAAgEAAgEAMCEwCQYFKw4DAhoFAAQUEr8DEYi10Gdt4ddRIkyMjD4i
+# N7SgggqNMIIFMDCCBBigAwIBAgIQBAkYG1/Vu2Z1U0O1b5VQCDANBgkqhkiG9w0B
 # AQsFADBlMQswCQYDVQQGEwJVUzEVMBMGA1UEChMMRGlnaUNlcnQgSW5jMRkwFwYD
 # VQQLExB3d3cuZGlnaWNlcnQuY29tMSQwIgYDVQQDExtEaWdpQ2VydCBBc3N1cmVk
 # IElEIFJvb3QgQ0EwHhcNMTMxMDIyMTIwMDAwWhcNMjgxMDIyMTIwMDAwWjByMQsw
@@ -118,11 +107,11 @@ http://darrenjrobinson.com/sailpoint-identitynow
 # b20xMTAvBgNVBAMTKERpZ2lDZXJ0IFNIQTIgQXNzdXJlZCBJRCBDb2RlIFNpZ25p
 # bmcgQ0ECEAzs0XV3s4G5ExftUKPGYK8wCQYFKw4DAhoFAKB4MBgGCisGAQQBgjcC
 # AQwxCjAIoAKAAKECgAAwGQYJKoZIhvcNAQkDMQwGCisGAQQBgjcCAQQwHAYKKwYB
-# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFJe18miO+JeM
-# R7IAgCGv16227FtxMA0GCSqGSIb3DQEBAQUABIIBACOdJU+ktLB9U1FxtHit7Eqw
-# 7xmfJMBQnjFKqjhupnR+y8CUC4iGpTgIFdn1vhKK/nIqlHWAFUz4HtshHFy/+isS
-# CNcZpdtdii1EHyerXRM2/IWfmCkB/UfiWC8zW5Zejzym36WpC3mByshcajB0PDOi
-# xeFV4H+1apf3/1MXT6kS5QZpbmNdT6Ch3nBYqN/mBuibkK1E/lu/EqcoSUqwX6fE
-# s+k6V/7JHR99zUy6M5BuK4KTPzpg5dmxCMJCmC6Cwdd0qPVdGazJx82iCvjr3lzw
-# UyJpuIEjC3YzePuObQh0N0+8h3zAMEJWdmxbdRxNJMkEvjuiyb4XxY4CSFRrMug=
+# BAGCNwIBCzEOMAwGCisGAQQBgjcCARUwIwYJKoZIhvcNAQkEMRYEFI6cwzkHqxX8
+# YSrYxNvRX0PWbCePMA0GCSqGSIb3DQEBAQUABIIBAH4JglTEO8RLgr6JKDNni53n
+# y+CwyXL7P8ZAQAwfdd0kFUAqpelJugR1VniRa+FWf4b9M49fiBpvo+y+w3lc3k7/
+# r+DqjWZrS+Wqf1c2VdngeauwoZa3q4Ta2GL1PdvF3pAj12nqjKcJ1PPkfgsZdDwZ
+# c8TazLD05Xj+4KT8RFcsEyT/gt6J7wZmTEQNkrIXObjNfw3osL9MuT/FFC3MdXrM
+# Ol9u173p5opGu54hqygnbFH0XoTtdQkFkB16r3QqUnCa9VVq0hDOwoj3kZUlPUH1
+# S5wHNIAi4CpvGHYmWoisF0NiYEyd8nZ5ms9de/m958LL9XFVL9SCWGrB22iqQIk=
 # SIG # End signature block

@@ -47,7 +47,7 @@ function Search-IdentityNowIdentities {
 
             if ($searchLimit -gt 2500) { $limit = 2500 } else { $limit = $searchLimit }
 
-            $searchURLBase = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v3/search?limit=$($limit)"
+            $searchURLBase = "https://$($IdentityNowConfiguration.orgName).api.identitynow.com/v3/search/identities?limit=$($limit)"
 
             $loop = 0
             if ($iterations -gt 1) {

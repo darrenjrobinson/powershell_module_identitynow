@@ -86,7 +86,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
                 -Uri $uri `
                 -Headers $headers
             if ($countFlag) {
-                $count = [int] $response.Headers["X-Total-Count"][0]
+                $count = [int] $response.Headers["X-Total-Count"]
                 Write-Verbose "Expecting $count result"
             }
             $roles += $response.Content | ConvertFrom-Json

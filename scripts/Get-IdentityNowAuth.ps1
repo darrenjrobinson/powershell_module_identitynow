@@ -159,7 +159,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
     if ($IdentityNowConfiguration.AdminCredential -and $IdentityNowConfiguration.AdminCredential.UserName -and $IdentityNowConfiguration.AdminCredential.Password) {
         # IdentityNow Admin User
         $adminUSR = [string]$IdentityNowConfiguration.AdminCredential.UserName.ToLower()
-        $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
+        $adminPWDClear = [System.Runtime.InteropServices.marshal]::PtrToStringBSTR([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.AdminCredential.Password))
         
         # Generate the account hash
         $hashUser = Get-HashString $adminUSR.ToLower() 
@@ -170,7 +170,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
     }
 
     if ($IdentityNowConfiguration.v3 -and $IdentityNowConfiguration.v3.Username -and $IdentityNowConfiguration.v3.Password) {
-        $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
+        $clientSecretv3 = [System.Runtime.InteropServices.marshal]::PtrToStringBSTR([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v3.Password))
         # Basic Auth
         $Bytesv3 = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v3.UserName):$($clientSecretv3)")
         $encodedAuthv3 = [Convert]::ToBase64String($Bytesv3)
@@ -212,7 +212,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
             }
             elseif ($oAuthTokenBody.client_id -eq $IdentityNowConfiguration.PAT.UserName) {
                 Write-Verbose "AuthType: Personal Access Token"
-                $oAuthTokenBody.client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
+                $oAuthTokenBody.client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringBSTR([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
             }
         }
     }
@@ -221,7 +221,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
         $oAuthTokenBody = @{
             grant_type    = "client_credentials"
             client_id     = $IdentityNowConfiguration.PAT.UserName
-            client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
+            client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringBSTR([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
         }
     }
     else {
@@ -261,7 +261,7 @@ http://darrenjrobinson.com/sailpoint-identitynow
     # v2 Auth
     # Check to see if v2 API Client exists before generating v2 Headers
     if ($IdentityNowConfiguration.v2) {
-        $clientSecretv2 = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v2.Password))
+        $clientSecretv2 = [System.Runtime.InteropServices.marshal]::PtrToStringBSTR([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.v2.Password))
         $Bytes = [System.Text.Encoding]::utf8.GetBytes("$($IdentityNowConfiguration.v2.UserName):$($clientSecretv2)") 
         $encodedAuth = [Convert]::ToBase64String($Bytes)     
         Write-Verbose "AuthType: v2 Basic Auth"

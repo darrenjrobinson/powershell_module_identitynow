@@ -64,7 +64,7 @@ function Test-IdentityNowCredentials {
                 $oAuthTokenBody = @{
                     grant_type    = "client_credentials"
                     client_id     = $IdentityNowConfiguration.PAT.UserName
-                    client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringAuto([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
+                    client_secret = [System.Runtime.InteropServices.marshal]::PtrToStringBSTR([System.Runtime.InteropServices.marshal]::SecureStringToBSTR($IdentityNowConfiguration.PAT.Password))
                 }
             
                 $v3PAT = Invoke-RestMethod -Uri $oAuthURI -Method Post -Body $oAuthTokenBody 
